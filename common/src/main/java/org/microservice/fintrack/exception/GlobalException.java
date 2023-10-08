@@ -26,4 +26,12 @@ public class GlobalException {
         problemDetail.setProperty("timestamp", LocalDateTime.now());
         return problemDetail;
     }
+    @ExceptionHandler(BadRequestException.class)
+    ProblemDetail problemDetail(BadRequestException exception) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST, exception.getMessage()
+        );
+        problemDetail.setProperty("timestamp", LocalDateTime.now());
+        return problemDetail;
+    }
 }
