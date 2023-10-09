@@ -31,7 +31,7 @@ public class AuthController {
 
     @GetMapping("/users/email")
     public ResponseEntity<?> getByEmail(@RequestParam String email){
-        return ResponseEntity.ok().body(userService.getByEmail(email));
+        return ResponseEntity.ok().body(userService.getUserRepresentationByEmail(email));
     }
     @GetMapping("/users/username")
     public ResponseEntity<?> getByUsername(@RequestParam String username){

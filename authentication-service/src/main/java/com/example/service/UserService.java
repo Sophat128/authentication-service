@@ -1,5 +1,8 @@
 package com.example.service;
 
+import com.example.exception.AlreadyExistException;
+import com.example.exception.BadRequestException;
+import com.example.exception.NotFoundException;
 import com.example.model.entity.User;
 import com.example.model.request.LoginRequest;
 import com.example.model.request.UserRequest;
@@ -8,9 +11,6 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.microservice.fintrack.dto.UserDto;
-import org.microservice.fintrack.exception.AlreadyExistException;
-import org.microservice.fintrack.exception.BadRequestException;
-import org.microservice.fintrack.exception.NotFoundException;
 import org.microservice.fintrack.response.ApiResponse;
 import org.microservice.fintrack.response.LoginResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -116,7 +116,8 @@ public class UserService {
             );
         }
 
-        UserRepresentation userRepresentation = prepareUserRepresentation(userRequest, preparePasswordRepresentation(userRequest.getPassword()), randomCode());
+        String randomCode=randomCode();
+        UserRepresentation userRepresentation = prepareUserRepresentation(userRequest, preparePasswordRepresentation(userRequest.getPassword()),randomCode);
         UsersResource userResource = keycloak.realm(realm).users();
         Response response = userResource.create(userRepresentation);
 
@@ -124,7 +125,7 @@ public class UserService {
             throw new AlreadyExistException("email is already exist");
         }
 
-        emailService.sendSimpleMail(userRequest.getUsername(), userRequest.getEmail(), randomCode(),1);
+        emailService.sendSimpleMail(userRequest.getUsername(), userRequest.getEmail(), randomCode,1);
         return ApiResponse.<UserDto>builder()
                 .message("register success..!")
                 .payload(getByEmail(userRequest.getEmail()))
