@@ -10,7 +10,6 @@ public class AuthenticationServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(AuthenticationServiceApplication.class, args);
     }
-
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();

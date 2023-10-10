@@ -13,30 +13,25 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
+
     private UUID id;
     private String username;
     private String email;
     private String firstName;
     private String lastName;
+    private String profile;
     private LocalDateTime createdDate;
     private LocalDateTime lastModified;
 
-    public static UserDto toDto(UserRepresentation userRepresentation) {
+    public static UserDto toDto(UserRepresentation userRepresentation,String url) {
         return new UserDto(
                 UUID.fromString(userRepresentation.getId()),
                 userRepresentation.getUsername(),
                 userRepresentation.getEmail(),
+                url+userRepresentation.getAttributes().get("profile").get(0),
                 LocalDateTime.parse(userRepresentation.getAttributes().get("createdDate").get(0)),
                 LocalDateTime.parse(userRepresentation.getAttributes().get("lastModified").get(0))
         );
     }
-    public static UserRepresentation toUserRepresentation(UserDto userDto) {
-        UserRepresentation userRepresentation =new UserRepresentation();
-        userRepresentation.setUsername(userDto.getUsername());
-        userRepresentation.setId(String.valueOf(userDto.getId()));
-        userRepresentation.setEmail(userDto.getEmail());
-        userRepresentation.singleAttribute("createdDate", String.valueOf(userDto.getCreatedDate()));
-        userRepresentation.singleAttribute("lastModified", String.valueOf(userDto.getLastModified()));
-        return userRepresentation;
-    }
 }
+

@@ -34,3 +34,6 @@ spring.mail:
   port: 587
   username: soccerdatehrd@gmail.com
   password: nolwmacooizbnviz
+
+image:
+  url: http://localhost:8081/api/v1/file/get-image?file=

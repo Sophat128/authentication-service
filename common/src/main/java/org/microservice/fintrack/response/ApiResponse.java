@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 @Data
 @NoArgsConstructor
@@ -21,6 +20,6 @@ public class ApiResponse<T> {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private LoginResponse loginResponse;
 
-    private HttpStatus status;
+    private Integer status;
 
 }

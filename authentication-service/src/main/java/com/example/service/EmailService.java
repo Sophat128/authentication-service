@@ -1,8 +1,6 @@
 package com.example.service;
 
-import com.example.model.request.UserRequest;
 import jakarta.mail.internet.MimeMessage;
-import org.microservice.fintrack.dto.UserDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;

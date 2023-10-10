@@ -19,10 +19,8 @@ public class KeycloakClientConfig {
     @Value("${keycloak.realm}")
     private String realm;
 
-
     @Bean
     public Keycloak keycloak() {
-
         return KeycloakBuilder.builder()
                 .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
                 .serverUrl(authUrl)
@@ -31,5 +29,4 @@ public class KeycloakClientConfig {
                 .clientSecret(secretKey)
                 .build();
     }
-
 }
