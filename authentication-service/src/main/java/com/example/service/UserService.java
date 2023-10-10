@@ -164,7 +164,6 @@ public class UserService {
 
     public UserRepresentation prepareUserRepresentationForProfile(UserRepresentation user,ProfileRequest profileRequest) {
         UserRepresentation userRepresentation = new UserRepresentation();
-        userRepresentation.setUsername(profileRequest.getUsername());
 
         userRepresentation.singleAttribute("createdDate", user.getAttributes().get("createdDate").get(0));
         userRepresentation.singleAttribute("lastModified", String.valueOf(LocalDateTime.now()));
@@ -336,16 +335,8 @@ public class UserService {
 
         if (userRequest.getProfile().isEmpty() || userRequest.getProfile().isBlank()) {
             throw new BadRequestException(
-                    "username can not empty"
+                    "profile can not empty"
             );
-        }
-        if (userRequest.getUsername().isEmpty() || userRequest.getUsername().isBlank()) {
-            throw new BadRequestException(
-                    "username can not empty"
-            );
-        }
-        if (!keycloak.realm(realm).users().searchByUsername(userRequest.getUsername(), true).isEmpty()) {
-            throw new AlreadyExistException("username is already exist, please input other name");
         }
         //validate password
         if (!userRequest.getNewPassword().matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$")) {
@@ -356,7 +347,9 @@ public class UserService {
 
         UserRepresentation userRepresentation = prepareUserRepresentationForProfile(user,userRequest);
         UsersResource userResource = keycloak.realm(realm).users();
+
         userResource.get(user.getId()).update(userRepresentation);
+
         return ApiResponse.builder()
                 .message("update user by id success")
                 .payload(User.toDto(getUserRepresentationById(id), url))

@@ -9,6 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProfileRequest {
     private String profile;
-    private String username;
     private String newPassword;
 }
