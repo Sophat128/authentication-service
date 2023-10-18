@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+#      Database to store notification
+
+  db:
+    image: postgres:11.4
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: my_password
+      POSTGRES_USER: my_user
+      POSTGRES_DB: mini_project_db
+
+
+    ports:
+      - '33007:5432'
+    volumes:
+      - my-db:/var/lib/pos
+volumes:
+  my-db:

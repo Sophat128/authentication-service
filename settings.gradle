@@ -1,1 +1,8 @@
 rootProject.name = 'fintrack'
+include 'email-service'
+include 'telegram-service'
+include 'notification-service'
+include 'validation-service'
+include 'common'
+include 'dead-letter-service'
+include 'web-push-service'
