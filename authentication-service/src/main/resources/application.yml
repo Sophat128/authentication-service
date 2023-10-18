@@ -23,7 +23,7 @@ keycloak:
     username: 'admin'
     password: 'admin'
     client-id: 'mini-project-app' # admin account for creating users
-    secret: 'T4e2dXQerVh9VAlpkcmfjxwzsHZEncDQ'
+    secret: 'pBZks5oS2VvZeXLowwFP7L6om0wvP6PE'
     provider: secret
 
   grant-type: password

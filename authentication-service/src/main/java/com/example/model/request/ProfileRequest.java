@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class ProfileRequest {
     private String profile;
     private String newPassword;
+    private String username;
 }

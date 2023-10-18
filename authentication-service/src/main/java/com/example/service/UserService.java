@@ -63,7 +63,7 @@ public class UserService {
         if (!Boolean.parseBoolean(userRepresentation.getAttributes().get("isVerify").get(0))) {
             throw new BadRequestException("user not yet verify code yet");
         }
-        try {
+//        try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -76,14 +76,14 @@ public class UserService {
 
             HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(map, headers);
 
-
             return ApiResponse.<LoginResponse>builder()
                     .message("login success...!!")
                     .loginResponse(restTemplate.postForEntity(tokenUrl, httpEntity, LoginResponse.class).getBody())
                     .status(200).build();
-        }catch (Exception e){
+
+       /* } catch (Exception e) {
             throw new BadRequestException("incorrect password");
-        }
+        }*/
     }
 
     public String randomCode() {
@@ -162,15 +162,16 @@ public class UserService {
         return userRepresentation;
     }
 
-    public UserRepresentation prepareUserRepresentationForProfile(UserRepresentation user,ProfileRequest profileRequest) {
+    public UserRepresentation prepareUserRepresentationForProfile(UserRepresentation user, ProfileRequest profileRequest) {
         UserRepresentation userRepresentation = new UserRepresentation();
+        userRepresentation.setUsername(profileRequest.getUsername());
 
         userRepresentation.singleAttribute("createdDate", user.getAttributes().get("createdDate").get(0));
         userRepresentation.singleAttribute("lastModified", String.valueOf(LocalDateTime.now()));
         userRepresentation.singleAttribute("profile", profileRequest.getProfile());
         userRepresentation.singleAttribute("isVerify", "true");
 
-        userRepresentation.setCredentials(Collections.singletonList( preparePasswordRepresentation(profileRequest.getNewPassword())));
+        userRepresentation.setCredentials(Collections.singletonList(preparePasswordRepresentation(profileRequest.getNewPassword())));
         userRepresentation.setEnabled(true);
         return userRepresentation;
     }
@@ -232,16 +233,17 @@ public class UserService {
         return users.get(0);
     }
 
+    public Boolean verifyCode(String email, String code) {
+        try {
+            UserRepresentation user = checkExpiredCode(email, code);
+            UserRepresentation userRepresentation = prepareUserRepresentationForVerifyCode(user, "true", user.getAttributes().get("createdDate").get(0));
+            UsersResource userResource = keycloak.realm(realm).users();
+            userResource.get(user.getId()).update(userRepresentation);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
 
-    public ApiResponse<?> verifyCode(String email, String code) {
-        UserRepresentation user = checkExpiredCode(email, code);
-        UserRepresentation userRepresentation = prepareUserRepresentationForVerifyCode(user, "true", user.getAttributes().get("createdDate").get(0));
-        UsersResource userResource = keycloak.realm(realm).users();
-        userResource.get(user.getId()).update(userRepresentation);
-        return ApiResponse.builder()
-                .message("verify opt code success,use can login your account")
-                .status(200)
-                .build();
     }
 
 
@@ -345,7 +347,7 @@ public class UserService {
             );
         }
 
-        UserRepresentation userRepresentation = prepareUserRepresentationForProfile(user,userRequest);
+        UserRepresentation userRepresentation = prepareUserRepresentationForProfile(user, userRequest);
         UsersResource userResource = keycloak.realm(realm).users();
 
         userResource.get(user.getId()).update(userRepresentation);

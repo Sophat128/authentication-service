@@ -16,6 +16,7 @@ public class EmailService{
     @Value("${spring.mail.username}")
     private String sender;
 
+
     public EmailService(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
     }
@@ -27,6 +28,9 @@ public class EmailService{
                 = javaMailSender.createMimeMessage();
         try {
 
+
+            String baseUrl="http://localhost:8081/api/v1/auth/verify-code?email="+email+"&optCode="+code;
+
             String subject =
                     "Email Verification";
             String senderName
@@ -36,7 +40,7 @@ public class EmailService{
             simple.add("<p> Hi, "+ username+"</p>"+
                     "<p>Thank you for registering with us</p>"+
                     "Please, verify your account with the code  below to complete your registration.</p>"+
-                    "<div> <h2>" + code + "</h2></div>\n" +
+                    "<div> "+"<a  href="+baseUrl+"  >verify email</a>"+" </div>\n" +
                     "<p> Thank you <br> Users Registration Portal Service");
             simple.add("<p> Hi, "+username+ "</p>"+
                     "<p>Here is your verify code for set new password</p>"+
