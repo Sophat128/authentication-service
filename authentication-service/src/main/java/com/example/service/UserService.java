@@ -59,6 +59,9 @@ public class UserService {
     @Value("${forgetPasswordPage.url}")
     private String forgetPasswordPageUrl;
 
+    @Value("${ExpiredPage.url}")
+    private String expiredPageUrl;
+
 
     public UserService(Keycloak keycloak, EmailService emailService, RestTemplate restTemplate) {
         this.keycloak = keycloak;
@@ -257,7 +260,7 @@ public class UserService {
             userResource.get(user.getId()).update(userRepresentation);
             return new RedirectView(url);
         } catch (Exception e) {
-            return new RedirectView("https://google.com");
+            return new RedirectView(expiredPageUrl);
         }
     }
 

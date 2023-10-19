@@ -46,4 +46,6 @@ image:
 LoginPage:
   url: http://localhost:4200/api/v1/login-page
 forgetPasswordPage:
-  url: http://localhost:4200/api/v1/forget-password-page
+  url: http://localhost:4200/api/v1/forget-password
+ExpiredPage:
+  url: http://localhost:4200/api/v1/expired-page

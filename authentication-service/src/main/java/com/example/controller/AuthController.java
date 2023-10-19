@@ -6,6 +6,7 @@ import com.example.model.request.UserRequest;
 import com.example.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 
 @RestController
@@ -28,8 +29,8 @@ public class AuthController {
     }
 
     @GetMapping("/verify-email")
-    public ResponseEntity<?> verifyEmail(@RequestParam String email, @RequestParam String type) {
-        return ResponseEntity.ok().body(userService.verifyEmail(email, type));
+    public RedirectView verifyEmail(@RequestParam String email, @RequestParam String type) {
+        return userService.verifyEmail(email, type);
     }
 
     @PostMapping("/resend-email")
