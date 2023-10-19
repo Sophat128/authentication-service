@@ -16,20 +16,22 @@ public class EmailService{
     @Value("${spring.mail.username}")
     private String sender;
 
+    @Value("${baseUrl}")
+    private String baseUrl;
+
 
     public EmailService(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
     }
 
 
-    public String sendSimpleMail(String username,String email, String code,Integer index) {
+    public String sendSimpleMail(String username,String email,Integer index) {
 
         MimeMessage mimeMessage
                 = javaMailSender.createMimeMessage();
         try {
 
-
-            String baseUrl="http://localhost:8081/api/v1/auth/verify-code?email="+email+"&optCode="+code;
+            String url=baseUrl+"/api/v1/auth/verify-email?email="+email+"&type=";
 
             String subject =
                     "Email Verification";
@@ -39,16 +41,15 @@ public class EmailService{
             List<String> simple= new ArrayList<>();
             simple.add("<p> Hi, "+ username+"</p>"+
                     "<p>Thank you for registering with us</p>"+
-                    "Please, verify your account with the code  below to complete your registration.</p>"+
-                    "<div> "+"<a  href="+baseUrl+"  >verify email</a>"+" </div>\n" +
-                    "<p> Thank you <br> Users Registration Portal Service");
-            simple.add("<p> Hi, "+username+ "</p>"+
-                    "<p>Here is your verify code for set new password</p>"+
-                    "Please, verify your account with the code  below to complete your reset Password.</p>"+
-                    "<div> <h2>" + code + "</h2></div>\n" +
+                    "Please, verify your account with link  below to complete your registration.</p>"+
+                    "<div>  "+"<a  href="+url+"1"+"  ><h3> verify email </h3></a>"+" </div>\n" +
                     "<p> Thank you </p>");
 
-
+            simple.add("<p> Hi, "+username+ "</p>"+
+                    "Please, verify your account with link  below to complete your reset Password.</p>"+
+                    "<p>Here link for verify email for set new password</p>"+
+                    "<div> "+"<a  href="+url+"2"+"  ><h3> verify email </h3></a>"+" </div>\n" +
+                    "<p> Thank you </p>");
 
 
             String html = "<!doctype html>\n" +

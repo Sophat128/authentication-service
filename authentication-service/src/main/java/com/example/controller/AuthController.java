@@ -6,7 +6,6 @@ import com.example.model.request.UserRequest;
 import com.example.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
 
 
 @RestController
@@ -28,30 +27,23 @@ public class AuthController {
         return ResponseEntity.ok().body(userService.login(loginRequest));
     }
 
-    @GetMapping("/verify-code")
-    public RedirectView verifyCode(@RequestParam String email, @RequestParam String optCode) {
-        Boolean isVerified = userService.verifyCode(email, optCode);
-        if (isVerified) {
-            return new RedirectView("https ://www.google.com");
-        } else {
-            return new RedirectView("https://www.youtube.com");
-        }
-
+    @GetMapping("/verify-email")
+    public ResponseEntity<?> verifyEmail(@RequestParam String email, @RequestParam String type) {
+        return ResponseEntity.ok().body(userService.verifyEmail(email, type));
     }
 
-    @PostMapping("/generate-code")
+    @PostMapping("/resend-email")
     public ResponseEntity<?> generateCode(@RequestParam String email) {
-        return ResponseEntity.ok().body(userService.generateCode(email, 1));
+        return ResponseEntity.ok().body(userService.generateLinkVerifyEmail(email, "false", 1, "false"));
     }
 
-    @PostMapping("/generate-code-forget-password")
+    @PostMapping("/generate-email-forget-password")
     public ResponseEntity<?> generateCodeForget(@RequestParam String email) {
-        return ResponseEntity.ok().body(userService.generateCodeForgetPassword(email));
+        return ResponseEntity.ok().body(userService.generateEmailForgetPassword(email));
     }
 
     @PutMapping("/forget-password")
-    public ResponseEntity<?> resetPassword(@RequestParam String email, @RequestParam String code, @RequestParam String newPassword) {
-        return ResponseEntity.ok().body(userService.forgetPassword(email, code, newPassword));
+    public ResponseEntity<?> resetPassword(@RequestParam String email, @RequestParam String newPassword) {
+        return ResponseEntity.ok().body(userService.forgetPassword(email, newPassword));
     }
-
 }

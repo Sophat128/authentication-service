@@ -52,7 +52,7 @@ public class FileStorageRestController {
         try {
             return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageService.load(fileName));
         } catch (Exception e) {
-            throw new NotFoundException("file name :"+fileName+"is not found");
+            throw new NotFoundException("file name :" + fileName + "is not found");
         }
     }
 

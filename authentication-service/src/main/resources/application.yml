@@ -1,5 +1,7 @@
 server:
   port: 8081
+baseUrl: http://localhost:${server.port}
+
 spring:
   mail:
     properties:
@@ -35,5 +37,13 @@ spring.mail:
   username: soccerdatehrd@gmail.com
   password: nolwmacooizbnviz
 
+
 image:
-  url: http://localhost:8081/api/v1/file/get-image?file=
+  url: ${baseUrl}/api/v1/file/get-image?file=
+
+
+#for link verify email that get from angular
+LoginPage:
+  url: http://localhost:4200/api/v1/login-page
+forgetPasswordPage:
+  url: http://localhost:4200/api/v1/forget-password-page

@@ -17,7 +17,6 @@ public class User {
     private UUID id;
     private String username;
     private String email;
-
     private String profile;
     private LocalDateTime createdDate;
     private LocalDateTime lastModified;

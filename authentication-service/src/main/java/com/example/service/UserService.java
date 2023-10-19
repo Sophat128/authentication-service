@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.ws.rs.core.Response;
 import java.text.SimpleDateFormat;
@@ -52,6 +53,13 @@ public class UserService {
     @Value("${image.url}")
     private String url;
 
+    @Value("${LoginPage.url}")
+    private String loginPageUrl;
+
+    @Value("${forgetPasswordPage.url}")
+    private String forgetPasswordPageUrl;
+
+
     public UserService(Keycloak keycloak, EmailService emailService, RestTemplate restTemplate) {
         this.keycloak = keycloak;
         this.emailService = emailService;
@@ -63,7 +71,7 @@ public class UserService {
         if (!Boolean.parseBoolean(userRepresentation.getAttributes().get("isVerify").get(0))) {
             throw new BadRequestException("user not yet verify code yet");
         }
-//        try {
+        try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -81,15 +89,11 @@ public class UserService {
                     .loginResponse(restTemplate.postForEntity(tokenUrl, httpEntity, LoginResponse.class).getBody())
                     .status(200).build();
 
-       /* } catch (Exception e) {
+        } catch (Exception e) {
             throw new BadRequestException("incorrect password");
-        }*/
+        }
     }
 
-    public String randomCode() {
-        Random rand = new Random();
-        return String.valueOf(rand.nextInt(900000) + 100000);
-    }
 
     public List<UserDto> getAllUsers() {
         return keycloak.realm(realm).users().list().stream()
@@ -120,8 +124,7 @@ public class UserService {
             );
         }
 
-        String randomCode = randomCode();
-        UserRepresentation userRepresentation = prepareUserRepresentation(userRequest, preparePasswordRepresentation(userRequest.getPassword()), randomCode);
+        UserRepresentation userRepresentation = prepareUserRepresentation(userRequest, preparePasswordRepresentation(userRequest.getPassword()));
         UsersResource userResource = keycloak.realm(realm).users();
         Response response = userResource.create(userRepresentation);
 
@@ -129,7 +132,7 @@ public class UserService {
             throw new AlreadyExistException("email is already exist");
         }
 
-        emailService.sendSimpleMail(userRequest.getUsername(), userRequest.getEmail(), randomCode, 1);
+        emailService.sendSimpleMail(userRequest.getUsername(), userRequest.getEmail(), 1);
         return ApiResponse.<UserDto>builder()
                 .message("register success..!")
                 .payload(getByEmail(userRequest.getEmail()))
@@ -145,17 +148,16 @@ public class UserService {
         return credentialRepresentation;
     }
 
-    public UserRepresentation prepareUserRepresentation(UserRequest userRequest, CredentialRepresentation credentialRepresentation, String optCode) {
+    public UserRepresentation prepareUserRepresentation(UserRequest userRequest, CredentialRepresentation credentialRepresentation) {
         UserRepresentation userRepresentation = new UserRepresentation();
         userRepresentation.setUsername(userRequest.getUsername());
         userRepresentation.setEmail(userRequest.getEmail());
 
         userRepresentation.singleAttribute("createdDate", String.valueOf(LocalDateTime.now()));
         userRepresentation.singleAttribute("lastModified", String.valueOf(LocalDateTime.now()));
-        userRepresentation.singleAttribute("optCode", optCode);
+
         userRepresentation.singleAttribute("profile", "DefaultProfile.jpeg");
         userRepresentation.singleAttribute("isVerify", "false");
-        userRepresentation.singleAttribute("optCreated", String.valueOf(LocalDateTime.now()));
 
         userRepresentation.setCredentials(Collections.singletonList(credentialRepresentation));
         userRepresentation.setEnabled(true);
@@ -176,7 +178,7 @@ public class UserService {
         return userRepresentation;
     }
 
-    public UserRepresentation prepareUserRepresentationForUpdate(UserRepresentation userRequest, String optCode) {
+    public UserRepresentation prepareUserRepresentationForUpdate(UserRepresentation userRequest, String isVerify, String isForget, int index) {
         UserRepresentation userRepresentation = new UserRepresentation();
         userRepresentation.setUsername(userRequest.getUsername());
         userRepresentation.setEmail(userRequest.getEmail());
@@ -184,9 +186,13 @@ public class UserService {
         userRepresentation.singleAttribute("createdDate", String.valueOf(LocalDateTime.now()));
         userRepresentation.singleAttribute("lastModified", String.valueOf(LocalDateTime.now()));
         userRepresentation.singleAttribute("profile", "DefaultProfile.jpeg");
-        userRepresentation.singleAttribute("optCode", optCode);
-        userRepresentation.singleAttribute("isVerify", "false");
-        userRepresentation.singleAttribute("optCreated", String.valueOf(LocalDateTime.now()));
+
+        userRepresentation.singleAttribute("isVerify", isVerify);
+
+        if (index == 2) {
+            userRepresentation.singleAttribute("isForget", isForget);
+            userRepresentation.singleAttribute("forget_createAt", String.valueOf(LocalDateTime.now()));
+        }
 
         userRepresentation.setEnabled(true);
         return userRepresentation;
@@ -208,15 +214,19 @@ public class UserService {
         return userRepresentation;
     }
 
-    private UserRepresentation prepareUserRepresentationForVerifyCode(UserRepresentation request, String isVerify, String createDate) {
+    private UserRepresentation prepareUserRepresentationForVerifyCode(UserRepresentation request, String isVerify, String isForget, String type) {
         UserRepresentation newUser = new UserRepresentation();
         newUser.setUsername(request.getUsername());
         newUser.setEmail(request.getEmail());
 
         newUser.singleAttribute("profile", "DefaultProfile.jpeg");
-        newUser.singleAttribute("createdDate", createDate);
+        newUser.singleAttribute("createdDate", String.valueOf(LocalDateTime.now()));
         newUser.singleAttribute("lastModified", String.valueOf(LocalDateTime.now()));
         newUser.singleAttribute("isVerify", isVerify);
+        if (type.equals("2")) {
+            newUser.singleAttribute("isForget", isForget);
+            newUser.singleAttribute("forget_createAt", String.valueOf(LocalDateTime.now()));
+        }
         newUser.setEnabled(true);
         return newUser;
     }
@@ -233,34 +243,42 @@ public class UserService {
         return users.get(0);
     }
 
-    public Boolean verifyCode(String email, String code) {
+    public RedirectView verifyEmail(String email, String type) {
+        String typeCreate = "createdDate";
+        String url = loginPageUrl;
+        if (type.equals("2")) {
+            typeCreate = "forget_createAt";
+            url = forgetPasswordPageUrl;
+        }
         try {
-            UserRepresentation user = checkExpiredCode(email, code);
-            UserRepresentation userRepresentation = prepareUserRepresentationForVerifyCode(user, "true", user.getAttributes().get("createdDate").get(0));
+            UserRepresentation user = checkLinkExpired(email, typeCreate);
+            UserRepresentation userRepresentation = prepareUserRepresentationForVerifyCode(user, "true", "true", type);
             UsersResource userResource = keycloak.realm(realm).users();
             userResource.get(user.getId()).update(userRepresentation);
-            return true;
+            return new RedirectView(url);
         } catch (Exception e) {
-            return false;
+            return new RedirectView("https://google.com");
         }
-
     }
 
-
-    public ApiResponse<?> getByUserName(String username) {
+    public UserDto getByUserName(String username) {
         List<UserRepresentation> user = keycloak.realm(realm).users().searchByUsername(username, true);
         if (user.isEmpty()) {
             throw new NotFoundException("username : " + username + " is not found..!!");
         }
-        return ApiResponse.builder()
-                .message("get user by username success")
-                .payload(User.toDto(user.get(0), url))
-                .status(200)
-                .build();
+        return User.toDto(user.get(0), url);
     }
 
-    public ApiResponse<?> forgetPassword(String email, String code, String newPassword) {
-        UserRepresentation user = checkExpiredCode(email, code);
+    public ApiResponse<?> forgetPassword(String email, String newPassword) {
+        UserRepresentation user = getUserRepresentationByEmail(email);
+        if (user.getAttributes().get("isForget") == null) {
+            throw new BadRequestException("you not yet verify email for reset new password");
+        } else {
+            if (user.getAttributes().get("isForget").get(0).equals("false")) {
+                throw new BadRequestException("you not yet verify email for reset new password2");
+            }
+        }
+
         //validate password
         if (!newPassword.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$")) {
             throw new BadRequestException(
@@ -276,16 +294,13 @@ public class UserService {
                 .build();
     }
 
-    public UserRepresentation checkExpiredCode(String email, String code) {
+    public UserRepresentation checkLinkExpired(String email, String typeCreate) {
         UserRepresentation user = getUserRepresentationByEmail(email);
-        if (!user.getAttributes().get("optCode").get(0).equals(code)) {
-            throw new NotFoundException("code: " + code + " is not found...!!");
-        }
+
         Date now = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
         String formattedTime = formatter.format(now);
-        LocalDateTime optCreated = LocalDateTime.parse(user.getAttributes().get("optCreated").get(0));
-
+        LocalDateTime optCreated = LocalDateTime.parse(user.getAttributes().get(typeCreate).get(0));
         LocalTime time1 = LocalTime.parse(formattedTime);
         LocalTime time2 = optCreated.toLocalTime();
 
@@ -294,24 +309,23 @@ public class UserService {
 
         //expired 1 minute
         if (minutes >= 1) {
-            throw new BadRequestException("code is expired");
+            throw new BadRequestException("link is expired");
         }
         return user;
     }
 
-    public ApiResponse<?> generateCodeForgetPassword(String email) {
-        return generateCode(email, 2);
+    public ApiResponse<?> generateEmailForgetPassword(String email) {
+        return generateLinkVerifyEmail(email, "true", 2, "false");
     }
 
-    public ApiResponse<?> generateCode(String email, Integer index) {
-        String randomCode = randomCode();
+    public ApiResponse<?> generateLinkVerifyEmail(String email, String isVerify, Integer index, String isForget) {
         UserRepresentation user = getUserRepresentationByEmail(email);
-        UserRepresentation userRepresentation = prepareUserRepresentationForUpdate(user, randomCode);
+        UserRepresentation userRepresentation = prepareUserRepresentationForUpdate(user, isVerify, isForget, index);
         UsersResource userResource = keycloak.realm(realm).users();
         userResource.get(user.getId()).update(userRepresentation);
-        emailService.sendSimpleMail(user.getUsername(), user.getEmail(), randomCode, index);
+        emailService.sendSimpleMail(user.getUsername(), user.getEmail(), index);
         return ApiResponse.builder()
-                .message("generate code success")
+                .message("verify email success")
                 .status(200)
                 .build();
     }
@@ -333,29 +347,32 @@ public class UserService {
     }
 
     public ApiResponse<?> updateById(UUID id, ProfileRequest userRequest) {
-        UserRepresentation user = getUserRepresentationById(id);
+        try {
+            UserRepresentation user = getUserRepresentationById(id);
+            if (userRequest.getProfile().isEmpty() || userRequest.getProfile().isBlank()) {
+                throw new BadRequestException(
+                        "profile can not empty"
+                );
+            }
 
-        if (userRequest.getProfile().isEmpty() || userRequest.getProfile().isBlank()) {
-            throw new BadRequestException(
-                    "profile can not empty"
-            );
+            if (!userRequest.getNewPassword().matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$")) {
+                throw new BadRequestException(
+                        "Password should be at least 8 character and 1 special character Uppercase and Lowercase character and No Space"
+                );
+            }
+
+            UserRepresentation userRepresentation = prepareUserRepresentationForProfile(user, userRequest);
+            UsersResource userResource = keycloak.realm(realm).users();
+            userResource.get(user.getId()).update(userRepresentation);
+
+            return ApiResponse.builder()
+                    .message("update user by id success")
+                    .payload(User.toDto(getUserRepresentationById(id), url))
+                    .status(200)
+                    .build();
+        } catch (Exception e) {
+            throw new BadRequestException("username can not empty");
         }
-        //validate password
-        if (!userRequest.getNewPassword().matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$")) {
-            throw new BadRequestException(
-                    "Password should be at least 8 character and 1 special character Uppercase and Lowercase character and No Space"
-            );
-        }
-
-        UserRepresentation userRepresentation = prepareUserRepresentationForProfile(user, userRequest);
-        UsersResource userResource = keycloak.realm(realm).users();
-
-        userResource.get(user.getId()).update(userRepresentation);
-
-        return ApiResponse.builder()
-                .message("update user by id success")
-                .payload(User.toDto(getUserRepresentationById(id), url))
-                .status(200)
-                .build();
     }
+
 }
