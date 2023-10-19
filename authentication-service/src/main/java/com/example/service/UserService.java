@@ -2,6 +2,7 @@ package com.example.service;
 
 import com.example.exception.AlreadyExistException;
 import com.example.exception.BadRequestException;
+import com.example.exception.ForbiddenException;
 import com.example.exception.NotFoundException;
 import com.example.model.entity.User;
 import com.example.model.request.LoginRequest;
@@ -25,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.ws.rs.core.Response;
+import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -340,7 +342,6 @@ public class UserService {
             throw new NotFoundException("user id : " + id + " is not found");
         }
     }
-
     public ApiResponse<?> getById(UUID id) {
         return ApiResponse.builder()
                 .message("get user by id success")
@@ -349,20 +350,30 @@ public class UserService {
                 .build();
     }
 
-    public ApiResponse<?> updateById(UUID id, ProfileRequest userRequest) {
+    public ApiResponse<?> updateById( ProfileRequest userRequest, Principal principal) {
+        if (principal==null){
+            throw new ForbiddenException("need token");
+        }
         try {
-            UserRepresentation user = getUserRepresentationById(id);
-            if (userRequest.getProfile().isEmpty() || userRequest.getProfile().isBlank()) {
-                throw new BadRequestException(
-                        "profile can not empty"
-                );
-            }
+             User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url);
+        }catch (Exception e){
+            throw new ForbiddenException("user need to login");
+        }
 
-            if (!userRequest.getNewPassword().matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$")) {
-                throw new BadRequestException(
-                        "Password should be at least 8 character and 1 special character Uppercase and Lowercase character and No Space"
-                );
-            }
+        UserRepresentation user = getUserRepresentationById(UUID.fromString(principal.getName()));
+        if (userRequest.getProfile().isEmpty() || userRequest.getProfile().isBlank()) {
+            throw new BadRequestException(
+                    "profile can not empty"
+            );
+        }
+
+        if (!userRequest.getNewPassword().matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$")) {
+            throw new BadRequestException(
+                    "Password should be at least 8 character and 1 special character Uppercase and Lowercase character and No Space"
+            );
+        }
+
+        try {
 
             UserRepresentation userRepresentation = prepareUserRepresentationForProfile(user, userRequest);
             UsersResource userResource = keycloak.realm(realm).users();
@@ -370,11 +381,12 @@ public class UserService {
 
             return ApiResponse.builder()
                     .message("update user by id success")
-                    .payload(User.toDto(getUserRepresentationById(id), url))
+                    .payload(User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url))
                     .status(200)
                     .build();
-        } catch (Exception e) {
-            throw new BadRequestException("username can not empty");
+        }
+        catch (Exception e) {
+            throw new BadRequestException("username already exist");
         }
     }
 
