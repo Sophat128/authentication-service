@@ -20,13 +20,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    @Operation(summary = "register ")
+    @Operation(summary = "register")
     public ResponseEntity<?> createUser(@RequestBody UserRequest userRequest) {
         return ResponseEntity.ok().body(userService.create(userRequest));
     }
 
     @PostMapping("/login")
-    @Operation(summary = "login ")
+    @Operation(summary = "login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok().body(userService.login(loginRequest));
     }
@@ -50,6 +50,7 @@ public class AuthController {
     }
 
     @PutMapping("/forget-password")
+    @Operation(summary = "reset password")
     public ResponseEntity<?> resetPassword(@RequestParam String email, @RequestParam String newPassword) {
         return ResponseEntity.ok().body(userService.forgetPassword(email, newPassword));
     }

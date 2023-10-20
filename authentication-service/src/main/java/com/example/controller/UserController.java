@@ -65,6 +65,5 @@ public class UserController {
     @Operation(summary = "update information user current user (token) ")
     public ResponseEntity<?> updateById(@RequestBody ProfileRequest userRequest, Principal principal) {
         return ResponseEntity.ok().body(userService.updateById(userRequest, principal));
-
     }
 }

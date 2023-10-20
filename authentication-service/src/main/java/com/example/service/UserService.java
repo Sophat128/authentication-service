@@ -237,7 +237,7 @@ public class UserService {
     }
 
     public UserDto getByEmail(String email) {
-        return User.toDto(getUserRepresentationByEmail(email), url);
+        return User.toDto(getUserRepresentationByEmail(email.trim()), url);
     }
 
     public UserRepresentation getUserRepresentationByEmail(String email) {
@@ -267,7 +267,7 @@ public class UserService {
     }
 
     public UserDto getByUserName(String username) {
-        List<UserRepresentation> user = keycloak.realm(realm).users().searchByUsername(username, true);
+        List<UserRepresentation> user = keycloak.realm(realm).users().searchByUsername(username.trim(), true);
         if (user.isEmpty()) {
             throw new NotFoundException("username : " + username + " is not found..!!");
         }
@@ -275,7 +275,7 @@ public class UserService {
     }
 
     public ApiResponse<?> forgetPassword(String email, String newPassword) {
-        UserRepresentation user = getUserRepresentationByEmail(email);
+        UserRepresentation user = getUserRepresentationByEmail(email.trim());
         if (user.getAttributes().get("isForget") == null) {
             throw new BadRequestException("you not yet verify email for reset new password");
         } else {
@@ -320,11 +320,11 @@ public class UserService {
     }
 
     public ApiResponse<?> generateEmailForgetPassword(String email) {
-        return generateLinkVerifyEmail(email, "true", 2, "false");
+        return generateLinkVerifyEmail(email.trim(), "true", 2, "false");
     }
 
     public ApiResponse<?> generateLinkVerifyEmail(String email, String isVerify, Integer index, String isForget) {
-        UserRepresentation user = getUserRepresentationByEmail(email);
+        UserRepresentation user = getUserRepresentationByEmail(email.trim());
         UserRepresentation userRepresentation = prepareUserRepresentationForUpdate(user, isVerify, isForget, index);
         UsersResource userResource = keycloak.realm(realm).users();
         userResource.get(user.getId()).update(userRepresentation);
