@@ -37,7 +37,10 @@ spring.mail:
   username: soccerdatehrd@gmail.com
   password: nolwmacooizbnviz
 
-
+spring.servlet:
+  multipart:
+    maxFileSize: 20000MB
+    maxRequestSize: 20000MB
 image:
   url: ${baseUrl}/api/v1/file/get-image?file=
 
