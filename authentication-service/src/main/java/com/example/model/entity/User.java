@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.microservice.fintrack.dto.UserDto;
+import com.example.dto.UserDto;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

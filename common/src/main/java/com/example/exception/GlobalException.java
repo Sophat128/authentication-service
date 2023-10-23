@@ -1,4 +1,4 @@
-package org.microservice.fintrack.exception;
+package com.example.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;

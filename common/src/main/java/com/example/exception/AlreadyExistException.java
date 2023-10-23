@@ -1,4 +1,4 @@
-package org.microservice.fintrack.exception;
+package com.example.exception;
 
 public class AlreadyExistException extends RuntimeException{
     public AlreadyExistException(String message) {

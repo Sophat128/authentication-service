@@ -69,10 +69,9 @@ public class UserController {
     @PutMapping
     @SecurityRequirement(name = "auth")
     @Operation(summary = "update information user current user (token) ")
-    public ResponseEntity<?> updateById(@RequestBody ProfileRequest userRequest, Principal principal) {
-        return ResponseEntity.ok().body(userService.updateById(userRequest, principal));
+    public ResponseEntity<?> updateById(@RequestBody ProfileRequest userRequest, Principal principal,@AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok().body(userService.updateById(userRequest, principal,jwt));
     }
-
 
 
 }

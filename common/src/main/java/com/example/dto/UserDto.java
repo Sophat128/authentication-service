@@ -1,4 +1,4 @@
-package org.microservice.fintrack.dto;
+package com.example.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

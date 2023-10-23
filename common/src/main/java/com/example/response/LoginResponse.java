@@ -1,4 +1,4 @@
-package org.microservice.fintrack.response;
+package com.example.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
