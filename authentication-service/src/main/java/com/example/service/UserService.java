@@ -350,6 +350,19 @@ public class UserService {
                 .build();
     }
 
+    public ApiResponse<?> getInfo(Principal principal) {
+        if (principal==null){
+            throw new ForbiddenException("need token");
+        }
+        return ApiResponse.builder()
+                .message("get user by id success")
+                .payload(User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url))
+                .status(200)
+                .build();
+    }
+
+
+
     public ApiResponse<?> updateById( ProfileRequest userRequest, Principal principal) {
         if (principal==null){
             throw new ForbiddenException("need token");

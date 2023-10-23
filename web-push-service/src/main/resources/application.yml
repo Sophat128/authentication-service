@@ -1,0 +1,52 @@
+
+spring:
+  kafka:
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      bootstrap-servers: localhost:9092
+    dead_letter_topic: notification-retry
+
+#    consumer:
+#      auto-offset-reset: earliest
+#      bootstrap-servers: localhost:9092
+#      group-id: message-group
+#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      properties:
+#        spring:
+#          json:
+#            trusted:
+#              packages: '*'
+#      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+#
+#    topic:
+#      name: notification
+
+  datasource:
+    url: jdbc:postgresql://localhost:33007/mini_project_db
+    username: my_user
+    password: my_password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+#hibernate:
+#  jdbc:
+logging:
+  level:
+    com.levi.testhibernate: debug
+#    batch_size: 1
+server:
+  port: 8084
+
+vapid:
+  public:
+    key: BM8sBfpPla7o8yocv8HMuEWLbT7AurG20zciQfVLasrBTNPbdWW4G_6gyZdfqWkPVazJFIT3igimQRkdQZzo6fc
+  private:
+    key: mM6nPE2_ZTiibfkcd9YrwRzt0yk2yD88W5h-AH9iNns
+  #vapid.subject=[mailto:your@email.com OR https://your-website.com]
+  subject: http://localhost:8080

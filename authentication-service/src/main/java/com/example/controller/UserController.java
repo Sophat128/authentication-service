@@ -59,6 +59,12 @@ public class UserController {
     public ResponseEntity<?> getById(@PathVariable UUID id) {
         return ResponseEntity.ok().body(userService.getById(id));
     }
+    @GetMapping
+    @SecurityRequirement(name = "auth")
+    @Operation(summary = "get user information ")
+    public ResponseEntity<?> getUserInfo(Principal principal) {
+        return ResponseEntity.ok().body(userService.getInfo(principal));
+    }
 
     @PutMapping
     @SecurityRequirement(name = "auth")
@@ -66,4 +72,7 @@ public class UserController {
     public ResponseEntity<?> updateById(@RequestBody ProfileRequest userRequest, Principal principal) {
         return ResponseEntity.ok().body(userService.updateById(userRequest, principal));
     }
+
+
+
 }

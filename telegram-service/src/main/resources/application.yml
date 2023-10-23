@@ -1,0 +1,46 @@
+
+spring:
+  kafka:
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      bootstrap-servers: localhost:9092
+    dead_letter_topic: notification-retry
+
+#    consumer:
+#      auto-offset-reset: earliest
+#      bootstrap-servers: localhost:9092
+#      group-id: message-group
+#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      properties:
+#        spring:
+#          json:
+#            trusted:
+#              packages: '*'
+#      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+#
+#    topic:
+#      name: notification
+
+  datasource:
+    url: jdbc:postgresql://localhost:33007/mini_project_db
+    username: my_user
+    password: my_password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+#hibernate:
+#  jdbc:
+logging:
+  level:
+    com.levi.testhibernate: debug
+#    batch_size: 1
+server:
+  port: 8081
+
+

@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+}
+
+group 'com.example'
+version '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-thymeleaf
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
+    implementation 'com.google.code.gson:gson'
+
+
+
+}
+
+test {
+    useJUnitPlatform()
+}
