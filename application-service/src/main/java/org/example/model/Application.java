@@ -9,7 +9,7 @@ import com.example.dto.ApplicationDto;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+
 import java.util.UUID;
 
 @Data

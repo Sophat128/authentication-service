@@ -1,10 +1,9 @@
 package org.example.service.serviceImpl;
 
 import com.example.dto.UserDto;
-import com.example.exception.BadRequestException;
-import com.example.exception.ForbiddenException;
-import com.example.exception.NotFoundException;
-import com.example.response.ApiResponse;
+
+import org.example.exception.ForbiddenException;
+import org.example.exception.NotFoundException;
 import org.example.model.Application;
 import org.example.model.PlatformType;
 import com.example.dto.ApplicationDto;
@@ -41,7 +40,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public ApplicationDto createNewApp(ApplicationRequest applicationRequest, PlatformType platformType, Principal principal) {
         if(principal == null){
-            throw new BadRequestException("Please Login");
+            throw new ForbiddenException("Need Token");
         }
         UUID userId = UUID.fromString(principal.getName());
         Application application = new Application();
