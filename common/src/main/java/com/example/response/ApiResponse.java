@@ -1,4 +1,4 @@
-package org.microservice.fintrack.response;
+package com.example.response;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;

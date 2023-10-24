@@ -1,4 +1,4 @@
-package org.microservice.fintrack.config;
+package com.example.config;
 
 public class OpenAPIConfig {
 }

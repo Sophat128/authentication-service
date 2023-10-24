@@ -1,46 +1,40 @@
+bot:
+  token: 6831194245:AAGlG3zTUD_Lsm4lAB5aw0QXkEiFt9IT__0
+  name: myrandom123_bot
+server:
+  port: 8082
 
 spring:
-  kafka:
-    producer:
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      bootstrap-servers: localhost:9092
-    dead_letter_topic: notification-retry
-
-#    consumer:
-#      auto-offset-reset: earliest
-#      bootstrap-servers: localhost:9092
-#      group-id: message-group
-#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-#      properties:
-#        spring:
-#          json:
-#            trusted:
-#              packages: '*'
-#      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-#
-#    topic:
-#      name: notification
-
   datasource:
-    url: jdbc:postgresql://localhost:33007/mini_project_db
-    username: my_user
-    password: my_password
+    url: jdbc:postgresql://localhost:5432/demo_telegram_bot
+    username: postgres
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8443/auth/realms/Fintrack
+          jwk-set-uri: http://localhost:8443/auth/realms/Fintrack/protocol/openid-connect/certs
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: update # Set this to "update" to automatically create/update the database schema
+    show-sql: true # Set this to true to see SQL queries in the console for debugging
     properties:
       hibernate:
-        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
-#hibernate:
-#  jdbc:
-logging:
-  level:
-    com.levi.testhibernate: debug
-#    batch_size: 1
-server:
-  port: 8081
+keycloak:
+  realm: Fintrack
+  resource: fintrack-app
+  #  auth-server-url: https://demo.docengine.tech/auth/ #docker container
+  auth-server-url: http://localhost:8443/auth/ #docker container
+  credentials:
+    username: 'admin'
+    password: 'admin'
+    client-id: 'fintrack-app' # admin account for creating users
+    secret: 'qOmECg1MXkL4ip2lwISCV0NEqokWpEJ6'
+    provider: secret
 
-
+  grant-type: password
+  tokenUrl: http://localhost:8443/auth/realms/Fintrack/protocol/openid-connect/token
