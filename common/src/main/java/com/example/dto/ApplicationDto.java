@@ -1,11 +1,12 @@
-package org.example.model.dto;
+package com.example.dto;
 
+import com.example.dto.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.microservice.fintrack.dto.UserDto;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 @Data
@@ -16,5 +17,5 @@ public class ApplicationDto {
     private String name;
     private String platformType;
     private LocalDateTime createdDate;
-    private UserDto userId;
+    private UserDto userDto;
 }

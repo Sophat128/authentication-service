@@ -34,4 +34,12 @@ public class GlobalException {
         problemDetail.setProperty("timestamp", LocalDateTime.now());
         return problemDetail;
     }
+    @ExceptionHandler(ForbiddenException.class)
+    ProblemDetail problemDetail(ForbiddenException exception) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.FORBIDDEN, exception.getMessage()
+        );
+        problemDetail.setProperty("timestamp", LocalDateTime.now());
+        return problemDetail;
+    }
 }
