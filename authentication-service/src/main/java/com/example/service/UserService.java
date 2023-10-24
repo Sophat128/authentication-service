@@ -12,17 +12,19 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.microservice.fintrack.dto.UserDto;
-import org.microservice.fintrack.response.ApiResponse;
-import org.microservice.fintrack.response.LoginResponse;
+import com.example.dto.UserDto;
+import com.example.response.ApiResponse;
+import com.example.response.LoginResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.ws.rs.core.Response;
@@ -36,6 +38,8 @@ import java.util.*;
 @Service
 public class UserService {
     private final Keycloak keycloak;
+    private final WebClient.Builder webClient;
+
     private final EmailService emailService;
     private final RestTemplate restTemplate;
     @Value("${keycloak.realm}")
@@ -64,11 +68,25 @@ public class UserService {
     @Value("${ExpiredPage.url}")
     private String expiredPageUrl;
 
+    @Value("${telegram.url}")
+    private String telegramUrl;
 
-    public UserService(Keycloak keycloak, EmailService emailService, RestTemplate restTemplate) {
+    public UserService(Keycloak keycloak, WebClient.Builder webClient, EmailService emailService, RestTemplate restTemplate) {
         this.keycloak = keycloak;
+        this.webClient = webClient;
         this.emailService = emailService;
         this.restTemplate = restTemplate;
+    }
+
+
+    public ApiResponse<?> sendMessage(String message, Jwt jwt) {
+        return webClient.baseUrl(telegramUrl + "/send-message")
+                .defaultHeaders(httpHeaders -> httpHeaders.setBearerAuth(jwt.getTokenValue()))
+                .build()
+                .post()
+                .uri("?message="+message)
+                .retrieve()
+                .bodyToMono(ApiResponse.class).block();
     }
 
     public ApiResponse<LoginResponse> login(LoginRequest loginrequest) {
@@ -144,6 +162,8 @@ public class UserService {
                 .status(200)
                 .build();
     }
+
+
 
     private CredentialRepresentation preparePasswordRepresentation(String password) {
         CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
@@ -363,7 +383,7 @@ public class UserService {
 
 
 
-    public ApiResponse<?> updateById( ProfileRequest userRequest, Principal principal) {
+    public ApiResponse<?> updateById( ProfileRequest userRequest, Principal principal,Jwt jwt) {
         if (principal==null){
             throw new ForbiddenException("need token");
         }
@@ -391,7 +411,7 @@ public class UserService {
             UserRepresentation userRepresentation = prepareUserRepresentationForProfile(user, userRequest);
             UsersResource userResource = keycloak.realm(realm).users();
             userResource.get(user.getId()).update(userRepresentation);
-
+            sendMessage("you have been update your information already",jwt);
             return ApiResponse.builder()
                     .message("update user by id success")
                     .payload(User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url))
