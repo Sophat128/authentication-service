@@ -1,5 +1,6 @@
 package com.example.webpush;
 
+import com.example.entities.request.PushNotificationRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -48,8 +49,11 @@ public class WebPushService {
 
     public void sendNotification(Subscription subscription, String messageJson) {
         try {
+            System.out.println("user subscription: " + subscription.keys.auth);
+
             HttpResponse response = pushService.send(new Notification(subscription, messageJson));
             int statusCode = response.getStatusLine().getStatusCode();
+
             if (statusCode != 201) {
                 System.out.println("Server error, status code:" + statusCode);
                 InputStream content = response.getEntity().getContent();
@@ -62,15 +66,25 @@ public class WebPushService {
         }
     }
 
+    public void getAllSubscription(){
+        for (Map.Entry<String, Subscription> entry : endpointToSubscription.entrySet()) {
+            String endpoint = entry.getKey();
+            Subscription subscription = entry.getValue();
+
+            // Now you can work with 'endpoint' and 'subscription' as needed
+            System.out.println("Endpoint: " + endpoint);
+            System.out.println("Subscription: " + subscription.keys.auth);
+        }
+    }
+    public void clearAllSubscription(){
+        endpointToSubscription.clear();
+    }
+
     public void subscribe(Subscription subscription) {
         System.out.println("Subscribed to " + subscription.endpoint);
-        /*
-         * Note, in a real world app you'll want to persist these
-         * in the backend. Also, you probably want to know which
-         * subscription belongs to which user to send custom messages
-         * for different users. In this demo, we'll just use
-         * endpoint URL as key to store subscriptions in memory.
-         */
+        System.out.println("auth to " + subscription.keys.auth);
+        System.out.println("p256dh to " + subscription.keys.p256dh);
+
         endpointToSubscription.put(subscription.endpoint, subscription);
     }
 
@@ -79,18 +93,32 @@ public class WebPushService {
         endpointToSubscription.remove(subscription.endpoint);
     }
 
-
     public record Message(String title, String body) {
     }
 
     ObjectMapper mapper = new ObjectMapper();
 
-    public void notifyAll(String title, String body) {
+    public void notifyAll(PushNotificationRequest pushNotificationRequest) {
+
         try {
-            String msg = mapper.writeValueAsString(new Message(title, body));
+            String msg = mapper.writeValueAsString(new Message(pushNotificationRequest.getTitle(), pushNotificationRequest.getBody()));
+            System.out.println("Data: " + msg);
             endpointToSubscription.values().forEach(subscription -> {
+                System.out.println("Subscription: " + subscription.keys.auth);
                 sendNotification(subscription, msg);
             });
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void notifySpecificUser(PushNotificationRequest pushNotificationRequest) {
+
+        try {
+            String msg = mapper.writeValueAsString(new Message(pushNotificationRequest.getTitle(), pushNotificationRequest.getBody()));
+            Subscription subscription = (Subscription) endpointToSubscription.values().toArray()[0];
+            System.out.println("Auth: " + subscription.keys.auth);
+                sendNotification(subscription, msg);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

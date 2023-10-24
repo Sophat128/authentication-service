@@ -49,4 +49,4 @@ vapid:
   private:
     key: mM6nPE2_ZTiibfkcd9YrwRzt0yk2yD88W5h-AH9iNns
   #vapid.subject=[mailto:your@email.com OR https://your-website.com]
-  subject: http://localhost:8080
+  subject: http://localhost:4200/
