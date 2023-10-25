@@ -1,5 +1,7 @@
 package org.example.controller;
 
+import com.example.dto.ApplicationDto;
+import com.example.response.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.example.model.PlatformType;
 import org.example.model.request.ApplicationRequest;
