@@ -39,13 +39,13 @@ subprojects {
 
     dependencies {
         implementation 'org.springframework.boot:spring-boot-starter-webflux'
-//        testImplementation 'org.springframework.kafka:spring-kafka-test'
-//        implementation 'org.springframework.kafka:spring-kafka'
+        testImplementation 'org.springframework.kafka:spring-kafka-test'
+        implementation 'org.springframework.kafka:spring-kafka'
 
 
         //database
-//        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-//        runtimeOnly 'org.postgresql:postgresql'
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        runtimeOnly 'org.postgresql:postgresql'
 
         implementation 'org.springframework.boot:spring-boot-starter-web'
         compileOnly 'org.projectlombok:lombok'

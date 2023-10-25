@@ -1,6 +1,6 @@
 bot:
-  token: 6831194245:AAGlG3zTUD_Lsm4lAB5aw0QXkEiFt9IT__0
-  name: myrandom123_bot
+  token: 6666866418:AAELLoneNBLB1rlW85dttCHw_KCMTPgXlro
+  name: FintrackAPIBot
 server:
   port: 8082
 
@@ -8,7 +8,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/demo_telegram_bot
     username: postgres
-    password: 1234
+    password: krya
     driver-class-name: org.postgresql.Driver
   security:
     oauth2:
@@ -24,6 +24,13 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  kafka:
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      bootstrap-servers: localhost:9092
+    dead_letter_topic: notification-retry
+
 keycloak:
   realm: Fintrack
   resource: fintrack-app
@@ -33,7 +40,7 @@ keycloak:
     username: 'admin'
     password: 'admin'
     client-id: 'fintrack-app' # admin account for creating users
-    secret: 'qOmECg1MXkL4ip2lwISCV0NEqokWpEJ6'
+    secret: '0dxOe3iyxaTdtZ9vkpAHTudJOcaVSmjK'
     provider: secret
 
   grant-type: password

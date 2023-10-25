@@ -2,7 +2,6 @@ package com.example.controller;
 
 import com.example.entities.request.EmailRequest;
 import com.example.entities.request.NotificationRequest;
-import com.example.entities.response.DataResponse;
 import com.example.service.NotificationService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

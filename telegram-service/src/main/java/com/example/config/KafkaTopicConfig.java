@@ -7,8 +7,10 @@ import org.springframework.kafka.config.TopicBuilder;
 
 @Configuration
 public class KafkaTopicConfig {
+
     @Bean
-    public NewTopic newsTopic() {
-        return TopicBuilder.name("notification").build();
+    public NewTopic topic() {
+        return TopicBuilder.name("telegram").build();
     }
+
 }
