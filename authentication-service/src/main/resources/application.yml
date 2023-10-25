@@ -1,0 +1,56 @@
+server:
+  port: 8081
+baseUrl: http://localhost:${server.port}
+
+spring:
+  mail:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8443/auth/realms/Fintrack
+          jwk-set-uri: http://localhost:8443/auth/realms/Fintrack/protocol/openid-connect/certs
+keycloak:
+  realm: Fintrack
+  resource: fintrack-app
+  #  auth-server-url: https://demo.docengine.tech/auth/ #docker container
+  auth-server-url: http://localhost:8443/auth/ #docker container
+  credentials:
+    username: 'admin'
+    password: 'admin'
+    client-id: 'fintrack-app' # admin account for creating users
+    secret: 'qOmECg1MXkL4ip2lwISCV0NEqokWpEJ6'
+    provider: secret
+
+  grant-type: password
+  tokenUrl: http://localhost:8443/auth/realms/Fintrack/protocol/openid-connect/token
+
+spring.mail:
+  host: smtp.gmail.com
+  port: 587
+  username: soccerdatehrd@gmail.com
+  password: nolwmacooizbnviz
+
+spring.servlet:
+  multipart:
+    maxFileSize: 20000MB
+    maxRequestSize: 20000MB
+image:
+  url: ${baseUrl}/api/v1/file/get-image?file=
+
+telegram:
+  url: http://localhost:8082/api/v1/telegram
+
+#for link verify email that get from angular
+LoginPage:
+  url: http://localhost:4200/api/v1/login-page
+forgetPasswordPage:
+  url: http://localhost:4200/api/v1/forget-password
+ExpiredPage:
+  url: http://localhost:4200/api/v1/expired-page

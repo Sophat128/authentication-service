@@ -1,3 +1,6 @@
+bot:
+  token: 6831194245:AAGlG3zTUD_Lsm4lAB5aw0QXkEiFt9IT__0
+  name: myrandom123_bot
 
 spring:
   kafka:
@@ -9,24 +12,35 @@ spring:
 
 
   datasource:
-    url: jdbc:postgresql://localhost:33007/mini_project_db
-    username: my_user
-    password: my_password
+    url: jdbc:postgresql://localhost:5432/demo_telegram_bot
+    username: postgres
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8443/auth/realms/Fintrack
+          jwk-set-uri: http://localhost:8443/auth/realms/Fintrack/protocol/openid-connect/certs
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
     properties:
       hibernate:
-        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
-#hibernate:
-#  jdbc:
-logging:
-  level:
-    com.levi.testhibernate: debug
-#    batch_size: 1
-server:
-  port: 8081
+keycloak:
+  realm: Fintrack
+  resource: fintrack-app
+  #  auth-server-url: https://demo.docengine.tech/auth/ #docker container
+  auth-server-url: http://localhost:8443/auth/ #docker container
+  credentials:
+    username: 'admin'
+    password: 'admin'
+    client-id: 'fintrack-app' # admin account for creating users
+    secret: 'qOmECg1MXkL4ip2lwISCV0NEqokWpEJ6'
+    provider: secret
 
-
+  grant-type: password
+  tokenUrl: http://localhost:8443/auth/realms/Fintrack/protocol/openid-connect/token

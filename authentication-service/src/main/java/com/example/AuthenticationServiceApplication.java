@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.security.OAuthFlows;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 @SecurityScheme(
@@ -19,8 +21,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
                 )
         )
 )
-public class TelegramApplication {
+public class AuthenticationServiceApplication {
     public static void main(String[] args) {
-        SpringApplication.run(TelegramApplication.class, args);
+        SpringApplication.run(AuthenticationServiceApplication.class, args);
+    }
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }
