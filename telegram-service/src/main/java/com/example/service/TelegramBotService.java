@@ -85,10 +85,8 @@ public class TelegramBotService extends TelegramLongPollingBot {
     private void startCommandReceived(Long chatId, String firstName,String lastname) {
         String answer="";
         if(userId!=null){
-            answer = EmojiParser.parseToUnicode("Hi, " + lastname+" "+firstName + "\nThank you for register our service ");
-        }
-        else
-            answer= EmojiParser.parseToUnicode("Hi, " + lastname+" "+firstName + "\nWhat can i help you");
+            answer = EmojiParser.parseToUnicode("Hi, " + lastname+" "+firstName + "\nThank you for register our service " + ":blush:");
+        } else answer= EmojiParser.parseToUnicode("Hi, " + lastname+" "+firstName + "\nWhat can i help you");
 
         sendMessage(chatId, answer);
     }

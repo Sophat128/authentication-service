@@ -15,20 +15,30 @@ services:
       KAFKA_ADVERTISED_HOST_NAME: localhost
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 
-#      Database to store notification
-
-  db:
-    image: postgres:11.4
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: my_password
-      POSTGRES_USER: my_user
-      POSTGRES_DB: mini_project_db
-
-
-    ports:
-      - '33007:5432'
-    volumes:
-      - my-db:/var/lib/pos
-volumes:
-  my-db:
+##      Database to store notification
+#  postgres:
+#    image: postgres:14.4-alpine
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#    environment:
+#      POSTGRES_DB: keycloak
+#      POSTGRES_USER: keycloak
+#      POSTGRES_PASSWORD: password
+#    ports:
+#      - "5432:5432"
+#  keycloak:
+#    image: jboss/keycloak
+#    environment:
+#      DB_VENDOR: POSTGRES
+#      DB_ADDR: postgres
+#      DB_DATABASE: keycloak
+#      DB_USER: keycloak
+#      DB_SCHEMA: public
+#      DB_PASSWORD: password
+#      KEYCLOAK_USER: admin
+#      KEYCLOAK_PASSWORD: admin
+#      PROXY_ADDRESS_FORWARDING: 'true'
+#    ports:
+#      - "8443:8080"
+#    depends_on:
+#      - postgres

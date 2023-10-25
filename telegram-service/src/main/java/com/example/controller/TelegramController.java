@@ -25,7 +25,7 @@ public class TelegramController {
     public RedirectView register(Principal principal){
         System.out.println("register");
         telegramBotService.getCurrentId(principal);
-        return new RedirectView("https://t.me/myrandom123_bot");
+        return new RedirectView("https://t.me/FintrackAPIBot");
     }
 
     @PostMapping("/send-message")
