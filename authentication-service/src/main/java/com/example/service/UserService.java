@@ -232,22 +232,6 @@ public class UserService {
         return userRepresentation;
     }
 
-    public UserRepresentation prepareUserRepresentationForRegister(UserRepresentation userRequest) {
-        UserRepresentation userRepresentation = new UserRepresentation();
-        userRepresentation.setUsername(userRequest.getUsername());
-        userRepresentation.setEmail(userRequest.getEmail());
-
-        userRepresentation.singleAttribute("createdDate", String.valueOf(LocalDateTime.now()));
-        userRepresentation.singleAttribute("lastModified", String.valueOf(LocalDateTime.now()));
-        userRepresentation.singleAttribute("profile", "DefaultProfile.jpeg");
-
-        userRepresentation.singleAttribute("isVerify", "false");
-
-
-        userRepresentation.setEnabled(true);
-        return userRepresentation;
-    }
-
     public UserRepresentation prepareUserRepresentationForgetPassword(UserRepresentation userRequest, CredentialRepresentation credentialRepresentation, String createDate) {
         UserRepresentation userRepresentation = new UserRepresentation();
 
@@ -375,7 +359,7 @@ public class UserService {
         userResource.get(user.getId()).update(userRepresentation);
         emailService.sendSimpleMail(user.getUsername(), user.getEmail(), index);
         return ApiResponse.builder()
-                .message("verify email success")
+                .message("generate email to verify success")
                 .status(200)
                 .build();
     }
