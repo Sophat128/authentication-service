@@ -8,8 +8,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8443/auth/realms/Fintrack
-          jwk-set-uri: http://localhost:8443/auth/realms/Fintrack/protocol/openid-connect/certs
+          issuer-uri: https://fintrack-keycloak.kbaenak.tech/auth/realms/Fintrack
+          jwk-set-uri: https://fintrack-keycloak.kbaenak.tech/auth/realms/Fintrack/protocol/openid-connect/certs
   jpa:
     hibernate:
       ddl-auto: update

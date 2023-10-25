@@ -15,7 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         in = SecuritySchemeIn.HEADER,
         flows = @OAuthFlows(
                 clientCredentials = @OAuthFlow(
-                        tokenUrl = "http://localhost:8443/auth/realms/Fintrack/protocol/openid-connect/token"
+                        tokenUrl = "https://fintrack-keycloak.kbaenak.tech/auth/realms/Fintrack/protocol/openid-connect/token"
                 )
         )
 )

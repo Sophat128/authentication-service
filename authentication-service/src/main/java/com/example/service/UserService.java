@@ -125,7 +125,12 @@ public class UserService {
     }
 
     public ApiResponse<UserDto> create(UserRequest userRequest) {
+        UserRepresentation userRepresentation1 = keycloak.realm(realm).users().searchByEmail(userRequest.getEmail(), true).get(0);
+        if (userRepresentation1==null && Boolean.parseBoolean(userRepresentation1.getAttributes().get("isVerify").get(0))) {
 
+
+
+        }
         if (userRequest.getUsername().isEmpty() || userRequest.getUsername().isBlank()) {
             throw new BadRequestException(
                     "username can not empty"
@@ -333,7 +338,7 @@ public class UserService {
         long minutes = duration.toMinutes() % 60;
 
         //expired 1 minute
-        if (minutes >= 1) {
+        if (minutes >= 5) {
             throw new BadRequestException("link is expired");
         }
         return user;
