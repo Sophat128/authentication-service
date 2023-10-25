@@ -1,4 +1,4 @@
-package com.example.exception;
+package org.example.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -30,6 +30,14 @@ public class GlobalException {
     ProblemDetail problemDetail(BadRequestException exception) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.BAD_REQUEST, exception.getMessage()
+        );
+        problemDetail.setProperty("timestamp", LocalDateTime.now());
+        return problemDetail;
+    }
+    @ExceptionHandler(ForbiddenException.class)
+    ProblemDetail problemDetail(ForbiddenException exception) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.FORBIDDEN, exception.getMessage()
         );
         problemDetail.setProperty("timestamp", LocalDateTime.now());
         return problemDetail;

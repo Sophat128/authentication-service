@@ -362,12 +362,8 @@ public class UserService {
             throw new NotFoundException("user id : " + id + " is not found");
         }
     }
-    public ApiResponse<?> getById(UUID id) {
-        return ApiResponse.builder()
-                .message("get user by id success")
-                .payload(User.toDto(getUserRepresentationById(id), url))
-                .status(200)
-                .build();
+    public UserDto getById(UUID id) {
+        return User.toDto(getUserRepresentationById(id), url);
     }
 
     public ApiResponse<?> getInfo(Principal principal) {
