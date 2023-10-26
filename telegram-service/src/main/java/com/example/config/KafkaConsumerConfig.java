@@ -43,9 +43,6 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
 
-//        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-//        props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, 10);
-//        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, 60000);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "message-group");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         // Specify the value deserializer with the object type
@@ -57,14 +54,7 @@ public class KafkaConsumerConfig {
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
-//    @Bean
-//    KafkaListenerContainerFactory<?> kafkaListenerContainerFactory(ConsumerFactory<String, Notification> consumerFactory) {
-//        ConcurrentKafkaListenerContainerFactory<String, Notification> kafkaListenerContainerFactory
-//                = new ConcurrentKafkaListenerContainerFactory<>();
-//        kafkaListenerContainerFactory.setConcurrency(2);
-//        kafkaListenerContainerFactory.setConsumerFactory(consumerFactory);
-//        return kafkaListenerContainerFactory;
-//    }
+
 
     @Bean("kafkaListenerContainerFactory")
     public ConcurrentKafkaListenerContainerFactory<String, Telegram> kafkaListenerContainerFactory() {

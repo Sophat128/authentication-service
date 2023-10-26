@@ -25,7 +25,6 @@ public class NotificationController {
         return ResponseEntity.ok("Successful");
 
     }
-
     @PostMapping("/send_mail")
     public ResponseEntity<?> sendMail(@RequestBody EmailRequest emailRequest) {
         service.publishToMail(emailRequest);

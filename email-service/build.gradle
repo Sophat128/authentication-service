@@ -19,6 +19,9 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson'
 
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+
 
 
 }

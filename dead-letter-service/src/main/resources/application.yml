@@ -1,6 +1,9 @@
 kafka:
   topic: notification-retry
 spring:
+
+  application:
+    name: dead-letter-service
   kafka:
     consumer:
       group-id: kafka-group

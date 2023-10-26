@@ -3,6 +3,9 @@ bot:
   name: myrandom123_bot
 
 spring:
+  application:
+    name: telegram-service
+
   kafka:
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -12,9 +15,9 @@ spring:
 
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/demo_telegram_bot
-    username: postgres
-    password: 1234
+    url: jdbc:postgresql://localhost:33007/mini_project_db
+    username: my_user
+    password: my_password
     driver-class-name: org.postgresql.Driver
   security:
     oauth2:

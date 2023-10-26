@@ -1,0 +1,20 @@
+server:
+  port: 8888
+
+#message: '{cipher}10f0b4a8a55743cbea43edaac48558fbcd9a9e50aeb7355525fbd1186fcec71d'
+
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/Sophat128/microservice-mini-project-config
+          #          To give specific branch
+          default-label: main
+
+encrypt:
+  key: secreykey
+
+

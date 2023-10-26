@@ -24,6 +24,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,"/api/v1/telegram/test").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
+
         );
         http.oauth2ResourceServer(t -> {
             t.jwt(Customizer.withDefaults());
