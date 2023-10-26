@@ -38,13 +38,13 @@ public class AuthController {
     }
 
     @PostMapping("/email")
-    @Operation(summary = "generate verify email again")
+    @Operation(summary = "generate email to verify  again")
     public ResponseEntity<?> generateCode(@RequestParam String email) {
         return ResponseEntity.ok().body(userService.generateLinkVerifyEmail(email, "false", 1, "false"));
     }
 
     @PostMapping("/forget-password/email")
-    @Operation(summary = "generate verify email for reset password")
+    @Operation(summary = "generate verify email to reset password")
     public ResponseEntity<?> generateCodeForget(@RequestParam String email) {
         return ResponseEntity.ok().body(userService.generateEmailForgetPassword(email));
     }

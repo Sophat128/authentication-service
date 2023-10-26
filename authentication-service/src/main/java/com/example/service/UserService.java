@@ -84,7 +84,7 @@ public class UserService {
                 .defaultHeaders(httpHeaders -> httpHeaders.setBearerAuth(jwt.getTokenValue()))
                 .build()
                 .post()
-                .uri("?message="+message)
+                .uri("?message=" + message)
                 .retrieve()
                 .bodyToMono(ApiResponse.class).block();
     }
@@ -125,11 +125,16 @@ public class UserService {
     }
 
     public ApiResponse<UserDto> create(UserRequest userRequest) {
-        UserRepresentation userRepresentation1 = keycloak.realm(realm).users().searchByEmail(userRequest.getEmail(), true).get(0);
-        if (userRepresentation1==null && Boolean.parseBoolean(userRepresentation1.getAttributes().get("isVerify").get(0))) {
-
-
-
+        List<UserRepresentation> userRepresentation1 = keycloak.realm(realm).users().searchByEmail(userRequest.getEmail(), true);
+        if (!userRepresentation1.isEmpty()) {
+            if (!Boolean.parseBoolean(userRepresentation1.get(0).getAttributes().get("isVerify").get(0))) {
+                generateLinkVerifyEmail(userRequest.getEmail(), "false", 1, "false");
+            }
+            return ApiResponse.<UserDto>builder()
+                    .message("register success..!")
+                    .payload(getByEmail(userRequest.getEmail()))
+                    .status(200)
+                    .build();
         }
         if (userRequest.getUsername().isEmpty() || userRequest.getUsername().isBlank()) {
             throw new BadRequestException(
@@ -167,7 +172,6 @@ public class UserService {
                 .status(200)
                 .build();
     }
-
 
 
     private CredentialRepresentation preparePasswordRepresentation(String password) {
@@ -355,7 +359,7 @@ public class UserService {
         userResource.get(user.getId()).update(userRepresentation);
         emailService.sendSimpleMail(user.getUsername(), user.getEmail(), index);
         return ApiResponse.builder()
-                .message("verify email success")
+                .message("generate email to verify success")
                 .status(200)
                 .build();
     }
@@ -367,12 +371,13 @@ public class UserService {
             throw new NotFoundException("user id : " + id + " is not found");
         }
     }
+
     public UserDto getById(UUID id) {
         return User.toDto(getUserRepresentationById(id), url);
     }
 
     public ApiResponse<?> getInfo(Principal principal) {
-        if (principal==null){
+        if (principal == null) {
             throw new ForbiddenException("need token");
         }
         return ApiResponse.builder()
@@ -383,13 +388,13 @@ public class UserService {
     }
 
 
-    public ApiResponse<?> updateById( ProfileRequest userRequest, Principal principal,Jwt jwt) {
-        if (principal==null){
+    public ApiResponse<?> updateById(ProfileRequest userRequest, Principal principal, Jwt jwt) {
+        if (principal == null) {
             throw new ForbiddenException("need token");
         }
         try {
-             User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url);
-        }catch (Exception e){
+            User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url);
+        } catch (Exception e) {
             throw new ForbiddenException("user need to login");
         }
 
@@ -411,14 +416,13 @@ public class UserService {
             UserRepresentation userRepresentation = prepareUserRepresentationForProfile(user, userRequest);
             UsersResource userResource = keycloak.realm(realm).users();
             userResource.get(user.getId()).update(userRepresentation);
-            sendMessage("you have been update your information already",jwt);
+            sendMessage("you have been update your information already", jwt);
             return ApiResponse.builder()
                     .message("update user by id success")
                     .payload(User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url))
                     .status(200)
                     .build();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new BadRequestException("username already exist");
         }
     }
