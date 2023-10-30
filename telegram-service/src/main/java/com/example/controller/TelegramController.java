@@ -21,22 +21,19 @@ public class TelegramController {
         this.telegramBotService = telegramBotService;
     }
 
-    @GetMapping("/register")
-    public RedirectView register(Principal principal){
-        System.out.println("register");
-        telegramBotService.getCurrentId(principal);
-        return new RedirectView("https://t.me/FintrackAPIBot");
-    }
+//    @GetMapping("/register")
+//    public RedirectView register(){
+//        return new RedirectView("https://t.me/fintrack_notification_bot");
+//    }
 
     @PostMapping("/send-message")
     public ResponseEntity<?> sendMessage(@RequestParam String message, Principal principal){
         return ResponseEntity.ok().body(telegramBotService.sendMessage(message,principal));
     }
 
-    @GetMapping("/test")
-    public String test(){
-        System.out.println("test");
-        return "test";
+    @GetMapping("/subscribe")
+    public Boolean subscribe(@RequestParam String chat_id, @RequestParam String token){
+        return telegramBotService.isSubscribe(chat_id,token);
     }
 
 }

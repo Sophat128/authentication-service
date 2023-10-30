@@ -1,6 +1,10 @@
+server.port: 8082
 bot:
-  token: 6831194245:AAGlG3zTUD_Lsm4lAB5aw0QXkEiFt9IT__0
-  name: myrandom123_bot
+  token: 6866869281:AAHkeris_QJgrkfmR7HV67hw168sLPYhzYw
+  name: fintrack_notification_bot
+
+fontEnd:
+  Url: http://localhost:4200
 
 spring:
   application:
@@ -15,16 +19,16 @@ spring:
 
 
   datasource:
-    url: jdbc:postgresql://localhost:33007/mini_project_db
-    username: my_user
-    password: my_password
+    url: jdbc:postgresql://34.142.208.161:2345/fintrack_db
+    username: postgres
+    password: 1234
     driver-class-name: org.postgresql.Driver
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://fintrack-keycloak.kbaenak.tech/auth/realms/Fintrack
-          jwk-set-uri: https://fintrack-keycloak.kbaenak.tech/auth/realms/Fintrack/protocol/openid-connect/certs
+          issuer-uri: https://keycloak-fintrack.sythorng.site/auth/realms/Fintrack
+          jwk-set-uri: https://keycloak-fintrack.sythorng.site/auth/realms/Fintrack/protocol/openid-connect/certs
   jpa:
     hibernate:
       ddl-auto: update
@@ -37,13 +41,13 @@ keycloak:
   realm: Fintrack
   resource: fintrack-app
   #  auth-server-url: https://demo.docengine.tech/auth/ #docker container
-  auth-server-url: https://fintrack-keycloak.kbaenak.tech/auth/ #docker container
+  auth-server-url: https://keycloak-fintrack.sythorng.site/auth/ #docker container
   credentials:
     username: 'admin'
     password: 'admin'
     client-id: 'fintrack-app' # admin account for creating users
-    secret: 'qOmECg1MXkL4ip2lwISCV0NEqokWpEJ6'
+    secret: 'eKy1dxGRLjS9Y55DSjhnwieF3Jxzjbtn'
     provider: secret
 
   grant-type: password
-  tokenUrl: https://fintrack-keycloak.kbaenak.tech/auth/realms/Fintrack/protocol/openid-connect/token
+  tokenUrl: https://keycloak-fintrack.sythorng.site/auth/realms/Fintrack/protocol/openid-connect/token

@@ -21,8 +21,8 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(authorize ->
                 authorize
-                        .requestMatchers(HttpMethod.GET,"/api/v1/telegram/test").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/v1/telegram/subscribe").permitAll()
                         .anyRequest().authenticated()
 
         );
