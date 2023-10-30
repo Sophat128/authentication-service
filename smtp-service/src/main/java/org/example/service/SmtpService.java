@@ -10,4 +10,8 @@ import java.util.UUID;
 
 public interface SmtpService {
     SmtpDto setUpSmtp(SmtpRequest smtpRequest, Principal principal, Jwt jwt, UUID appId);
+
+    SmtpDto getSmtpById(UUID id, UUID appId, Principal principal, Jwt jwt);
+
+    SmtpDto updateSmtpById(UUID id, UUID appId, SmtpRequest smtpRequest, Principal principal, Jwt jwt);
 }

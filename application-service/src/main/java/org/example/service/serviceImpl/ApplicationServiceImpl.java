@@ -76,7 +76,6 @@ public class ApplicationServiceImpl implements ApplicationService {
             dto.setPlatformType(application.getPlatformType());
             dto.setCreatedDate(application.getCreatedDate());
             applicationDtoList.add(dto);
-
         }
         return applicationDtoList;
     }

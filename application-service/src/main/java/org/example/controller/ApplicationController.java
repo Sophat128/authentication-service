@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/application")
-@SecurityRequirement(name = "auth")
+@SecurityRequirement(name = "app")
 public class ApplicationController {
     private final ApplicationService applicationService;
 

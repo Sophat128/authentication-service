@@ -2,7 +2,6 @@ package org.example.entity;
 
 import com.example.dto.ApplicationDto;
 import com.example.dto.SmtpDto;
-import com.example.dto.UserDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,6 +23,7 @@ public class Smtp {
     private String username;
     @Column(name = "password", length = 100, nullable = false)
     private String password;
+    @Column(name = "appId",unique = true)
     private UUID appId;
 
 

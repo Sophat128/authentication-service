@@ -14,22 +14,22 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://fintrack-keycloak.kbaenak.tech/auth/realms/Fintrack
-          jwk-set-uri: https://fintrack-keycloak.kbaenak.tech/auth/realms/Fintrack/protocol/openid-connect/certs
+          issuer-uri: http://localhost:8443/auth/realms/Fintrack
+          jwk-set-uri: http://localhost:8443/auth/realms/Fintrack/protocol/openid-connect/certs
 keycloak:
   realm: Fintrack
   resource: fintrack-app
   #  auth-server-url: https://demo.docengine.tech/auth/ #docker container
-  auth-server-url: https://fintrack-keycloak.kbaenak.tech/auth/ #docker container
+  auth-server-url: http://localhost:8443/auth/ #docker container
   credentials:
     username: 'admin'
     password: 'admin'
     client-id: 'fintrack-app' # admin account for creating users
-    secret: 'hYxLbqyzlFZc8uOjZwCPDExozA6sWmqv'
+    secret: 'OX9FJt9iXOzexxdbSr4mQyNdHxFm2Jsn'
     provider: secret
 
   grant-type: password
-  tokenUrl: https://fintrack-keycloak.kbaenak.tech/auth/realms/Fintrack/protocol/openid-connect/token
+  tokenUrl: http://localhost:8443/auth/realms/Fintrack/protocol/openid-connect/token
 
 spring.mail:
   host: smtp.gmail.com

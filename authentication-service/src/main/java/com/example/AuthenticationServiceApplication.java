@@ -17,7 +17,8 @@ import org.springframework.web.client.RestTemplate;
         in = SecuritySchemeIn.HEADER,
         flows = @OAuthFlows(
                 clientCredentials = @OAuthFlow(
-                        tokenUrl = "https://fintrack-keycloak.kbaenak.tech/auth/realms/Fintrack/protocol/openid-connect/token"
+                        tokenUrl = "http://localhost:8443/auth/realms/Fintrack/protocol/openid-connect/token"
+
                 )
         )
 )
