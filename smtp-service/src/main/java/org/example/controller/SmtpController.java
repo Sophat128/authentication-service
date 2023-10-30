@@ -1,12 +1,10 @@
 package org.example.controller;
 
-import com.example.dto.ApplicationDto;
+
 import com.example.dto.SmtpDto;
 import com.example.response.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.validation.Valid;
 import org.example.entity.request.SmtpRequest;
-import org.example.exception.BadRequestException;
 import org.example.service.SmtpService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,17 +26,6 @@ public class SmtpController {
     @PostMapping("/{appId}")
     public ResponseEntity<?> setUpSmtp( @RequestBody SmtpRequest smtpRequest, Principal principal , @AuthenticationPrincipal Jwt jwt, @PathVariable UUID appId){
         SmtpDto smtpDto = smtpService.setUpSmtp(smtpRequest,principal,jwt,appId);
-        if (smtpRequest.getUsername().isBlank()){
-            throw new BadRequestException("Field username can't be blank");
-        }
-        if (!smtpRequest.getUsername().matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,6}")) {
-            throw new BadRequestException(
-                    "Username should be like this -> somthing@somthing.com"
-            );
-        }
-        if (smtpRequest.getPassword().isBlank()){
-            throw new BadRequestException("Field password can't be blank");
-        }
         ApiResponse<SmtpDto> response = ApiResponse.<SmtpDto>builder()
                 .message("setup SMTP successfully")
                 .status(200)
@@ -59,17 +46,6 @@ public class SmtpController {
     @PutMapping("/{id}/{appId}")
     public ResponseEntity<?> updateSmtpById(@PathVariable UUID id,@PathVariable UUID appId,@RequestBody SmtpRequest smtpRequest ,Principal principal,@AuthenticationPrincipal Jwt jwt){
         SmtpDto smtpDto = smtpService.updateSmtpById(id,appId,smtpRequest,principal,jwt);
-        if (smtpRequest.getUsername().isBlank()){
-            throw new BadRequestException("Field username can't be blank");
-        }
-        if (!smtpRequest.getUsername().matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,6}")) {
-            throw new BadRequestException(
-                    "Username should be like this -> somthing@somthing.com"
-            );
-        }
-        if (smtpRequest.getPassword().isBlank()){
-            throw new BadRequestException("Field password can't be blank");
-        }
         ApiResponse<SmtpDto> response = ApiResponse.<SmtpDto>builder()
                 .message("update SMTP successfully")
                 .status(200)

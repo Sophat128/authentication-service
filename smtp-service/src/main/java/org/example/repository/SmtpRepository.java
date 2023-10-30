@@ -11,5 +11,6 @@ import java.util.UUID;
 public interface SmtpRepository extends JpaRepository<Smtp,UUID>{
     @Query(value = "SELECT * FROM smtp WHERE id = :id AND app_id = :appId", nativeQuery = true)
     Smtp findBySmtpById(UUID id, UUID appId);
-
+    @Query(value = "SELECT * FROM smtp WHERE app_id = :appId", nativeQuery = true)
+    Smtp findByAppId(UUID appId);
 }

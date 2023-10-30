@@ -3,9 +3,9 @@ package org.example.service;
 import com.example.dto.ApplicationDto;
 import com.example.dto.SmtpDto;
 import com.example.response.ApiResponse;
-import jakarta.validation.constraints.NotBlank;
 import org.example.entity.Smtp;
 import org.example.entity.request.SmtpRequest;
+import org.example.exception.BadRequestException;
 import org.example.exception.ForbiddenException;
 import org.example.exception.NotFoundException;
 import org.example.repository.SmtpRepository;
@@ -41,20 +41,13 @@ public class SmtpServiceImpl implements SmtpService{
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 throw new NotFoundException("Application not found."); // or handle it in a way you prefer
             } else {
-                throw e; // rethrow other WebClientResponseException
+                throw e;
             }
         }
     }
-    private void checkUserIsOwnerOfApp(UUID userId, ApplicationDto appDto) {
-        if (!userId.equals(UUID.fromString(String.valueOf(appDto.getUserDto().getId())))) {
-            throw new ForbiddenException("User is not the owner of the application.");
-        }
-    }
-
-
-
+    
     @Override
-    public SmtpDto setUpSmtp(@NotBlank SmtpRequest smtpRequest, Principal principal, Jwt jwt, UUID appId) {
+    public SmtpDto setUpSmtp( SmtpRequest smtpRequest, Principal principal, Jwt jwt, UUID appId) {
         if (principal.getName()==null){
             throw new ForbiddenException("need token");
         }
@@ -64,6 +57,21 @@ public class SmtpServiceImpl implements SmtpService{
             throw new ForbiddenException("User is not the owner of the application.");
         }
         if ("email".equalsIgnoreCase(appById.getPlatformType())) {
+            Smtp existingSmtp = smtpRepository.findByAppId(appId);
+            if (existingSmtp != null) {
+                throw new ForbiddenException("SMTP configuration already exists for this application.");
+            }
+            if (smtpRequest.getUsername().isBlank()||smtpRequest.getUsername().isEmpty()){
+                throw new BadRequestException("Field username can't be blank");
+            }
+            if (!smtpRequest.getUsername().matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,6}")) {
+                throw new BadRequestException(
+                        "Username should be like this -> somthing@somthing.com"
+                );
+            }
+            if (smtpRequest.getPassword().isBlank()||smtpRequest.getPassword().isEmpty()){
+                throw new BadRequestException("Field password can't be blank");
+            }
             Smtp smtp = new Smtp();
             smtp.setUsername(smtpRequest.getUsername());
             smtp.setPassword(smtpRequest.getPassword());
@@ -108,6 +116,17 @@ public class SmtpServiceImpl implements SmtpService{
         }
         Smtp smtp = smtpRepository.findBySmtpById(id,appId);
         if (smtp!=null){
+            if (smtpRequest.getUsername().isBlank()||smtpRequest.getUsername().isEmpty()){
+                throw new BadRequestException("Field username can't be blank");
+            }
+            if (!smtpRequest.getUsername().matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,6}")) {
+                throw new BadRequestException(
+                        "Username should be like this -> somthing@somthing.com"
+                );
+            }
+            if (smtpRequest.getPassword().isBlank()||smtpRequest.getPassword().isEmpty()){
+                throw new BadRequestException("Field password can't be blank");
+            }
             smtp.setUsername(smtpRequest.getUsername());
             smtp.setPassword(smtp.getPassword());
             smtpRepository.save(smtp);
