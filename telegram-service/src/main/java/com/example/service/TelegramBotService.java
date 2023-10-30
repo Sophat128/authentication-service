@@ -59,7 +59,9 @@ public class TelegramBotService extends TelegramLongPollingBot {
             Long chatId = update.getMessage().getChatId();
 
             if (messageText.equals("/start")) {
-                startCommandReceived(chatId, update.getMessage().getChat().getLastName(), update.getMessage().getChat().getFirstName());
+                if(telegramRepository.findUserByChatId(chatId)==null){
+                    startCommandReceived(chatId, update.getMessage().getChat().getLastName(), update.getMessage().getChat().getFirstName());
+                }
             } else {
                 prepareAndSendMessage(chatId, "Sorry, command was not recognized!");
             }
@@ -77,6 +79,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
                 if (telegram != null)
                     return false;
                 else
+                    prepareAndSendMessage(Long.valueOf(chatId),"សូមអបអរសាទរអ្នកបានភ្ជាប់គណនី FINTRACK ដោយជោគជ័យ។");
                     return telegramRepository.save(new Telegram(Long.valueOf(chatId), UUID.fromString(userId), true)).getIsSubscribe();
             }
             throw new NotFoundException("user id is not found");
