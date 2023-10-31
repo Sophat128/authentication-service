@@ -74,9 +74,9 @@ public class UserController {
         return ResponseEntity.ok().body(userService.updateById(userRequest, principal,jwt));
     }
 
-    @PutMapping("/after-login")
+    @GetMapping("/after-login")
     @SecurityRequirement(name = "auth")
-    @Operation(summary = "updateUserWhenLoginGit  user current user ")
+    @Operation(summary = "register when login git & google user current user ")
     public ResponseEntity<?> updateUserWhenLoginGit( Principal principal) {
         return ResponseEntity.ok().body(userService.updateUserWhenLoginGit(principal));
     }

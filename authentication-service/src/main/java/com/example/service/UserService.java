@@ -434,6 +434,9 @@ public class UserService {
 
 
     public ApiResponse<?>  updateUserWhenLoginGit(Principal principal){
+        if (principal == null) {
+            throw new ForbiddenException("need token");
+        }
         UserRepresentation userRepresentation= getUserRepresentationById(UUID.fromString(principal.getName()));
         if(userRepresentation.getAttributes()==null){
             userRepresentation.singleAttribute("createdDate", String.valueOf(LocalDateTime.now()));
@@ -442,12 +445,13 @@ public class UserService {
             userRepresentation.singleAttribute("isVerify", "true");
             UsersResource userResource = keycloak.realm(realm).users();
             userResource.get(userRepresentation.getId()).update(userRepresentation);
+            return ApiResponse.builder()
+                    .message("update user success")
+                    .payload(User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url))
+                    .status(200)
+                    .build();
         }
-        return ApiResponse.builder()
-                .message("update user success")
-                .payload(User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url))
-                .status(200)
-                .build();
+        return  null;
     }
 
 }
