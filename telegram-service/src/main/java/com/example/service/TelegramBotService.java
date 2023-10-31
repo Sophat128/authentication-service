@@ -59,7 +59,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
             Long chatId = update.getMessage().getChatId();
 
             if (messageText.equals("/start")) {
-                if(telegramRepository.findUserByChatId(chatId)==null){
+                if (telegramRepository.findUserByChatId(chatId) == null) {
                     startCommandReceived(chatId, update.getMessage().getChat().getLastName(), update.getMessage().getChat().getFirstName());
                 }
             } else {
@@ -75,12 +75,12 @@ public class TelegramBotService extends TelegramLongPollingBot {
             DecodedJWT decodedJWT = JWT.decode(token);
             String userId = decodedJWT.getSubject();
             if (userId != null) {
-                Telegram telegram = telegramRepository.findByUserId(UUID.fromString(userId));
+                Telegram telegram = telegramRepository.findByChatId(Long.valueOf(chatId));
                 if (telegram != null)
                     return false;
                 else
-                    prepareAndSendMessage(Long.valueOf(chatId),"សូមអបអរសាទរអ្នកបានភ្ជាប់គណនី FINTRACK ដោយជោគជ័យ។");
-                    return telegramRepository.save(new Telegram(Long.valueOf(chatId), UUID.fromString(userId), true)).getIsSubscribe();
+                    prepareAndSendMessage(Long.valueOf(chatId), "សូមអបអរសាទរអ្នកបានភ្ជាប់គណនី FINTRACK ដោយជោគជ័យ។");
+                return telegramRepository.save(new Telegram(Long.valueOf(chatId), UUID.fromString(userId), true)).getIsSubscribe();
             }
             throw new NotFoundException("user id is not found");
         } catch (Exception e) {
@@ -141,7 +141,7 @@ public class TelegramBotService extends TelegramLongPollingBot {
         }
         Telegram telegram = telegramRepository.findByUserId(UUID.fromString(principal.getName()));
         if (telegram != null) {
-            String answer = EmojiParser.parseToUnicode("Hi, " + "....username....." + "\n" + message);
+            String answer = EmojiParser.parseToUnicode(message);
             sendMessage(telegram.getChatId(), answer);
         }
         return ApiResponse.builder()
