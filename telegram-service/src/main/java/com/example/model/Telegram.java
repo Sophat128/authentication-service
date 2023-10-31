@@ -18,10 +18,13 @@ public class Telegram {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String firstName;
-    private String lastName;
-    private String userName;
     private Long chatId;
     private UUID userId;
+    private Boolean isSubscribe;
 
+    public Telegram(Long chatId, UUID userId, Boolean isSubscribe) {
+        this.chatId = chatId;
+        this.userId = userId;
+        this.isSubscribe = isSubscribe;
+    }
 }

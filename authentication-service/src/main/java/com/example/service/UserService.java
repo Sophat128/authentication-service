@@ -159,6 +159,7 @@ public class UserService {
 
         UserRepresentation userRepresentation = prepareUserRepresentation(userRequest, preparePasswordRepresentation(userRequest.getPassword()));
         UsersResource userResource = keycloak.realm(realm).users();
+
         Response response = userResource.create(userRepresentation);
 
         if (response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
