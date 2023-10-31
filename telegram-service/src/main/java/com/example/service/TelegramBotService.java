@@ -117,9 +117,10 @@ public class TelegramBotService extends TelegramLongPollingBot {
     private void startCommandReceived(Long chatId, String firstName, String lastname) {
         String answer = EmojiParser.parseToUnicode("Hello, " + lastname + " " + firstName + "\n" +
                         "FINTRACK notification message send to telegram in real time, please bind FINTRACK account first! \n"
-//                + fontEndUrl+"/application/4/dashboard?chat_id=" + chatId
+                + fontEndUrl+"/application/4/dashboard?chat_id=" + chatId
         );
-        sendUrlButtonMessage(chatId, answer);
+//        sendUrlButtonMessage(chatId, answer);
+        sendMessage(chatId, answer);
     }
 
 
