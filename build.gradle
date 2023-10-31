@@ -26,7 +26,6 @@ subprojects {
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
 
-
     ext {
         set('springCloudVersion', "2022.0.4")
     }

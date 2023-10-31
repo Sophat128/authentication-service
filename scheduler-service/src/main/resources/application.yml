@@ -1,0 +1,36 @@
+server:
+  port: 8085
+spring:
+  application:
+    name: schedule-service
+  kafka:
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      bootstrap-servers: localhost:9092
+    dead_letter_topic: notification-retry
+
+
+  datasource:
+    url: jdbc:postgresql://localhost:33007/mini_project_db
+    username: my_user
+    password: my_password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  #hibernate:
+  #  jdbc:
+  logging:
+    level:
+      com.levi.testhibernate: debug
+
+kafka:
+  group-id: hero-consumer
+  auto-offset: earliest
+  topics:
+    data: schedule-task

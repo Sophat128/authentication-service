@@ -28,7 +28,6 @@ public class NotificationServiceImpl implements NotificationService {
 //        ProducerRecord<String, Notification> record = new ProducerRecord<>("notification", null, notification);
 //        // Publish to Kafka (asynchronous operation)
 //        kafkaTemplate.send(record);
-
         // create Message
         Message<Notification> message = MessageBuilder
                 .withPayload(notification)

@@ -92,10 +92,8 @@ public class WebPushService {
         System.out.println("Unsubscribed " + subscription.endpoint + " auth:" + subscription.keys.auth);
         endpointToSubscription.remove(subscription.endpoint);
     }
-
     public record Message(String title, String body) {
     }
-
     ObjectMapper mapper = new ObjectMapper();
 
     public void notifyAll(PushNotificationRequest pushNotificationRequest) {
