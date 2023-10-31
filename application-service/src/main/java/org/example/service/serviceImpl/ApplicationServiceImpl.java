@@ -2,10 +2,11 @@ package org.example.service.serviceImpl;
 
 import com.example.dto.UserDto;
 
+import org.example.exception.AlreadyExistException;
 import org.example.exception.ForbiddenException;
 import org.example.exception.NotFoundException;
 import org.example.model.Application;
-import org.example.model.PlatformType;
+import com.example.constant.PlatformType;
 import com.example.dto.ApplicationDto;
 import org.example.model.request.ApplicationRequest;
 import org.example.repository.ApplicationRepository;
@@ -16,7 +17,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ApplicationServiceImpl implements ApplicationService {
@@ -38,14 +38,14 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public ApplicationDto createNewApp(ApplicationRequest applicationRequest, PlatformType platformType, Principal principal) {
+    public ApplicationDto createNewApp(ApplicationRequest applicationRequest, Collection<PlatformType> platformType, Principal principal) {
         if(principal == null){
             throw new ForbiddenException("Need Token");
         }
         UUID userId = UUID.fromString(principal.getName());
         Application application = new Application();
         application.setName(applicationRequest.getName());
-        application.setPlatformType(String.valueOf(platformType));
+        application.setPlatformType(platformType);
         application.setUserId(userId);
         application.setCreatedDate(LocalDateTime.now());
         applicationRepository.save(application);
@@ -91,7 +91,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         Application application = applicationRepository.findApplicationByIdAndUserId(id, userId);
         if (application != null){
-            UserDto userById =getUserById(userId);
+            UserDto userById = getUserById(userId);
             ApplicationDto dto = new ApplicationDto();
             dto.setUserDto(userById);
             dto.setId(application.getId());
@@ -162,6 +162,39 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         }
         return applicationDtoList;
+    }
+
+    @Override
+    public ApplicationDto addNewPlatform(List<PlatformType> platformType, UUID id, Principal principal) {
+        if (principal == null) {
+            throw new ForbiddenException("Need token");
+        }
+        UUID userId = UUID.fromString(principal.getName());
+        Application application = applicationRepository.findApplicationByIdAndUserId(id, userId);
+        if (application!=null){
+            Collection<PlatformType> platformTypes = new HashSet<>(application.getPlatformType());
+            for(PlatformType platform : application.getPlatformType()){
+                for(PlatformType platformOne: platformType){
+                    if (platform.equals(platformOne)){
+                        throw new AlreadyExistException(platform + " has already exist");
+                    }else{
+                        platformTypes.add(platformOne);
+                    }
+                }
+            }
+            application.setPlatformType(platformTypes);
+            Application updateApp = applicationRepository.save(application);
+            ApplicationDto dto = new ApplicationDto();
+            UserDto userById = getUserById(userId);
+            dto.setUserDto(userById);
+            dto.setId(application.getId());
+            dto.setName(application.getName());
+            dto.setPlatformType(platformTypes);
+            dto.setCreatedDate(application.getCreatedDate());
+            return dto;
+        }else{
+            throw new NotFoundException("application not found");
+        }
     }
 }
 

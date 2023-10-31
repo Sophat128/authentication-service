@@ -1,5 +1,6 @@
 package org.example.model;
 
+import com.example.constant.PlatformType;
 import com.example.dto.UserDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
+import java.util.Collection;
 import java.util.UUID;
 
 @Data
@@ -23,8 +25,11 @@ public class Application {
     private UUID id ;
     @Column(name = "name", length = 100, nullable = false)
     private String name;
-    @Column(name = "platform",nullable = false)
-    private String platformType;
+    @ElementCollection
+    @JoinTable(name = "tblPlatformTypes", joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "platformType", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Collection<PlatformType> platformType;
     @Column(name = "user_id",nullable = false)
     private UUID userId;
     @CreatedDate

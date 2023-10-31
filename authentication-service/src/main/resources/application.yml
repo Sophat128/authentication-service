@@ -14,22 +14,22 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://fintrack-keycloak.kbaenak.tech/auth/realms/Fintrack
-          jwk-set-uri: https://fintrack-keycloak.kbaenak.tech/auth/realms/Fintrack/protocol/openid-connect/certs
+          issuer-uri: http://localhost:8443/auth/realms/Fintrack
+          jwk-set-uri: http://localhost:8443/auth/realms/Fintrack/protocol/openid-connect/certs
 keycloak:
   realm: Fintrack
   resource: fintrack-app
   #  auth-server-url: https://demo.docengine.tech/auth/ #docker container
-  auth-server-url: https://fintrack-keycloak.kbaenak.tech/auth/ #docker container
+  auth-server-url: http://localhost:8443/auth/ #docker container
   credentials:
     username: 'admin'
     password: 'admin'
     client-id: 'fintrack-app' # admin account for creating users
-    secret: 'hYxLbqyzlFZc8uOjZwCPDExozA6sWmqv'
+    secret: '08OJAsqLPU5UzhqQlZ25JeHjTjW90naa'
     provider: secret
 
   grant-type: password
-  tokenUrl: https://fintrack-keycloak.kbaenak.tech/auth/realms/Fintrack/protocol/openid-connect/token
+  tokenUrl: http://localhost:8443/auth/realms/Fintrack/protocol/openid-connect/token
 
 spring.mail:
   host: smtp.gmail.com
@@ -49,8 +49,8 @@ telegram:
 
 #for link verify email that get from angular
 LoginPage:
-  url: http://localhost:4200/api/v1/login-page
+  url: http://localhost:4200/login
 forgetPasswordPage:
-  url: http://localhost:4200/api/v1/forget-password
+  url: http://localhost:4200/forget-password
 ExpiredPage:
-  url: http://localhost:4200/api/v1/expired-page
+  url: http://localhost:4200/expired

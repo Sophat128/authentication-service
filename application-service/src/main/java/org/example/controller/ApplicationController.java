@@ -3,7 +3,7 @@ package org.example.controller;
 import com.example.dto.ApplicationDto;
 import com.example.response.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.example.model.PlatformType;
+import com.example.constant.PlatformType;
 import org.example.model.request.ApplicationRequest;
 import org.example.service.ApplicationService;
 import org.springframework.http.ResponseEntity;
@@ -11,12 +11,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/application")
-@SecurityRequirement(name = "auth")
+@SecurityRequirement(name = "app")
 public class ApplicationController {
     private final ApplicationService applicationService;
 
@@ -26,7 +27,7 @@ public class ApplicationController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<?> createNewApp(@RequestBody ApplicationRequest applicationRequest, @RequestParam PlatformType platformType, Principal principal){
+    public ResponseEntity<?> createNewApp(@RequestBody ApplicationRequest applicationRequest, @RequestParam Collection<PlatformType> platformType, Principal principal){
         ApplicationDto applicationDto = applicationService.createNewApp(applicationRequest,platformType,principal);
         ApiResponse<ApplicationDto> response = ApiResponse.<ApplicationDto>builder()
                 .message("create new application successfully")
@@ -64,7 +65,7 @@ public class ApplicationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateAppByid(@PathVariable UUID id,@RequestBody ApplicationRequest applicationRequest, Principal principal){
+    public ResponseEntity<?> updateAppById(@PathVariable UUID id,@RequestBody ApplicationRequest applicationRequest, Principal principal){
         ApplicationDto applicationDto = applicationService.updateApp(applicationRequest,id,principal);
         ApiResponse<ApplicationDto> response = ApiResponse.<ApplicationDto>builder()
                 .message("update application successfully")
@@ -73,6 +74,19 @@ public class ApplicationController {
                 .build();
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/{id}")
+    public ResponseEntity<?> addNewPlatform(@PathVariable UUID id,@RequestParam List<PlatformType> platformType, Principal principal){
+        ApplicationDto applicationDto = applicationService.addNewPlatform(platformType,id,principal);
+        ApiResponse<ApplicationDto> response = ApiResponse.<ApplicationDto>builder()
+                .message("update application successfully")
+                .status(200)
+                .payload(applicationDto)
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+
     @GetMapping("/type/")
     public ResponseEntity<?> getAppByPlatformType(@RequestParam String platformType , Principal principal){
         List<ApplicationDto> applicationDto = applicationService.getApplicationByType(platformType,principal);
