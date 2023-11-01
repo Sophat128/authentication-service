@@ -34,7 +34,6 @@ public class WebPushService {
     private String privateKey;
     @Value("${vapid.subject}")
     private String subject;
-
     private PushService pushService;
 
     private final Map<String, Subscription> endpointToSubscription = new HashMap<>();
