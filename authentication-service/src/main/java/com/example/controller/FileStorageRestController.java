@@ -62,7 +62,7 @@ public class FileStorageRestController {
     public ResponseEntity<Resource> downloadImage(
             @RequestParam("file") String fileName
     ) {
-        Path path = Paths.get("images/" + fileName);
+        Path path = Paths.get("src/main/resources/images/" + fileName);
         HttpHeaders header = new HttpHeaders();
         header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
         try {
