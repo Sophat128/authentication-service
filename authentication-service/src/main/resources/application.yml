@@ -25,7 +25,7 @@ keycloak:
     username: 'admin'
     password: 'admin'
     client-id: 'fintrack-app' # admin account for creating users
-    secret: 'eKy1dxGRLjS9Y55DSjhnwieF3Jxzjbtn'
+    secret: 'MYhYGrLOk1UNwK9eTaULwIye39hVujPi'
     provider: secret
 
   grant-type: password

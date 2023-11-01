@@ -23,6 +23,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/users/**").permitAll()
                         .requestMatchers(HttpMethod.PUT,"/api/v1/users/").authenticated()
                         .requestMatchers(HttpMethod.GET,"/api/v1/users/").authenticated()
+                        .requestMatchers(HttpMethod.GET,"/api/v1/users/after-login").authenticated()
                         .requestMatchers("/api/v1/file/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
