@@ -1,24 +1,25 @@
 package com.example.config;
 
-import com.example.custom.CDIJobFactory;
-import org.quartz.Scheduler;
+import org.quartz.spi.JobFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
 @Configuration
 public class QuartzConfig {
     @Bean
-    public SchedulerFactoryBean schedulerFactoryBean() {
-        SchedulerFactoryBean factory = new SchedulerFactoryBean();
-        factory.setJobFactory(new CDIJobFactory()); // Set the custom JobFactory
-        // Additional Quartz configuration here
-        return factory;
+    public JobFactory jobFactory() {
+        return new SpringBeanJobFactory();
     }
 
     @Bean
-    public Scheduler scheduler() {
-        return schedulerFactoryBean().getScheduler();
+    public SchedulerFactoryBean schedulerFactoryBean() {
+        SchedulerFactoryBean factory = new SchedulerFactoryBean();
+        factory.setJobFactory(new SpringBeanJobFactory());
+        System.out.println("Config");
+        // Other Quartz configurations
+        return factory;
     }
 }
 

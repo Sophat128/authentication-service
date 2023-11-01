@@ -20,7 +20,7 @@ public class RetryMessageListener {
                 consumerRecord.offset(), consumerRecord.value());
 
 
-        if(consumerRecord.offset() % 2 != 0) throw new IllegalStateException("This is something odd.");
+//        if(consumerRecord.offset() % 2 != 0) throw new IllegalStateException("This is something odd.");
 
         try {
 //            MyDTO myDto = objectMapper.readValue(consumerRecord.value(), MyDTO.class);

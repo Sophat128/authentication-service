@@ -54,4 +54,14 @@ public class NotificationServiceImpl implements NotificationService {
         kafkaTemplate.send(message);
 
     }
+
+    @Override
+    public void sendData(String data) {
+        Message<String> message = MessageBuilder
+                .withPayload(data)
+                .setHeader(KafkaHeaders.TOPIC, "web-notification")
+                .build();
+        System.out.println("Message: " + message);
+        kafkaTemplate.send(message);
+    }
 }

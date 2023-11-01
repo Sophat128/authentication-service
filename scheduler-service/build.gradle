@@ -13,7 +13,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     implementation 'org.quartz-scheduler:quartz:2.5.0-rc1'
-    implementation 'org.quartz-scheduler:quartz-jobs:2.5.0-rc1'
+//    implementation 'org.quartz-scheduler:quartz-jobs:2.5.0-rc1'
     implementation 'org.springframework:spring-context-support:6.0.10'
     implementation 'javax.enterprise:cdi-api:1.2'
     //database
