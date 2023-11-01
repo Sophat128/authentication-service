@@ -1,6 +1,8 @@
 package com.example.webpush;
 
 import com.example.entities.request.PushNotificationRequest;
+import com.example.entities.request.UserSubscription;
+import com.example.repository.WebRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -36,6 +38,11 @@ public class WebPushService {
     private PushService pushService;
 
     private final Map<String, Subscription> endpointToSubscription = new HashMap<>();
+    private final WebRepository webRepository;
+
+    public WebPushService(WebRepository webRepository) {
+        this.webRepository = webRepository;
+    }
 
     @PostConstruct
     private void init() throws GeneralSecurityException {
@@ -66,17 +73,18 @@ public class WebPushService {
         }
     }
 
-    public void getAllSubscription(){
+    public void getAllSubscription() {
+
         for (Map.Entry<String, Subscription> entry : endpointToSubscription.entrySet()) {
             String endpoint = entry.getKey();
             Subscription subscription = entry.getValue();
-
             // Now you can work with 'endpoint' and 'subscription' as needed
             System.out.println("Endpoint: " + endpoint);
             System.out.println("Subscription: " + subscription.keys.auth);
         }
     }
-    public void clearAllSubscription(){
+
+    public void clearAllSubscription() {
         endpointToSubscription.clear();
     }
 
@@ -84,7 +92,13 @@ public class WebPushService {
         System.out.println("Subscribed to " + subscription.endpoint);
         System.out.println("auth to " + subscription.keys.auth);
         System.out.println("p256dh to " + subscription.keys.p256dh);
-
+//        The userId should be get from web application but I just give the default
+        UserSubscription userSubscription = new UserSubscription(subscription.endpoint, subscription.keys.auth, subscription.keys.p256dh, 1L);
+        if (webRepository.findByUserId(1L) != null) {
+            webRepository.save(userSubscription);
+        }else {
+            System.out.println("This user is already subscribe");
+        }
         endpointToSubscription.put(subscription.endpoint, subscription);
     }
 
@@ -92,8 +106,10 @@ public class WebPushService {
         System.out.println("Unsubscribed " + subscription.endpoint + " auth:" + subscription.keys.auth);
         endpointToSubscription.remove(subscription.endpoint);
     }
+
     public record Message(String title, String body) {
     }
+
     ObjectMapper mapper = new ObjectMapper();
 
     public void notifyAll(PushNotificationRequest pushNotificationRequest) {
@@ -111,12 +127,14 @@ public class WebPushService {
     }
 
     public void notifySpecificUser(PushNotificationRequest pushNotificationRequest) {
-
         try {
             String msg = mapper.writeValueAsString(new Message(pushNotificationRequest.getTitle(), pushNotificationRequest.getBody()));
-            Subscription subscription = (Subscription) endpointToSubscription.values().toArray()[0];
+//            Give default user id
+            UserSubscription userSubscription = webRepository.findByUserId(1L);
+
+            Subscription subscription = new Subscription(userSubscription.getEndpoint(), new Subscription.Keys(userSubscription.getP256dh(), userSubscription.getAuth()));
             System.out.println("Auth: " + subscription.keys.auth);
-                sendNotification(subscription, msg);
+            sendNotification(subscription, msg);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

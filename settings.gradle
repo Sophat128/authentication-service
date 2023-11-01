@@ -15,4 +15,5 @@ include 'eureka-server'
 include 'transation-service'
 include 'loan-service'
 include 'scheduler-service'
+include 'smtp-service'
 

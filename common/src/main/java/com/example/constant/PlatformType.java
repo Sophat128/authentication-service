@@ -1,4 +1,4 @@
-package org.example.model;
+package com.example.constant;
 
 public enum PlatformType {
     EMAIL,

@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/kdmv
+    username: postgres
+    password: runrun2001
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8443/auth/realms/Fintrack
+          jwk-set-uri: http://localhost:8443/auth/realms/Fintrack/protocol/openid-connect/certs
+  jpa:
+    hibernate:
+      ddl-auto: update
+server:
+  port: 8088
+
+Base:
+  url: http://localhost:8089/api/v1/
+
