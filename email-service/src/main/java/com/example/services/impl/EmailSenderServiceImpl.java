@@ -2,6 +2,7 @@ package com.example.services.impl;
 
 
 import com.example.dto.SmtpDto;
+import com.example.exception.NotFoundException;
 import com.example.models.Email;
 import com.example.models.EmailConfig;
 import com.example.response.ApiResponse;
@@ -59,7 +60,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
                     .getPayload();
         } catch (WebClientResponseException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                throw new EntityNotFoundException("Application not found."); // or handle it in a way you prefer
+                throw new NotFoundException("Application not found."); // or handle it in a way you prefer
             } else {
                 throw e;
             }
@@ -79,9 +80,9 @@ public class EmailSenderServiceImpl implements EmailSenderService {
 
         Context context = new Context();
         context.setVariables(email.getProps());
-        String html = templateEngine.process("confirmation", context);
+//        String html = templateEngine.process("confirmation", context);
         helper.setTo(email.getTo());
-        helper.setText(html, true);
+        helper.setText(email.getContent());
         helper.setSubject(email.getSubject());
         helper.setFrom(email.getFrom());
         mailSender.send(message);
