@@ -10,6 +10,8 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       bootstrap-servers: localhost:9092
+    dead_letter_topic: notification-retry
+
 
     topic:
       name: notification
@@ -34,6 +36,9 @@ logging:
   level:
     com.levi.testhibernate: debug
 #    batch_size: 1
-
-
+kafka:
+  group-id: hero-consumer
+  auto-offset: earliest
+  topics:
+    data: notification
 

@@ -12,4 +12,8 @@ include 'web-push-service'
 include 'application-service'
 include 'config-server'
 include 'eureka-server'
+include 'transation-service'
+include 'loan-service'
+include 'scheduler-service'
+include 'smtp-service'
 

@@ -28,7 +28,6 @@ public class NotificationServiceImpl implements NotificationService {
 //        ProducerRecord<String, Notification> record = new ProducerRecord<>("notification", null, notification);
 //        // Publish to Kafka (asynchronous operation)
 //        kafkaTemplate.send(record);
-
         // create Message
         Message<Notification> message = MessageBuilder
                 .withPayload(notification)
@@ -54,5 +53,15 @@ public class NotificationServiceImpl implements NotificationService {
         System.out.println("Message: " + message);
         kafkaTemplate.send(message);
 
+    }
+
+    @Override
+    public void sendData(String data) {
+        Message<String> message = MessageBuilder
+                .withPayload(data)
+                .setHeader(KafkaHeaders.TOPIC, "web-notification")
+                .build();
+        System.out.println("Message: " + message);
+        kafkaTemplate.send(message);
     }
 }

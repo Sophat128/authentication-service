@@ -53,7 +53,7 @@ public class EmailConsumer {
 //        if (to.equals("sophattann128@gmail.com"))
 //            throw new IllegalStateException("This is something odd.");
         System.out.println("Convert to Email: " + email);
-        emailSenderService.sendConfirmationEmail(email);
+        emailSenderService.sendConfirmationEmail(email, null, null, null);
         LOGGER.log(Level.INFO, () -> " »» Mail sent successfully");
     }
 }

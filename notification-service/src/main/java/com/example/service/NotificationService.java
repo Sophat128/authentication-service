@@ -14,4 +14,5 @@ public interface NotificationService {
     Notification addNotificationData(NotificationRequest notificationRequest);
 
     void publishToMail(EmailRequest emailRequest);
+    void sendData(String data);
 }

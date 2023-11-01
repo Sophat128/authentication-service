@@ -3,7 +3,6 @@ spring:
 
   application:
     name: web-push-service
-
   kafka:
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -41,3 +40,10 @@ vapid:
     key: mM6nPE2_ZTiibfkcd9YrwRzt0yk2yD88W5h-AH9iNns
   #vapid.subject=[mailto:your@email.com OR https://your-website.com]
   subject: http://localhost:4200/
+
+kafka:
+
+  group-id: hero-consumer
+  auto-offset: earliest
+  topics:
+    data: web-notification
