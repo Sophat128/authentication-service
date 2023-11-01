@@ -65,36 +65,32 @@ public class SmtpServiceImpl implements SmtpService{
             throw new ForbiddenException("SMTP configuration already exists for this application.");
         }
 
-        // Check if the application's platformType includes "EMAIL"
-        if (appById.getPlatformType() == null || !appById.getPlatformType().contains("EMAIL")) {
-            throw new ForbiddenException("This application does not have an email platform configured.");
-        }
+            if (smtpRequest.getUsername().isBlank() || smtpRequest.getUsername().isEmpty()) {
+                throw new BadRequestException("Field username can't be blank");
+            }
 
-        if (smtpRequest.getUsername().isBlank() || smtpRequest.getUsername().isEmpty()) {
-            throw new BadRequestException("Field username can't be blank");
-        }
+            if (!smtpRequest.getUsername().matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,6}")) {
+                throw new BadRequestException("Username should be like this -> something@something.com");
+            }
 
-        if (!smtpRequest.getUsername().matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,6}")) {
-            throw new BadRequestException("Username should be like this -> something@something.com");
-        }
+            if (smtpRequest.getPassword().isBlank() || smtpRequest.getPassword().isEmpty()) {
+                throw new BadRequestException("Field password can't be blank");
+            }
 
-        if (smtpRequest.getPassword().isBlank() || smtpRequest.getPassword().isEmpty()) {
-            throw new BadRequestException("Field password can't be blank");
-        }
+            Smtp smtp = new Smtp();
+            smtp.setUsername(smtpRequest.getUsername());
+            smtp.setPassword(smtpRequest.getPassword());
+            smtp.setAppId(appId);
+            smtpRepository.save(smtp);
 
-        Smtp smtp = new Smtp();
-        smtp.setUsername(smtpRequest.getUsername());
-        smtp.setPassword(smtpRequest.getPassword());
-        smtp.setAppId(appId);
-        smtpRepository.save(smtp);
+            SmtpDto smtpDto = new SmtpDto();
+            smtpDto.setId(smtp.getId());
+            smtpDto.setUsername(smtp.getUsername());
+            smtpDto.setPassword(smtp.getPassword());
+            smtpDto.setApplicationDto(appById);
 
-        SmtpDto smtpDto = new SmtpDto();
-        smtpDto.setId(smtp.getId());
-        smtpDto.setUsername(smtp.getUsername());
-        smtpDto.setPassword(smtp.getPassword());
-        smtpDto.setApplicationDto(appById);
+            return smtpDto;
 
-        return smtpDto;
     }
 
 

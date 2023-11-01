@@ -5,6 +5,7 @@ import com.example.models.Email;
 import com.example.models.EmailConfig;
 import com.example.models.EmailRequest;
 import com.example.services.EmailSenderService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.mail.MessagingException;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ import java.security.Principal;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/configEmail")
+@RequestMapping("/api/v1/sendEmail")
 @SecurityRequirement(name = "app")
 public class EmailController {
     private final EmailSenderService emailSenderService;
@@ -27,13 +28,14 @@ public class EmailController {
         this.emailSenderService = emailSenderService;
     }
 
-    @GetMapping("/{smtpId}/{appId}")
+//    @GetMapping("/{smtpId}/{appId}")
     public ResponseEntity<?> getSmtp(@PathVariable UUID smtpId , @PathVariable UUID appId, Principal principal, @AuthenticationPrincipal Jwt jwt){
         EmailConfig emailConfig = emailSenderService.cofigMailSender(smtpId,appId,principal,jwt);
         return ResponseEntity.ok(emailConfig);
     }
 
     @PostMapping("/{smtpId}/{appId}")
+    @Operation(summary = "for props we do not input it")
     public ResponseEntity<?> sendMail(@PathVariable UUID smtpId , @PathVariable UUID appId, Principal principal, @AuthenticationPrincipal Jwt jwt, Email email) throws MessagingException, IOException {
         emailSenderService.sendConfirmationEmail(email,smtpId,appId,jwt);
         return ResponseEntity.ok("successfully");

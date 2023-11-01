@@ -88,7 +88,7 @@ public class ApplicationController {
     }
 
 
-    @GetMapping("/type/")
+//    @GetMapping("/type/")
     public ResponseEntity<?> getAppByPlatformType(@RequestParam String platformType , Principal principal){
         List<ApplicationDto> applicationDto = applicationService.getApplicationByType(platformType,principal);
         ApiResponse<List<ApplicationDto>> response = ApiResponse.<List<ApplicationDto>>builder()
