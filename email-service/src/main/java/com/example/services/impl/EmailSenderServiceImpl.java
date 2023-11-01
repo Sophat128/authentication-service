@@ -25,7 +25,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
-//import org.webjars.NotFoundException;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
@@ -38,8 +37,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
 
     private final MailSenderFactory mailSenderFactory;
 
-//    private final JavaMailSender javaMailSender;
-    private final SpringTemplateEngine templateEngine;
+          private final SpringTemplateEngine templateEngine;
     private final WebClient webClient;
 
     @Autowired
@@ -86,19 +84,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         helper.setSubject(email.getSubject());
         helper.setFrom(email.getFrom());
         mailSender.send(message);
-//        MimeMessage message = javaMailSender.createMimeMessage();
-//        MimeMessageHelper helper = new MimeMessageHelper(message,
-//                MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-//                StandardCharsets.UTF_8.name());
-//
-//        Context context = new Context();
-//        context.setVariables(email.getProps());
-//        String html = templateEngine.process("confirmation", context);
-//        helper.setTo(email.getTo());
-//        helper.setText(html, true);
-//        helper.setSubject(email.getSubject());
-//        helper.setFrom(email.getFrom());
-//        javaMailSender.send(message);
+
     }
 
     @Override
@@ -112,26 +98,5 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         emailConfig.setPassword(smtpDto.getPassword());
         return emailConfig;
     }
-
-//    @Override
-//    public JavaMailSenderImpl setSender(UUID smtpId, UUID appId, Principal principal, Jwt jwt) {
-//        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-//
-//        mailSender.setJavaMailProperties(mailProperties());
-//        SmtpDto smtpDto = getSmtpById(smtpId,appId,jwt);
-//        mailSender.setHost("smtp.gmail.com");
-//        mailSender.setUsername(smtpDto.getUsername());
-//        mailSender.setPassword(smtpDto.getPassword());
-//        mailSender.setPort(587);
-//        return mailSender;
-////        return null;
-//    }
-//    private Properties mailProperties() {
-//        Properties props = new Properties();
-//        props.put("mail.smtp.auth", "true");
-//        props.put("mail.smtp.starttls.enable", "true");
-//        props.put("mail.smtp.port",587);
-//        return props;
-//    }
 }
 
