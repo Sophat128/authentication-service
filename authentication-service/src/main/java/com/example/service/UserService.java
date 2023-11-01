@@ -386,6 +386,11 @@ public class UserService {
         if (principal == null) {
             throw new ForbiddenException("need token");
         }
+        try {
+            User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url);
+        } catch (Exception e) {
+            throw new ForbiddenException("user not found");
+        }
         return ApiResponse.builder()
                 .message("get user by id success")
                 .payload(User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url))
@@ -400,7 +405,7 @@ public class UserService {
         try {
             User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url);
         } catch (Exception e) {
-            throw new ForbiddenException("user need to login");
+            throw new ForbiddenException("user not found login");
         }
 
         UserRepresentation user = getUserRepresentationById(UUID.fromString(principal.getName()));

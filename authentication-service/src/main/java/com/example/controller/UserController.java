@@ -47,7 +47,7 @@ public class UserController {
     @GetMapping("email")
     @Operation(summary = "get user by email")
     public ResponseEntity<?> getByEmail(@RequestParam String email) {
-        return ResponseEntity.ok().body(userService.getUserRepresentationByEmail(email));
+        return ResponseEntity.ok().body(userService.getByEmail(email));
     }
 
 //    @GetMapping
@@ -58,7 +58,7 @@ public class UserController {
     @GetMapping("/{id}")
     @Operation(summary = "get user by id (UUID) ")
     public ResponseEntity<?> getById(@PathVariable UUID id) {
-        return ResponseEntity.ok().body(userService.getUserRepresentationById(id));
+        return ResponseEntity.ok().body(userService.getById(id));
     }
     @GetMapping
     @SecurityRequirement(name = "auth")
