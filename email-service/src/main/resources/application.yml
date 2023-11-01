@@ -28,9 +28,9 @@ spring:
 ##    port: '587'
 
   datasource:
-    url: jdbc:postgresql://localhost:33007/mini_project_db
-    username: my_user
-    password: my_password
+    url: jdbc:postgresql://34.142.208.161:2345/fintrack_db
+    username: postgres
+    password: 1234
   jpa:
     hibernate:
       ddl-auto: update
@@ -47,8 +47,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8443/auth/realms/Fintrack
-          jwk-set-uri: http://localhost:8443/auth/realms/Fintrack/protocol/openid-connect/certs
+          issuer-uri: https://keycloak-fintrack.sythorng.site/auth/realms/Fintrack
+          jwk-set-uri: https://keycloak-fintrack.sythorng.site/auth/realms/Fintrack/protocol/openid-connect/certs
 Base:
   url: http://localhost:8088/api/v1/
 kafka:

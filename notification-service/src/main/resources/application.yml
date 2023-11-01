@@ -5,6 +5,13 @@ spring:
   application:
     name: notification-service
 
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: http://localhost:8443/auth/realms/Fintrack
+#          jwk-set-uri: http://localhost:8443/auth/realms/Fintrack/protocol/openid-connect/certs
+
   kafka:
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -19,9 +26,9 @@ spring:
     bootstrap-servers: localhost:9092
 
   datasource:
-    url: jdbc:postgresql://localhost:33007/mini_project_db
-    username: my_user
-    password: my_password
+    url: jdbc:postgresql://34.142.208.161:2345/fintrack_db
+    username: postgres
+    password: 1234
   jpa:
     hibernate:
       ddl-auto: update
