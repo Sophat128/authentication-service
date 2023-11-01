@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/TestN
+    url: jdbc:postgresql://localhost:5432/testn
     username: postgres
-    password: runrun2001
+    password: 2003
 
   security:
     oauth2:

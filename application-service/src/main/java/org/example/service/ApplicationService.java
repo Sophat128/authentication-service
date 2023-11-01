@@ -8,8 +8,8 @@ import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
-public interface  ApplicationService {
-    ApplicationDto createNewApp(ApplicationRequest applicationRequest, PlatformType platformType, Principal principal);
+public interface ApplicationService {
+    ApplicationDto createNewApp(ApplicationRequest applicationRequest, Collection<PlatformType> platformType, Principal principal);
 
     List<ApplicationDto> getAllApp(Principal principal);
 

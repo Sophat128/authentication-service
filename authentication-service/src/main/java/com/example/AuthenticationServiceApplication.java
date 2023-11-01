@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 @SecurityScheme(
-        name = "auth",
+        name = "app",
         type = SecuritySchemeType.OAUTH2,
         in = SecuritySchemeIn.HEADER,
         flows = @OAuthFlows(
