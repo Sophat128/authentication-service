@@ -3,6 +3,7 @@ package org.example.service.serviceImpl;
 import com.example.dto.UserDto;
 
 import org.example.exception.AlreadyExistException;
+import org.example.exception.BadRequestException;
 import org.example.exception.ForbiddenException;
 import org.example.exception.NotFoundException;
 import org.example.model.Application;
@@ -41,6 +42,9 @@ public class ApplicationServiceImpl implements ApplicationService {
     public ApplicationDto createNewApp(ApplicationRequest applicationRequest, Collection<PlatformType> platformType, Principal principal) {
         if(principal == null){
             throw new ForbiddenException("Need Token");
+        }
+        if (platformType == null || platformType.isEmpty()) {
+            throw new BadRequestException("Platform type must be selected");
         }
         UUID userId = UUID.fromString(principal.getName());
         Application application = new Application();

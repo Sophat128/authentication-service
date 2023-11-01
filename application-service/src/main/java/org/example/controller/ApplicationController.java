@@ -4,6 +4,7 @@ import com.example.dto.ApplicationDto;
 import com.example.response.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import com.example.constant.PlatformType;
+import jakarta.validation.Valid;
 import org.example.model.request.ApplicationRequest;
 import org.example.service.ApplicationService;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class ApplicationController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<?> createNewApp(@RequestBody ApplicationRequest applicationRequest, @RequestParam Collection<PlatformType> platformType, Principal principal){
+    public ResponseEntity<?> createNewApp(@Valid @RequestBody ApplicationRequest applicationRequest, @RequestParam Collection<PlatformType> platformType, Principal principal){
         ApplicationDto applicationDto = applicationService.createNewApp(applicationRequest,platformType,principal);
         ApiResponse<ApplicationDto> response = ApiResponse.<ApplicationDto>builder()
                 .message("create new application successfully")
