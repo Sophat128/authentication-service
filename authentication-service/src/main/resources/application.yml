@@ -35,7 +35,7 @@ spring.mail:
   host: smtp.gmail.com
   port: 587
   username: soccerdatehrd@gmail.com
-  password: nolwmacooizbnviz
+  password: tmkylzbkhzsautkz
 
 spring.servlet:
   multipart:
