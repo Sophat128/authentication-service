@@ -1,11 +1,13 @@
 package com.example.response;
 
 
+import com.example.dto.UserDtoClient;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 @Data
 @NoArgsConstructor
@@ -22,4 +24,6 @@ public class ApiResponse<T> {
 
     private Integer status;
 
+    public ApiResponse(HttpStatus httpStatus, String moneyTransferSuccessful) {
+    }
 }

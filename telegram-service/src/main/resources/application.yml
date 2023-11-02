@@ -1,6 +1,6 @@
 bot:
-  token: 6831194245:AAGlG3zTUD_Lsm4lAB5aw0QXkEiFt9IT__0
-  name: myrandom123_bot
+  token: 6666866418:AAFe1UyRicd_jFhpadlh8Qp3bMCwxTx3Q4k
+  name: FintrackAPIBot
 
 spring:
   kafka:
@@ -14,14 +14,14 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/demo_telegram_bot
     username: postgres
-    password: 1234
+    password: krya
     driver-class-name: org.postgresql.Driver
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8443/auth/realms/Fintrack
-          jwk-set-uri: http://localhost:8443/auth/realms/Fintrack/protocol/openid-connect/certs
+          issuer-uri: http://localhost:8443/auth/realms/client_user
+          jwk-set-uri: http://localhost:8443/auth/realms/client_user/protocol/openid-connect/certs
   jpa:
     hibernate:
       ddl-auto: update
@@ -31,16 +31,22 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 keycloak:
-  realm: Fintrack
-  resource: fintrack-app
+  realm: client_user
+  resource: client-user-app
   #  auth-server-url: https://demo.docengine.tech/auth/ #docker container
   auth-server-url: http://localhost:8443/auth/ #docker container
   credentials:
     username: 'admin'
     password: 'admin'
-    client-id: 'fintrack-app' # admin account for creating users
-    secret: 'qOmECg1MXkL4ip2lwISCV0NEqokWpEJ6'
+    client-id: 'client-user-app' # admin account for creating users
+    secret: 'kdV1S5gjjriGOK1wUXGoooGRUHUdIFgf'
     provider: secret
 
   grant-type: password
-  tokenUrl: http://localhost:8443/auth/realms/Fintrack/protocol/openid-connect/token
+  tokenUrl: http://localhost:8443/auth/realms/client_user/protocol/openid-connect/token
+
+server:
+  port: 8082
+
+kafka:
+  group-id: notification-consumer

@@ -1,5 +1,4 @@
 
-
 spring:
 
   kafka:
@@ -7,6 +6,8 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       bootstrap-servers: localhost:9092
+    dead_letter_topic: notification-retry
+
 
     topic:
       name: notification
@@ -14,9 +15,9 @@ spring:
     bootstrap-servers: localhost:9092
 
   datasource:
-    url: jdbc:postgresql://localhost:33007/mini_project_db
-    username: my_user
-    password: my_password
+    url: jdbc:postgresql://localhost:5432/demo_telegram_bot
+    username: postgres
+    password: krya
   jpa:
     hibernate:
       ddl-auto: update
@@ -32,5 +33,10 @@ logging:
     com.levi.testhibernate: debug
 #    batch_size: 1
 
+kafka:
+  group-id: notification-consumer
+  auto-offset: earliest
 
+server:
+  port: 8084
 

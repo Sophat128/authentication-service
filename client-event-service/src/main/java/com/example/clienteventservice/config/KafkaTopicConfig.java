@@ -1,4 +1,4 @@
-package com.example.config;
+package com.example.clienteventservice.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;
@@ -10,7 +10,6 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic topic() {
-        return TopicBuilder.name("telegram").build();
+        return TopicBuilder.name("notification").build();
     }
-
 }

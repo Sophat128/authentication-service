@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/TestN
+    url: jdbc:postgresql://localhost:5432/demo_telegram_bot
     username: postgres
-    password: runrun2001
+    password: krya
 
   security:
     oauth2:

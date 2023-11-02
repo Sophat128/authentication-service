@@ -18,10 +18,7 @@ public class Telegram {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String firstName;
-    private String lastName;
-    private String userName;
     private Long chatId;
-    private UUID userId;
+    private String userId;
 
 }

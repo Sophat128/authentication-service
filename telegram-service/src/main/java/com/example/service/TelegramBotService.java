@@ -2,20 +2,17 @@ package com.example.service;
 
 
 import com.example.config.TelegramBotConfig;
-import com.example.exception.NotFoundException;
 import com.example.model.Telegram;
 import com.example.repository.TelegramRepository;
-import com.example.response.ApiResponse;
-import com.vdurmont.emoji.EmojiParser;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.security.Principal;
-import java.util.UUID;
+import java.util.List;
 
 
 @Service
@@ -23,6 +20,8 @@ public class TelegramBotService extends TelegramLongPollingBot {
 
     private final TelegramBotConfig telegramBotConfig;
     private final TelegramRepository telegramRepository;
+
+
 
     public TelegramBotService(TelegramBotConfig telegramBotConfig, TelegramRepository userRepository)  {
         this.telegramBotConfig = telegramBotConfig;
@@ -41,92 +40,58 @@ public class TelegramBotService extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-
         if (update.hasMessage() && update.getMessage().hasText()) {
-            String messageText = update.getMessage().getText();
             Long chatId = update.getMessage().getChatId();
+            String messageText = update.getMessage().getText();
 
-            if (messageText.equals("/start")) {
-                registerUser(update.getMessage());
-                startCommandReceived(chatId, update.getMessage().getChat().getLastName(), update.getMessage().getChat().getFirstName());
-            } else {
-                prepareAndSendMessage(chatId, "Sorry, command was not recognized!");
-            }
-        }
+            if ("/start".equals(messageText)) {
 
-    }
+                SendMessage message = new SendMessage();
+                message.setChatId(chatId);
+                message.setText("Welcome to your bot! Click the button below to bind your account and navigate to the application.");
 
-    private UUID userId =null;
-    public void getCurrentId(Principal principal) {
-        userId = UUID.fromString(principal.getName());
-    }
+                // Include the chatId as a parameter in the URL
+                String appUrl = "https://your-app.com?chatId=" + chatId;
 
-    private void registerUser(Message message) {
+                // Create the inline keyboard button
+                InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+                InlineKeyboardButton button = new InlineKeyboardButton("Bind Account");
 
-        Long chatId = message.getChatId();
-        var chat = message.getChat();
+                // Set the URL to your application's URL with chatId parameter
+                button.setUrl(appUrl);
 
-        Telegram user;
-        user = new Telegram();
+                markup.setKeyboard(List.of(List.of(button)));
+                message.setReplyMarkup(markup);
 
-        user.setFirstName(chat.getFirstName());
-        user.setLastName(chat.getLastName());
-        user.setUserName(chat.getUserName());
-        user.setChatId(chatId);
-        user.setUserId(userId);
 
-        if (telegramRepository.findUserByChatId(message.getChatId()) == null) {
-            if(userId!=null){
-                telegramRepository.save(user);
+
+
+                try {
+                    execute(message);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
-    private void startCommandReceived(Long chatId, String firstName,String lastname) {
-        String answer="";
-        if(userId!=null){
-            answer = EmojiParser.parseToUnicode("Hi, " + lastname+" "+firstName + "\nThank you for register our service " + ":blush:");
-        } else answer= EmojiParser.parseToUnicode("Hi, " + lastname+" "+firstName + "\nWhat can i help you");
-
-        sendMessage(chatId, answer);
-    }
-
-    public void sendMessage(Long chatId, String textToSend) {
-
+    public void sendTextMessage(Long chatId, String text) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        sendMessage.setText(textToSend);
+        sendMessage.setText(text);
+
         try {
             execute(sendMessage);
         } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
-    public ApiResponse<?> sendMessage(String message, Principal principal){
-        if(principal.getName()==null){
-            throw new NotFoundException("use need to login");
-        }
-        Telegram telegram=telegramRepository.findByUserId(UUID.fromString(principal.getName()));
-        if(telegram!=null){
-            String answer= EmojiParser.parseToUnicode("Hi, " + telegram.getLastName()+" "+telegram.getFirstName() + "\n"+message);
-            sendMessage(telegram.getChatId(),answer);
-        }
-        return ApiResponse.builder()
-                .message("send message success")
-                .status(200)
-                .build();
+
+    public Long fetchChatIdByUserId(String userId) {
+        Telegram telegram = telegramRepository.findByUserId(userId);
+        return telegram.getChatId();
     }
 
-    private void prepareAndSendMessage(Long chatId, String textToSend) {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        sendMessage.setText(textToSend);
-        try {
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
 }
