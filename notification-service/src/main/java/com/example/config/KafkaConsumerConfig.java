@@ -24,20 +24,22 @@ import java.util.Map;
 public class KafkaConsumerConfig {
     @Value("${spring.kafka.producer.bootstrap-servers}")
     private String bootstrapServers;
+
     @Value(value = "${spring.kafka.dead_letter_topic}")
     private String deadLetterTopic;
+
     @Value("${kafka.group-id}")
     private String groupId;
 
     @Value("${kafka.auto-offset}")
     private String autoOffset;
 
-
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     public KafkaConsumerConfig(KafkaTemplate<String, String> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
+
     @Bean
     public ConsumerFactory<String, String> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
@@ -48,6 +50,7 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         return new DefaultKafkaConsumerFactory<>(props);
     }
+
 
     @Bean("kafkaListenerContainerFactory")
     public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
@@ -63,4 +66,5 @@ public class KafkaConsumerConfig {
         concurrentKafkaListenerContainerFactory.setCommonErrorHandler(errorHandler);
         return concurrentKafkaListenerContainerFactory;
     }
+
 }

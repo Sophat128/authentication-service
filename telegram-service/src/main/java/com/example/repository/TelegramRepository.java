@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 public interface TelegramRepository extends JpaRepository<Telegram, Long> {
-    Telegram findUserByChatId(Long chatId);
-    Telegram findByUserId(UUID userID);
-    Telegram findByChatId(Long userID);
+    Telegram findByUserId(String userId);
+//    Telegram findUserByChatId(Long id);
+//    Telegram findByUserId(UUID id);
 }

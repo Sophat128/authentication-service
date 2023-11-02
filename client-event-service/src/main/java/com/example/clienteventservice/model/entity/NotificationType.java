@@ -1,4 +1,4 @@
-package com.example.entities;
+package com.example.clienteventservice.model.entity;
 
 public enum NotificationType {
     EMAIL,

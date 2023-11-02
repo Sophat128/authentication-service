@@ -19,12 +19,6 @@ public class Telegram {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long chatId;
-    private UUID userId;
-    private Boolean isSubscribe;
+    private String userId;
 
-    public Telegram(Long chatId, UUID userId, Boolean isSubscribe) {
-        this.chatId = chatId;
-        this.userId = userId;
-        this.isSubscribe = isSubscribe;
-    }
 }
