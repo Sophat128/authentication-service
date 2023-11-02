@@ -16,4 +16,5 @@ include 'transation-service'
 include 'loan-service'
 include 'scheduler-service'
 include 'smtp-service'
+include 'gateway'
 
