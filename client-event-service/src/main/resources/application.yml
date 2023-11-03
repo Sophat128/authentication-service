@@ -14,13 +14,13 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8443/auth/realms/client_user
-          jwk-set-uri: http://localhost:8443/auth/realms/client_user/protocol/openid-connect/certs
+          issuer-uri:  https://keycloak-fintrack.sythorng.site/auth/realms/user_service
+          jwk-set-uri: https://keycloak-fintrack.sythorng.site/auth/realms/user_service/protocol/openid-connect/certs
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/demo_telegram_bot
-    username: postgres
-    password: krya
+    url: jdbc:postgresql://localhost:33007/mini_project_db
+    username: my_user
+    password: my_password
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -32,18 +32,18 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 keycloak:
-  realm: client_user
-  resource: client-user-app
+  realm: USER_SERVICE
+  resource: client-app
   #  auth-server-url: https://demo.docengine.tech/auth/ #docker container
-  auth-server-url: http://localhost:8443/auth/ #docker container
+  auth-server-url: https://keycloak-fintrack.sythorng.site/auth/ #docker container
   credentials:
     username: 'admin'
     password: 'admin'
-    client-id: 'client-user-app' # admin account for creating users
-    secret: 'kdV1S5gjjriGOK1wUXGoooGRUHUdIFgf'
+    client-id: 'client-app' # admin account for creating users
+    secret: 'fdakufDNpefxzc7oaGHugg4UcL6jmSAy'
 
   grant-type: password
-  tokenUrl: http://localhost:8443/auth/realms/client_user/protocol/openid-connect/token
+  tokenUrl: https://keycloak-fintrack.sythorng.site/auth/realms/user_service/protocol/openid-connect/token
 
 spring.mail:
   host: smtp.gmail.com

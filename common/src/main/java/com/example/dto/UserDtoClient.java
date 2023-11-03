@@ -22,7 +22,7 @@ public class UserDtoClient {
 //    @JsonInclude(JsonInclude.Include.NON_NULL)
 //    private String notificationType;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String balance;
+//    @JsonInclude(JsonInclude.Include.NON_NULL)
+//    private String balance;
 
 }

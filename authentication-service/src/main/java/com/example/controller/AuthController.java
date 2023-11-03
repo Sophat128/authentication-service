@@ -1,8 +1,8 @@
 package com.example.controller;
 
 
-import com.example.model.request.LoginRequest;
-import com.example.model.request.UserRequest;
+import com.example.model.LoginRequest;
+import com.example.model.UserRequest;
 import com.example.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;

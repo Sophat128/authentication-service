@@ -1,6 +1,6 @@
 package com.example.listener;
 
-import com.example.entities.request.PushNotificationRequest;
+import com.example.model.request.PushNotificationRequest;
 import com.example.webpush.WebPushService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.logging.log4j.Level;

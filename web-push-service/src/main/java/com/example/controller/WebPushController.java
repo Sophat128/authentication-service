@@ -1,15 +1,22 @@
 package com.example.controller;
 
-import com.example.entities.request.PushNotificationRequest;
+import com.example.model.entities.WebDataConfig;
+import com.example.model.request.PushNotificationRequest;
+import com.example.model.request.WebConfigRequest;
+import com.example.service.WebService;
 import com.example.webpush.WebPushService;
 import lombok.AllArgsConstructor;
 import nl.martijndwars.webpush.Subscription;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.service.annotation.PutExchange;
+
+import java.util.UUID;
 
 @RestController
 @AllArgsConstructor
 public class WebPushController {
     private final WebPushService webPushService;
+    private final WebService webService;
 
     @GetMapping("/publicKey")
     public String getPublicKey(){
@@ -50,4 +57,19 @@ public class WebPushController {
         webPushService.notifySpecificUser(pushNotificationRequest);
 
     }
+
+    @PostMapping("/addConfig")
+    public void addWebConfig(@RequestBody WebConfigRequest webConfigRequest){
+        webService.addConfig(webConfigRequest);
+    }
+    @PutMapping("/updateConfig/{id}")
+    public WebDataConfig updateConfig(@RequestBody WebConfigRequest webConfigRequest, @PathVariable UUID id){
+        return webService.updateConfig(id, webConfigRequest);
+    }
+
+    @GetMapping("/getConfig/{id}")
+    public WebDataConfig getConfigById(@PathVariable UUID id){
+        return webService.getConfigById(id);
+    }
+
 }

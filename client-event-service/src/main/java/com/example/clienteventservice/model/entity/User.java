@@ -27,8 +27,8 @@ public class User {
 //    @JsonInclude(JsonInclude.Include.NON_NULL)
 //    private String notificationType;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private BigDecimal balance;
+//    @JsonInclude(JsonInclude.Include.NON_NULL)
+//    private BigDecimal balance;
 
 
     public static UserDtoClient toDto(UserRepresentation userRepresentation, String url) {
@@ -38,9 +38,9 @@ public class User {
                 userRepresentation.getEmail(),
                 url+userRepresentation.getAttributes().get("profile").get(0),
                 LocalDateTime.parse(userRepresentation.getAttributes().get("createdDate").get(0)),
-                LocalDateTime.parse(userRepresentation.getAttributes().get("lastModified").get(0)),
+                LocalDateTime.parse(userRepresentation.getAttributes().get("lastModified").get(0))
 //                userRepresentation.getAttributes().get("notificationType").get(0),
-                userRepresentation.getAttributes().get("balance").get(0)
+//                userRepresentation.getAttributes().get("balance").get(0)
         );
     }
 }

@@ -485,10 +485,10 @@ public class UserService {
             User sender = getUserByPrincipal(principal);
 
             // Check if the sender has sufficient funds to complete the transaction
-            BigDecimal senderBalance = sender.getBalance();
+//            BigDecimal senderBalance = sender.getBalance();
 
             // Deduct the amount from the sender's balance
-            sender.setBalance(senderBalance.subtract(amount));
+//            sender.setBalance(senderBalance.subtract(amount));
 
 
             String _sender = "user id: ";
@@ -531,9 +531,9 @@ public class UserService {
         user.setId(userDTOClient.getId());
         user.setUsername(principalName);
 
-        String balanceAsString = userDTOClient.getBalance();
-        BigDecimal balance = new BigDecimal(balanceAsString);
-        user.setBalance(balance); // Set the user's balance
+//        String balanceAsString = userDTOClient.getBalance();
+//        BigDecimal balance = new BigDecimal(balanceAsString);
+//        user.setBalance(balance); // Set the user's balance
 
         return user;
     }

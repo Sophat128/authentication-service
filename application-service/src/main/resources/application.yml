@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://34.142.208.161:2345/fintrack_db
-    username: postgres
-    password: 1234
+    url: jdbc:postgresql://localhost:33007/mini_project_db
+    username: my_user
+    password: my_password
 
   security:
     oauth2:

@@ -1,5 +1,6 @@
 package com.example.model.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProfileRequest {
-    private String profile;
-    private String newPassword;
-    private String username;
+public class PushNotificationRequest {
+    private String title;
+    private String body;
+
 }

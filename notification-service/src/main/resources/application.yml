@@ -38,5 +38,5 @@ kafka:
   auto-offset: earliest
 
 server:
-  port: 8084
+  port: 8087
 

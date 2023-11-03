@@ -1,0 +1,41 @@
+server:
+  servlet:
+    context-path: /
+  port:
+    9001
+spring:
+  #  main:
+  #    web-application-type: reactive
+
+  application:
+    name: api-gateway-service
+springdoc:
+
+  #  enable-native-support: true
+  api-docs:
+    enabled: true
+  swagger-ui:
+    disable-swagger-default-url: true
+    enabled: true
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - url: /v3/api-docs
+        name: API Gateway Service
+      - url: /task-service/v3/api-docs
+        name: Task Service
+      - url: /keycloak-client/v3/api-docs
+        name: Keycloak Client
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  endpoint:
+    gateway:
+      enabled: true

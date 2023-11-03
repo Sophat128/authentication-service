@@ -1,5 +1,8 @@
 package com.example.service;
 
+import com.example.entities.request.TransferRequest;
+import com.example.entities.response.TransferResponse;
+
 public interface TransactionService {
-    String transfer(String amount);
+    TransferResponse transfer(TransferRequest transferRequest);
 }
