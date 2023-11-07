@@ -48,7 +48,6 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         return new DefaultKafkaConsumerFactory<>(props);
     }
-
     @Bean("kafkaListenerContainerFactory")
     public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, String> concurrentKafkaListenerContainerFactory

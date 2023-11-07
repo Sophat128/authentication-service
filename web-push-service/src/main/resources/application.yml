@@ -52,3 +52,11 @@ kafka:
   auto-offset: earliest
   topics:
     data: web-notification
+
+
+
+springdoc:
+  api-docs:
+    path: /web-push-service/v3/api-docs #these urls will used to load the swagger ui of this service by the api gateway
+  swagger-ui:
+    path: /web-push-service/swagger-ui.html

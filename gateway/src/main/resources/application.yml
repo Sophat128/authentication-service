@@ -4,11 +4,49 @@ server:
   port:
     9001
 spring:
-  #  main:
-  #    web-application-type: reactive
-
+  main:
+    web-application-type: reactive
   application:
     name: api-gateway-service
+
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: transaction-openapi
+          uri: lb://TRANSACTION-SERVICE
+          predicates:
+            - Path=/transaction-service/**
+        #          filters:
+        #            - RewritePath=/student-service/(?<path>.*), /$\{path}
+
+        - id: webpush-openapi
+          uri: lb://WEB-PUSH-SERVICE
+          predicates:
+            - Path=/web-push-service/**
+        #          filters:
+        #            - RewritePath=/course-service/(?<path>.*), /$\{path}
+
+        - id: transaction-service
+          uri: lb://TRANSACTION-SERVICE  # URL of service1
+          predicates:
+            - Path=/api/v1/transaction/**  # Route requests starting with /api/students/ to service1
+
+        - id: web-push-service
+          uri: lb://WEB-PUSH-SERVICE  # URL of service2
+          predicates:
+            - Path=/api/v1/webpush/**
+
+        - id: openapi
+          uri: http://localhost:${server.port}
+          predicates:
+            - Path=/v3/api-docs/**
+          filters:
+            - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs
+
 springdoc:
 
   #  enable-native-support: true
@@ -22,10 +60,11 @@ springdoc:
     urls:
       - url: /v3/api-docs
         name: API Gateway Service
-      - url: /task-service/v3/api-docs
-        name: Task Service
-      - url: /keycloak-client/v3/api-docs
-        name: Keycloak Client
+      - url: /transaction-service/v3/api-docs
+        name: Transaction Service
+      - url: /web-push-service/v3/api-docs
+        name: Webpush Service
+
 eureka:
   client:
     serviceUrl:

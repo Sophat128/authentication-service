@@ -6,4 +6,6 @@ import com.example.entities.request.EmailRequest;
 public interface NotificationService {
 
     void publishToMail(EmailRequest emailRequest);
+    void pushToWeb(Object data);
+    Object getPublicKey();
 }

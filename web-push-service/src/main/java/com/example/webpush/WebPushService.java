@@ -8,6 +8,7 @@ import com.example.service.WebService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
 import nl.martijndwars.webpush.Subscription;
@@ -15,6 +16,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jose4j.lang.JoseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -28,17 +31,18 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Service
+@Slf4j
 public class WebPushService {
 
-    @Value("${vapid.public.key}")
-    private String publicKey;
-    @Value("${vapid.private.key}")
-    private String privateKey;
-    @Value("${vapid.subject}")
-    private String subject;
+    //    @Value("${vapid.public.key}")
+//    private String publicKey;
+//    @Value("${vapid.private.key}")
+//    private String privateKey;
+//    @Value("${vapid.subject}")
+//    private String subject;
     private final WebService webService;
-
     private PushService pushService;
+    private final Logger logger = LoggerFactory.getLogger(WebPushService.class);
 
     private final Map<String, Subscription> endpointToSubscription = new HashMap<>();
     private final WebRepository webRepository;
@@ -50,13 +54,27 @@ public class WebPushService {
 
     @PostConstruct
     private void init() throws GeneralSecurityException {
-        WebDataConfig webDataConfig = webService.getConfig();
-        Security.addProvider(new BouncyCastleProvider());
-        pushService = new PushService(webDataConfig.getPublicKey(),webDataConfig.getPrivateKey());
+        WebDataConfig webDataConfig = new WebDataConfig();
+        try {
+            webDataConfig = webService.getConfig();
+            Security.addProvider(new BouncyCastleProvider());
+            pushService = new PushService(webDataConfig.getPublicKey(), webDataConfig.getPrivateKey());
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            logger.error("Error initializing PushService: " + e.getMessage(), e);
+        }
+
     }
-    public String getPublicKey() {
-        return publicKey;
-    }
+
+//    public void reinitializeConfig() throws GeneralSecurityException {
+//        WebDataConfig webDataConfig = webService.getConfig();
+//        Security.addProvider(new BouncyCastleProvider());
+//        pushService = new PushService(webDataConfig.getPublicKey(), webDataConfig.getPrivateKey());
+//    }
+//    public String getPublicKey() {
+//        return publicKey;
+//    }
 
     public void sendNotification(Subscription subscription, String messageJson) {
         try {
@@ -76,8 +94,9 @@ public class WebPushService {
             e.printStackTrace();
         }
     }
+
     public List<UserSubscription> getAllSubscriber() {
-       return webRepository.findAll();
+        return webRepository.findAll();
     }
 
     public void clearAllSubscription() {
@@ -92,16 +111,18 @@ public class WebPushService {
         UserSubscription userSubscription = new UserSubscription(subscription.endpoint, subscription.keys.auth, subscription.keys.p256dh, 1L);
         if (webRepository.findByUserId(1L) == null) {
             webRepository.save(userSubscription);
-        }else {
+        } else {
             System.out.println("This user is already subscribe");
         }
         endpointToSubscription.put(subscription.endpoint, subscription);
     }
+
     public void unsubscribe(Subscription subscription) {
         System.out.println("Unsubscribed " + subscription.endpoint + " auth:" + subscription.keys.auth);
         webRepository.deleteByEndpoint(subscription.endpoint);
         endpointToSubscription.remove(subscription.endpoint);
     }
+
     public record Message(String title, String body) {
     }
 
@@ -124,11 +145,12 @@ public class WebPushService {
             throw new RuntimeException(e);
         }
     }
+
     public void notifySpecificUser(PushNotificationRequest pushNotificationRequest) {
         try {
             String msg = mapper.writeValueAsString(new Message(pushNotificationRequest.getTitle(), pushNotificationRequest.getBody()));
 //            Give default user id
-            UserSubscription userSubscription = webRepository.findByUserId(1L);
+            UserSubscription userSubscription = webRepository.findByUserId(6L);
             Subscription subscription = new Subscription(userSubscription.getEndpoint(), new Subscription.Keys(userSubscription.getP256dh(), userSubscription.getAuth()));
             System.out.println("Auth: " + subscription.keys.auth);
             sendNotification(subscription, msg);

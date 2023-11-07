@@ -49,3 +49,16 @@ kafka:
 #  protocol: SASL_PLAINTEXT
   topics:
     data: transaction
+
+
+
+springdoc:
+  api-docs:
+    path: /transaction-service/v3/api-docs #these urls will used to load the swagger ui of this service by the api gateway
+#  swagger-ui:
+#    path: /transaction-service/swagger-ui.html
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/

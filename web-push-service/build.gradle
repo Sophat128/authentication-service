@@ -8,14 +8,23 @@ version '0.0.1-SNAPSHOT'
 repositories {
     mavenCentral()
 }
+ext {
+    set('springCloudVersion', "2022.0.4")
+}
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     implementation 'nl.martijndwars:web-push:5.1.1'
+
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui
+    implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+    implementation 'org.springframework.kafka:spring-kafka'
 // https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on
     implementation 'org.bouncycastle:bcpkix-jdk15on:1.70'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+//    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation 'commons-io:commons-io:2.14.0'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
@@ -26,6 +35,13 @@ dependencies {
 
 
 
+
+
+}
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 test {

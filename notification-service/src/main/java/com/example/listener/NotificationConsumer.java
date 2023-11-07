@@ -1,6 +1,5 @@
 package com.example.listener;
 
-import com.example.config.BeanConfig;
 import com.example.dto.SubscriptionDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -10,7 +9,7 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+//import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 
@@ -20,16 +19,14 @@ import java.util.List;
 public class NotificationConsumer {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
-    private final BeanConfig beanConfig;
 
     private static final String NOTIFICATION_TOPIC = "notification";
     private static final String TELEGRAM_TOPIC = "telegram";
     private static final String EMAIL_TOPIC = "email";
 
 
-    public NotificationConsumer(KafkaTemplate<String, String> kafkaTemplate, BeanConfig beanConfig) {
+    public NotificationConsumer(KafkaTemplate<String, String> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
-        this.beanConfig = beanConfig;
     }
 
     //    @RetryableTopic(
@@ -46,6 +43,8 @@ public class NotificationConsumer {
     void listener(ConsumerRecord<Object, Object> notification) {
         log.info("Started consuming message on topic: {}, offset {}, message {}", notification.topic(),
                 notification.offset(), notification.value());
+
+
 
         Message<Object> message = MessageBuilder
                 .withPayload(notification.value())

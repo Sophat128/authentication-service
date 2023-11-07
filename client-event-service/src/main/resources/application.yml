@@ -3,6 +3,10 @@ server:
 baseUrl: http://localhost:${server.port}
 
 spring:
+
+  application:
+    name: client-service
+
   mail:
     properties:
       mail:
