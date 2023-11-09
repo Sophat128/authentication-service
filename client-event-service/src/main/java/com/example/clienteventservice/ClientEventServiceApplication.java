@@ -8,19 +8,21 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
+@EnableJpaAuditing
 @SecurityScheme(
         name = "auth",
         type = SecuritySchemeType.OAUTH2,
         in = SecuritySchemeIn.HEADER,
         flows = @OAuthFlows(
                 clientCredentials = @OAuthFlow(
-                        tokenUrl = "https://keycloak-fintrack.sythorng.site/auth/realms/client_user/protocol/openid-connect/token"
+                        tokenUrl = "https://keycloak-fintrack.sythorng.site/auth/realms/USER_SERVICE/protocol/openid-connect/token"
                 ),
                 password = @OAuthFlow(
-                        tokenUrl = "https://keycloak-fintrack.sythorng.site/auth/realms/client_user/protocol/openid-connect/token"
+                        tokenUrl = "https://keycloak-fintrack.sythorng.site/auth/realms/USER_SERVICE/protocol/openid-connect/token"
                 )
         )
 )

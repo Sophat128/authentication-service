@@ -45,7 +45,6 @@ public class NotificationConsumer {
                 notification.offset(), notification.value());
 
 
-
         Message<Object> message = MessageBuilder
                 .withPayload(notification.value())
                 .setHeader(KafkaHeaders.TOPIC, "web-notification")

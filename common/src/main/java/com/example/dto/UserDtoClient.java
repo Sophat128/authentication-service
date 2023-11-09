@@ -1,6 +1,5 @@
 package com.example.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,11 +12,15 @@ import java.util.UUID;
 @NoArgsConstructor
 public class UserDtoClient {
     private UUID id;
+    private String firstName;
+    private String lastName;
     private String username;
     private String email;
+    private String phoneNumber;
     private String profile;
-    private LocalDateTime createdDate;
-    private LocalDateTime lastModified;
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 
 //    @JsonInclude(JsonInclude.Include.NON_NULL)
 //    private String notificationType;

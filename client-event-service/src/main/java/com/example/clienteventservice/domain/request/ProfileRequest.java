@@ -1,4 +1,4 @@
-package com.example.clienteventservice.model.request;
+package com.example.clienteventservice.domain.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

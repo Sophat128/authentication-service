@@ -2,7 +2,7 @@ package com.example.clienteventservice.controller;
 
 
 import com.example.clienteventservice.exception.NotFoundException;
-import com.example.clienteventservice.model.entity.Image;
+import com.example.clienteventservice.domain.model.Image;
 import com.example.clienteventservice.service.FileUploadService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.core.io.ByteArrayResource;

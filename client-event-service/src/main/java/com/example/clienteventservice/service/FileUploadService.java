@@ -1,6 +1,6 @@
 package com.example.clienteventservice.service;
 
-import com.example.clienteventservice.model.entity.Image;
+import com.example.clienteventservice.domain.model.Image;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;

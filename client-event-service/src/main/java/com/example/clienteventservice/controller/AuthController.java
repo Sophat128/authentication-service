@@ -1,8 +1,9 @@
 package com.example.clienteventservice.controller;
 
-import com.example.clienteventservice.model.request.LoginRequest;
-import com.example.clienteventservice.model.request.UserRequest;
+import com.example.clienteventservice.domain.request.LoginRequest;
+import com.example.clienteventservice.domain.request.UserRequest;
 import com.example.clienteventservice.service.UserService;
+import com.google.common.base.Preconditions;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ public class AuthController {
     @PostMapping("/register")
     @Operation(summary = "register")
     public ResponseEntity<?> createUser(@RequestBody UserRequest userRequest) {
+        Preconditions.checkNotNull(userRequest, "userRequest can not be null");
         return ResponseEntity.ok().body(userService.create(userRequest));
     }
 

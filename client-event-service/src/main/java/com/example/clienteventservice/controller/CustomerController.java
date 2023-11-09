@@ -1,7 +1,9 @@
 package com.example.clienteventservice.controller;
 
-import com.example.clienteventservice.model.request.ProfileRequest;
+import com.example.clienteventservice.domain.request.ProfileRequest;
 import com.example.clienteventservice.service.UserService;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
@@ -17,37 +19,62 @@ import java.util.UUID;
 
 @RestController
 @CrossOrigin
-@RequestMapping("api/v1/clients")
+@RequestMapping("api/v1/customers")
 @AllArgsConstructor
-public class UserController {
+public class CustomerController {
 
     private final UserService userService;
 
     @GetMapping("username")
     @Operation(summary = "get user by username")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK."),
+            @ApiResponse(code = 400, message = "Bad Request."),
+            @ApiResponse(code = 500, message = "Internal Error.")
+    })
     public ResponseEntity<?> getByUsername(@RequestParam String username) {
         return ResponseEntity.ok().body(userService.getByUserName(username));
     }
 
     @GetMapping("email")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK."),
+            @ApiResponse(code = 400, message = "Bad Request."),
+            @ApiResponse(code = 500, message = "Internal Error.")
+    })
     @Operation(summary = "get user by email")
     public ResponseEntity<?> getByEmail(@RequestParam String email) {
         return ResponseEntity.ok().body(userService.getByEmail(email));
     }
 
-//    @GetMapping
+    @GetMapping
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK."),
+            @ApiResponse(code = 400, message = "Bad Request."),
+            @ApiResponse(code = 500, message = "Internal Error.")
+    })
     public ResponseEntity<?> getAllUser() {
         return ResponseEntity.ok().body(userService.getAllUsers());
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "get user by id (UUID) ")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK."),
+            @ApiResponse(code = 400, message = "Bad Request."),
+            @ApiResponse(code = 500, message = "Internal Error.")
+    })
     public ResponseEntity<?> getById(@PathVariable UUID id) {
         return ResponseEntity.ok().body(userService.getById(id));
     }
-    @GetMapping
+    @GetMapping("/current_user")
     @SecurityRequirement(name = "auth")
     @Operation(summary = "get user information ")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK."),
+            @ApiResponse(code = 400, message = "Bad Request."),
+            @ApiResponse(code = 500, message = "Internal Error.")
+    })
     public ResponseEntity<?> getUserInfo(Principal principal) {
         return ResponseEntity.ok().body(userService.getInfo(principal));
     }
@@ -55,6 +82,11 @@ public class UserController {
     @PutMapping
     @SecurityRequirement(name = "auth")
     @Operation(summary = "update information user current user (token) ")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK."),
+            @ApiResponse(code = 400, message = "Bad Request."),
+            @ApiResponse(code = 500, message = "Internal Error.")
+    })
     public ResponseEntity<?> updateById(@RequestBody ProfileRequest userRequest, Principal principal, @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok().body(userService.updateById(userRequest, principal,jwt));
     }

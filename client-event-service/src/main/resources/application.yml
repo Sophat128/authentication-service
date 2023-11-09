@@ -18,8 +18,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri:  https://keycloak-fintrack.sythorng.site/auth/realms/user_service
-          jwk-set-uri: https://keycloak-fintrack.sythorng.site/auth/realms/user_service/protocol/openid-connect/certs
+          issuer-uri:  https://keycloak-fintrack.sythorng.site/auth/realms/USER_SERVICE
+          jwk-set-uri: https://keycloak-fintrack.sythorng.site/auth/realms/USER_SERVICE/protocol/openid-connect/certs
 
   datasource:
     url: jdbc:postgresql://localhost:33007/mini_project_db
@@ -47,7 +47,7 @@ keycloak:
     secret: 'fdakufDNpefxzc7oaGHugg4UcL6jmSAy'
 
   grant-type: password
-  tokenUrl: https://keycloak-fintrack.sythorng.site/auth/realms/user_service/protocol/openid-connect/token
+  tokenUrl: https://keycloak-fintrack.sythorng.site/auth/realms/USER_SERVICE/protocol/openid-connect/token
 
 spring.mail:
   host: smtp.gmail.com

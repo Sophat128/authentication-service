@@ -1,4 +1,4 @@
-package com.example.clienteventservice.model.entity;
+package com.example.clienteventservice.domain.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

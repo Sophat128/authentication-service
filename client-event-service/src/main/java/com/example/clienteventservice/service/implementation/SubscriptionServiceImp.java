@@ -1,13 +1,11 @@
 package com.example.clienteventservice.service.implementation;
 
-import com.example.clienteventservice.model.entity.Subscription;
+import com.example.clienteventservice.domain.model.Subscription;
 import com.example.clienteventservice.repository.SubscriptionRepository;
 import com.example.clienteventservice.service.SubscriptionService;
-import com.example.dto.SubscriptionDto;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

@@ -14,10 +14,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 @AllArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
-
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final WebClient.Builder webClient;
-
     @Override
     public void publishToMail(EmailRequest emailRequest) {
         Email email = emailRequest.toEntity();
@@ -36,7 +34,6 @@ public class NotificationServiceImpl implements NotificationService {
                 .get()
                 .retrieve().bodyToMono(Object.class).block();
     }
-
     @Override
     public void pushToWeb(Object data) {
         Message<Object> message = MessageBuilder

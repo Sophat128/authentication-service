@@ -4,13 +4,13 @@ import com.example.clienteventservice.exception.AlreadyExistException;
 import com.example.clienteventservice.exception.BadRequestException;
 import com.example.clienteventservice.exception.ForbiddenException;
 import com.example.clienteventservice.exception.NotFoundException;
-import com.example.clienteventservice.model.entity.Subscription;
+import com.example.clienteventservice.domain.model.Subscription;
 import com.example.clienteventservice.repository.SubscriptionRepository;
 import com.example.dto.UserDtoClient;
-import com.example.clienteventservice.model.entity.User;
-import com.example.clienteventservice.model.request.LoginRequest;
-import com.example.clienteventservice.model.request.ProfileRequest;
-import com.example.clienteventservice.model.request.UserRequest;
+import com.example.clienteventservice.domain.model.User;
+import com.example.clienteventservice.domain.request.LoginRequest;
+import com.example.clienteventservice.domain.request.ProfileRequest;
+import com.example.clienteventservice.domain.request.UserRequest;
 import com.example.response.ApiResponse;
 import com.example.response.LoginResponse;
 import org.keycloak.admin.client.Keycloak;
@@ -23,6 +23,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -124,10 +127,11 @@ public class UserService {
             map.add("password", loginrequest.getPassword());
 
             HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(map, headers);
+            LoginResponse loginResponse =  restTemplate.postForEntity(tokenUrl, httpEntity, LoginResponse.class).getBody();
 
             return ApiResponse.<LoginResponse>builder()
                     .message("login success...!!")
-                    .loginResponse(restTemplate.postForEntity(tokenUrl, httpEntity, LoginResponse.class).getBody())
+                    .loginResponse(loginResponse)
                     .status(200).build();
 
         } catch (Exception e) {
@@ -137,7 +141,8 @@ public class UserService {
 
 
     public List<UserDtoClient> getAllUsers() {
-        return keycloak.realm(realm).users().list().stream()
+        return keycloak.realm(realm).users().
+                list().stream()
                 .map(e -> User.toDto(e, url))
                 .toList();
     }
@@ -194,6 +199,9 @@ public class UserService {
     public UserRepresentation prepareUserRepresentation(UserRequest userRequest, CredentialRepresentation credentialRepresentation) {
         UserRepresentation userRepresentation = new UserRepresentation();
         userRepresentation.setUsername(userRequest.getUsername());
+        userRepresentation.setFirstName(userRequest.getFirstName());
+        userRepresentation.setLastName(userRequest.getLastName());
+
         userRepresentation.setEmail(userRequest.getEmail());
 
         userRepresentation.singleAttribute("createdDate", String.valueOf(LocalDateTime.now()));
@@ -201,6 +209,8 @@ public class UserService {
 
         userRepresentation.singleAttribute("profile", "DefaultProfile.jpeg");
         userRepresentation.singleAttribute("isVerify", "false");
+        userRepresentation.singleAttribute("phoneNumber", userRequest.getPhoneNumber());
+
 
         userRepresentation.setCredentials(Collections.singletonList(credentialRepresentation));
         userRepresentation.setEnabled(true);

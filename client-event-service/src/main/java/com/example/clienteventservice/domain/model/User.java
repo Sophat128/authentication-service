@@ -1,4 +1,4 @@
-package com.example.clienteventservice.model.entity;
+package com.example.clienteventservice.domain.model;
 
 
 import com.example.dto.UserDtoClient;
@@ -7,9 +7,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 @Data
@@ -18,29 +21,30 @@ import java.util.UUID;
 public class User {
 
     private UUID id;
+    private String firstName;
+    private String lastName;
     private String username;
     private String email;
+    private String phoneNumber;
     private String profile;
-    private LocalDateTime createdDate;
-    private LocalDateTime lastModified;
+    @CreatedDate
+    private LocalDateTime createdAt;
 
-//    @JsonInclude(JsonInclude.Include.NON_NULL)
-//    private String notificationType;
-
-//    @JsonInclude(JsonInclude.Include.NON_NULL)
-//    private BigDecimal balance;
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
 
     public static UserDtoClient toDto(UserRepresentation userRepresentation, String url) {
         return new UserDtoClient(
                 UUID.fromString(userRepresentation.getId()),
+                userRepresentation.getFirstName(),
+                userRepresentation.getLastName(),
                 userRepresentation.getUsername(),
                 userRepresentation.getEmail(),
+                userRepresentation.getAttributes().get("phoneNumber").get(0),
                 url+userRepresentation.getAttributes().get("profile").get(0),
                 LocalDateTime.parse(userRepresentation.getAttributes().get("createdDate").get(0)),
                 LocalDateTime.parse(userRepresentation.getAttributes().get("lastModified").get(0))
-//                userRepresentation.getAttributes().get("notificationType").get(0),
-//                userRepresentation.getAttributes().get("balance").get(0)
         );
     }
 }

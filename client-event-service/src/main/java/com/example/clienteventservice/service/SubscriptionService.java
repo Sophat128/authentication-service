@@ -1,7 +1,6 @@
 package com.example.clienteventservice.service;
 
-import com.example.clienteventservice.model.entity.Subscription;
-import com.example.dto.SubscriptionDto;
+import com.example.clienteventservice.domain.model.Subscription;
 
 import java.util.List;
 
