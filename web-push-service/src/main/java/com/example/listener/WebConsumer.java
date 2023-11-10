@@ -20,7 +20,7 @@ public class WebConsumer {
         this.webPushService = webPushService;
     }
     @KafkaListener(topics = "${kafka.topics.data}")
-    public void sendConfirmationEmails(ConsumerRecord<?, ?> commandsRecord) throws MessagingException, IOException {
+    public void sendConfirmationEmails(ConsumerRecord<Object, Object> commandsRecord) throws MessagingException, IOException {
         LOGGER.log(Level.INFO, () -> String.format("sendConfirmationEmails() » Topic: %s", commandsRecord.topic()));
         PushNotificationRequest pushNotificationRequest = new PushNotificationRequest("Transaction", commandsRecord.value().toString());
         webPushService.notifySpecificUser(pushNotificationRequest);
