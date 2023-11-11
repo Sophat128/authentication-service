@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -29,9 +30,8 @@ public class NotificationController {
         return ResponseEntity.ok("Successful");
 
     }
-    @PostMapping("/send_mail/{smtpId}/{appId}")
+    @PostMapping(value = "/send_mail")
     public ResponseEntity<?> sendMail(@RequestBody EmailRequest emailRequest) {
-
         service.publishToMail(emailRequest);
         return ResponseEntity.ok("Successful");
 

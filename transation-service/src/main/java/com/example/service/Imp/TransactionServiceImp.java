@@ -14,13 +14,15 @@ public class TransactionServiceImp implements TransactionService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
-    public String transfer(String amount) {
+    public String transfer(String amount,String email) {
         Message<String> message = MessageBuilder
                 .withPayload(amount)
-                .setHeader(KafkaHeaders.TOPIC, "notification")
+//                .setHeader(KafkaHeaders.TOPIC, "notification")
+                .setHeader(KafkaHeaders.TOPIC,"send.email.kb")
                 .build();
         System.out.println("Message: " + message);
         kafkaTemplate.send(message);
+
 
         return amount;
     }

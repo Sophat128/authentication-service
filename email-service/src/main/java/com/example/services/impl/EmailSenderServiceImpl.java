@@ -92,6 +92,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         if (principal.getName()==null){
             throw new EntityNotFoundException("need token");
         }
+
         SmtpDto smtpDto = getSmtpById(smtpId,appId,jwt);
         EmailConfig emailConfig = new EmailConfig();
         emailConfig.setUsername(smtpDto.getUsername());

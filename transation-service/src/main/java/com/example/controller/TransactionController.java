@@ -12,6 +12,6 @@ public class TransactionController {
 
     @GetMapping("/transaction")
     public String transaction(){
-        return transactionService.transfer("20000");
+        return transactionService.transfer("20000","rphearun22@gmail.com");
     }
 }

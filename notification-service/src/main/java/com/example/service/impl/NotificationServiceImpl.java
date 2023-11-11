@@ -4,15 +4,14 @@ import com.example.Email;
 import com.example.Notification;
 import com.example.entities.request.EmailRequest;
 import com.example.entities.request.NotificationRequest;
-import com.example.repository.NotificationRepository;
 import com.example.service.NotificationService;
 import lombok.AllArgsConstructor;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @AllArgsConstructor
@@ -47,9 +46,10 @@ public class NotificationServiceImpl implements NotificationService {
     public void publishToMail(EmailRequest emailRequest) {
         Email email = emailRequest.toEntity();
         Message<Email> message = MessageBuilder
-                .withPayload(email)
-                .setHeader(KafkaHeaders.TOPIC, "send.email")
+                .withPayload(email) // Set the payload to the 'email' object
+                .setHeader(KafkaHeaders.TOPIC, "send.email.kb") // Set the Kafka topic header
                 .build();
+
         System.out.println("Message: " + message);
         kafkaTemplate.send(message);
 
