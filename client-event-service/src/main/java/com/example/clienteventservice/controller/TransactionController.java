@@ -2,6 +2,7 @@ package com.example.clienteventservice.controller;
 
 import com.example.clienteventservice.domain.dto.AmountDto;
 import com.example.clienteventservice.domain.model.TransactionHistory;
+import com.example.clienteventservice.domain.type.TransactionType;
 import com.example.clienteventservice.service.DepositService;
 import com.example.clienteventservice.service.TransactionService;
 import com.example.clienteventservice.service.TransferService;
@@ -43,7 +44,7 @@ public class TransactionController {
 
         withdrawService.withdraw(bankAccountNumber, amountDto.getAmount());
 
-        return ResponseEntity.ok(new ApiResponse<>("Withdraw successfully", HttpStatus.OK.value()));
+        return ResponseEntity.ok(new ApiResponse<>("Withdraw successfully",  HttpStatus.OK.value()));
     }
 
     @ApiOperation(value = "Transfer money from an account to other account")
@@ -62,14 +63,14 @@ public class TransactionController {
 
     @ApiOperation(value = "Deposit the money")
 
-    @PostMapping(value = "/deposit/{toBankAccountNumber}")
+    @PostMapping(value = "/deposit/{accountNumber}")
     @ResponseStatus(value = HttpStatus.OK)
     public ResponseEntity<?> deposit(
-            @ApiParam(value = "The ID of the to bank account") @PathVariable(name = "toBankAccountNumber") String toBankAccountNumber,
+            @ApiParam(value = "The ID of the to bank account") @PathVariable(name = "accountNumber") String accountNumber,
             @ApiParam(value = "The amount of the withdraw transaction") @RequestBody @Valid AmountDto amountDto) {
-        LOG.info("/{} called with amount: {}", toBankAccountNumber, amountDto);
+        LOG.info("/{} called with amount: {}", accountNumber, amountDto);
 
-        depositService.deposit(toBankAccountNumber, amountDto.getAmount());
+        depositService.deposit(accountNumber, amountDto.getAmount());
         return ResponseEntity.ok(new ApiResponse<>("Deposit successfully", HttpStatus.OK.value()));
 
     }

@@ -1,9 +1,18 @@
 package com.example.repository;
 
 import com.example.model.entities.UserSubscription;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+import java.util.Optional;
+
+
+@Transactional
 public interface WebRepository extends JpaRepository<UserSubscription, Long> {
-    UserSubscription findByUserId(Long id);
-    void deleteByEndpoint(String endpoint);
+    List<UserSubscription> findByUserId(String userId);
+
+//    UserSubscription findByUserId(String id);
+    void deleteByEndpointContains(String endpoint);
+
 }

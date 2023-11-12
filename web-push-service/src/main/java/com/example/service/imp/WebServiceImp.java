@@ -1,13 +1,17 @@
 package com.example.service.imp;
 
 import com.example.exception.NotFoundException;
+import com.example.model.entities.UserSubscription;
 import com.example.model.entities.WebDataConfig;
 import com.example.model.request.WebConfigRequest;
+import com.example.model.respone.BankAccountResponse;
 import com.example.repository.WebConfigRepository;
+import com.example.repository.WebRepository;
 import com.example.service.WebService;
 import com.example.webpush.WebPushService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.security.GeneralSecurityException;
 import java.util.UUID;
@@ -16,6 +20,9 @@ import java.util.UUID;
 @AllArgsConstructor
 public class WebServiceImp implements WebService {
     private final WebConfigRepository webConfigRepository;
+    private final WebRepository webRepository;
+    private final WebClient.Builder webClient;
+
 
     @Override
     public void addConfig(WebConfigRequest webConfigRequest) throws GeneralSecurityException {
@@ -48,6 +55,14 @@ public class WebServiceImp implements WebService {
         }
 
     }
+
+    public BankAccountResponse getCustomerInfoByBankAccountNo(String accountNo){
+        return webClient.baseUrl("http://client-event-service/api/v1/bank/customerInfo/" + accountNo)
+                .build()
+                .get()
+                .retrieve().bodyToMono(BankAccountResponse.class).block();
+    }
+
 
 
 }

@@ -31,7 +31,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/file/clients/**").permitAll()
                         .requestMatchers(
                                 "/api/v1/auth/clients/**",
-                                "/api/v1/bank/account/**",
+                                "/api/v1/bank/**",
                                 "/api/v1/customers/**",
                                 "/api/v1/transaction/**"
                         ).permitAll()

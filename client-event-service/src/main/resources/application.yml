@@ -5,7 +5,7 @@ baseUrl: http://localhost:${server.port}
 spring:
 
   application:
-    name: client-service
+    name: client-event-service
 
   kafka:
     producer:
@@ -79,3 +79,10 @@ forgetPasswordPage:
   url: http://localhost:4200/api/v1/forget-password
 ExpiredPage:
   url: http://localhost:4200/api/v1/expired-page
+
+
+#springdoc:
+#  api-docs:
+#    path: /client-event-service/v3/api-docs #these urls will used to load the swagger ui of this service by the api gateway
+#  swagger-ui:
+#    path: /client-event-service/swagger-ui.html

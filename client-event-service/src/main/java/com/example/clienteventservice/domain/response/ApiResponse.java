@@ -17,8 +17,6 @@ public class ApiResponse<T> {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T payload;
-
-
     private Integer status;
 
     public ApiResponse(String message, Integer status) {

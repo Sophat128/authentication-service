@@ -40,6 +40,11 @@ spring:
           predicates:
             - Path=/api/v1/webpush/**
 
+#        - id: client-event-service
+#          uri: lb://CLIENT-EVENT-SERVICE  # URL of service2
+#          predicates:
+#            - Path=/api/v1/bank/**
+
         - id: openapi
           uri: http://localhost:${server.port}
           predicates:
@@ -64,6 +69,8 @@ springdoc:
         name: Transaction Service
       - url: /web-push-service/v3/api-docs
         name: Webpush Service
+#      - url: /client-event-service/v3/api-docs
+#        name: Client Event Service
 
 eureka:
   client:

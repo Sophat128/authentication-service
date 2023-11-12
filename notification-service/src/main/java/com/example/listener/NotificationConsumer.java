@@ -18,14 +18,14 @@ import java.util.List;
 @Slf4j
 public class NotificationConsumer {
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTemplate<Object, Object> kafkaTemplate;
 
     private static final String NOTIFICATION_TOPIC = "notification";
     private static final String TELEGRAM_TOPIC = "telegram";
     private static final String EMAIL_TOPIC = "email";
 
 
-    public NotificationConsumer(KafkaTemplate<String, String> kafkaTemplate) {
+    public NotificationConsumer(KafkaTemplate<Object, Object> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
@@ -43,7 +43,6 @@ public class NotificationConsumer {
     void listener(ConsumerRecord<Object, Object> notification) {
         log.info("Started consuming message on topic: {}, offset {}, message {}", notification.topic(),
                 notification.offset(), notification.value());
-
 
         Message<Object> message = MessageBuilder
                 .withPayload(notification.value())

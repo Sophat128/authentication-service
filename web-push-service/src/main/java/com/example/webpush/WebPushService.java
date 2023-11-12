@@ -55,10 +55,11 @@ public class WebPushService {
     @PostConstruct
     private void init() throws GeneralSecurityException {
         WebDataConfig webDataConfig = new WebDataConfig();
+        String subject = "http://localhost:64114";
         try {
             webDataConfig = webService.getConfig();
             Security.addProvider(new BouncyCastleProvider());
-            pushService = new PushService(webDataConfig.getPublicKey(), webDataConfig.getPrivateKey());
+            pushService = new PushService(webDataConfig.getPublicKey(), webDataConfig.getPrivateKey(), subject);
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -103,24 +104,21 @@ public class WebPushService {
         endpointToSubscription.clear();
     }
 
-    public void subscribe(Subscription subscription) {
+    public void subscribe(Subscription subscription, String userId) {
         System.out.println("Subscribed to " + subscription.endpoint);
         System.out.println("auth to " + subscription.keys.auth);
         System.out.println("p256dh to " + subscription.keys.p256dh);
 //        The userId should be get from web application but I just give the default
-        UserSubscription userSubscription = new UserSubscription(subscription.endpoint, subscription.keys.auth, subscription.keys.p256dh, 1L);
-        if (webRepository.findByUserId(1L) == null) {
-            webRepository.save(userSubscription);
-        } else {
-            System.out.println("This user is already subscribe");
-        }
+        UserSubscription userSubscription = new UserSubscription(subscription.endpoint, subscription.keys.auth, subscription.keys.p256dh, userId);
+        webRepository.save(userSubscription);
+
         endpointToSubscription.put(subscription.endpoint, subscription);
     }
 
-    public void unsubscribe(Subscription subscription) {
-        System.out.println("Unsubscribed " + subscription.endpoint + " auth:" + subscription.keys.auth);
-        webRepository.deleteByEndpoint(subscription.endpoint);
-        endpointToSubscription.remove(subscription.endpoint);
+    public void unsubscribe(String endpoint) {
+        webRepository.deleteByEndpointContains(endpoint);
+        String subscriptionPrefix = "https://fcm.googleapis.com/fcm/send/";
+        System.out.println("Unsubscribed " + subscriptionPrefix + endpoint);
     }
 
     public record Message(String title, String body) {
@@ -137,23 +135,20 @@ public class WebPushService {
                 System.out.println("Subscription: " + subscription.keys.auth);
                 sendNotification(subscription, msg);
             });
-//            endpointToSubscription.values().forEach(subscription -> {
-//                System.out.println("Subscription: " + subscription.keys.auth);
-//                sendNotification(subscription, msg);
-//            });
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void notifySpecificUser(PushNotificationRequest pushNotificationRequest) {
+    public void notifySpecificUser(PushNotificationRequest pushNotificationRequest, String userId) {
         try {
             String msg = mapper.writeValueAsString(new Message(pushNotificationRequest.getTitle(), pushNotificationRequest.getBody()));
-//            Give default user id
-            UserSubscription userSubscription = webRepository.findByUserId(6L);
-            Subscription subscription = new Subscription(userSubscription.getEndpoint(), new Subscription.Keys(userSubscription.getP256dh(), userSubscription.getAuth()));
-            System.out.println("Auth: " + subscription.keys.auth);
-            sendNotification(subscription, msg);
+            List<UserSubscription> userSubscriptions = webRepository.findByUserId(userId);
+            userSubscriptions.forEach(userSubscription -> {
+                Subscription subscription = new Subscription(userSubscription.getEndpoint(), new Subscription.Keys(userSubscription.getP256dh(), userSubscription.getAuth()));
+                System.out.println("Subscription: " + subscription.keys.auth);
+                sendNotification(subscription, msg);
+            });
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

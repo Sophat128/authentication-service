@@ -21,6 +21,7 @@ public class BankAccountDto {
 
     private String accountNumber;
     private BigDecimal balance;
+
 //    private CardDto card;
 
     public BankAccount toEntity(){

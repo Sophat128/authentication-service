@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
 @RequestMapping(BankAccountController.SERVICE_PATH)
 public class BankAccountController {
 
-    public static final String SERVICE_PATH = "api/v1/bank/account";
+    public static final String SERVICE_PATH = "api/v1/bank/";
     public static final String METHOD_GET_BALANCE = "/balance";
     private static final String METHOD_GET_BALANCE_WITH_PARAM = "/balance/{bankAccountNumber}";
     public static final String METHOD_GET_BALANCE_ALL = "/balance/all";
@@ -98,5 +99,15 @@ public class BankAccountController {
         BankAccount bankAccount = bankAccountService.getBankAccountByUserId(userId);
         return conversionService.convert(bankAccount, BalanceDto.class);
     }
+
+    @ApiOperation(value = "Retrieves customer info with bank account number", response = BankAccount.class)
+
+    @GetMapping("/customerInfo/{bankAccountNo}")
+    public ResponseEntity<?> getAccountInfoByUserId(@ApiParam(value = "The ID of the bank account") @PathVariable(name = "bankAccountNo") String bankAccountNo) {
+        BankAccount bankAccount = bankAccountService.getBankAccount(bankAccountNo);
+        return ResponseEntity.ok(bankAccount);
+    }
+
+
 
 }

@@ -20,9 +20,9 @@ public class UserSubscription {
     private String auth;
     private String p256dh;
 
-    private Long userId;
+    private String userId;
 
-    public UserSubscription(String endpoint, String auth, String p256dh, Long userId) {
+    public UserSubscription(String endpoint, String auth, String p256dh, String userId) {
         this.endpoint = endpoint;
         this.auth = auth;
         this.p256dh = p256dh;

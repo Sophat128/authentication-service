@@ -35,10 +35,10 @@ public class WebPushController {
         }
     }
 
-    @PostMapping("/subscribe")
-    public ResponseEntity<?> subscribe(@RequestBody Subscription subscription) {
+    @PostMapping("/subscribe/{userId}")
+    public ResponseEntity<?> subscribe(@RequestBody Subscription subscription, @PathVariable String userId) {
         try {
-            webPushService.subscribe(subscription);
+            webPushService.subscribe(subscription, userId);
             ApiResponse<?> data = new ApiResponse<>("Subscribe successfully", HttpStatus.OK.value());
             return ResponseEntity.ok(data);
         } catch (Exception e) {
@@ -57,10 +57,10 @@ public class WebPushController {
         }
     }
 
-    @PostMapping("/unsubscribe")
-    public ResponseEntity<?> unsubscribe(@RequestBody Subscription subscription) {
+    @DeleteMapping("/unsubscribe/{endpoint}")
+    public ResponseEntity<?> unsubscribe(@PathVariable String endpoint) {
         try {
-            webPushService.unsubscribe(subscription);
+            webPushService.unsubscribe(endpoint);
             ApiResponse<?> data = new ApiResponse<>("Unsubscribe successfully", HttpStatus.OK.value());
             return ResponseEntity.ok(data);
         } catch (Exception e) {
@@ -80,10 +80,10 @@ public class WebPushController {
 
     }
 
-    @PostMapping("/send_notification_user")
-    public ResponseEntity<?> sendNotificationToSpecificUser(@RequestBody PushNotificationRequest pushNotificationRequest) {
+    @PostMapping("/send_notification_user/{userId}")
+    public ResponseEntity<?> sendNotificationToSpecificUser(@RequestBody PushNotificationRequest pushNotificationRequest, @PathVariable String userId) {
         try {
-            webPushService.notifySpecificUser(pushNotificationRequest);
+            webPushService.notifySpecificUser(pushNotificationRequest, userId);
             ApiResponse<?> data = new ApiResponse<>("Alert to a subscriber successfully", HttpStatus.OK.value());
             return ResponseEntity.ok(data);
         } catch (Exception e) {
@@ -125,5 +125,7 @@ public class WebPushController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to get configuration " + e.getMessage());
         }
     }
+
+
 
 }

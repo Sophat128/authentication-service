@@ -33,13 +33,13 @@ public class KafkaConsumerConfig {
     private String autoOffset;
 
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTemplate<Object, Object> kafkaTemplate;
 
-    public KafkaConsumerConfig(KafkaTemplate<String, String> kafkaTemplate) {
+    public KafkaConsumerConfig(KafkaTemplate<Object, Object> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
     @Bean
-    public ConsumerFactory<String, String> consumerFactory() {
+    public ConsumerFactory<Object, Object> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -48,9 +48,10 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         return new DefaultKafkaConsumerFactory<>(props);
     }
+
     @Bean("kafkaListenerContainerFactory")
-    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, String> concurrentKafkaListenerContainerFactory
+    public ConcurrentKafkaListenerContainerFactory<Object, Object> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<Object, Object> concurrentKafkaListenerContainerFactory
                 = new ConcurrentKafkaListenerContainerFactory<>();
         concurrentKafkaListenerContainerFactory.setConsumerFactory(consumerFactory());
         DeadLetterPublishingRecoverer deadLetterPublishingRecoverer =

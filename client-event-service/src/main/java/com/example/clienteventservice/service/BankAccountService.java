@@ -96,4 +96,6 @@ public class BankAccountService {
         return bankAccountRepository.findByCustomerId(userId)
                 .orElseThrow(() -> BankAccountManagerException.to(MESSAGE_FORMAT_NO_BANK_ACCOUNT, userId));
     }
+
+
 }
