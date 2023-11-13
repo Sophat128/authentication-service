@@ -121,9 +121,4 @@ public class CustomerController {
 //    }
 
 
-    @PostMapping("/send-money")
-    @SecurityRequirement(name = "auth")
-    public ResponseEntity<?> sendMoney(@RequestBody BigDecimal sendMoney, Principal principal) {
-        return ResponseEntity.ok().body(userService.sendMoney(String.valueOf(sendMoney), principal));
-    }
 }

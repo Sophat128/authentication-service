@@ -1,6 +1,6 @@
 package com.example.config;
 
-import com.example.model.Telegram;
+import com.example.dto.TransactionHistoryDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.TopicPartition;
@@ -30,35 +30,49 @@ public class KafkaConsumerConfig {
 
     @Value(value = "${spring.kafka.dead_letter_topic}")
     private String deadLetterTopic;
-    private final KafkaTemplate<String, Telegram> kafkaTemplate;
 
-    public KafkaConsumerConfig(KafkaTemplate<String, Telegram> kafkaTemplate) {
+    @Value("${kafka.group-id}")
+    private String groupId;
+
+    private final KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate;
+
+    public KafkaConsumerConfig(KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
 
     @Bean
-    public ConsumerFactory<String, Telegram> consumerFactory() {
+    public ConsumerFactory<String, TransactionHistoryDto> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
 
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "message-group");
+//        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+//        props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, 10);
+//        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, 60000);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         // Specify the value deserializer with the object type
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         // Specify the value class for the JsonDeserializer
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "*"); // You can restrict trusted packages for security
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, Telegram.class);
+//        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, Telegram.class);
 
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
-
+//    @Bean
+//    KafkaListenerContainerFactory<?> kafkaListenerContainerFactory(ConsumerFactory<String, Notification> consumerFactory) {
+//        ConcurrentKafkaListenerContainerFactory<String, Notification> kafkaListenerContainerFactory
+//                = new ConcurrentKafkaListenerContainerFactory<>();
+//        kafkaListenerContainerFactory.setConcurrency(2);
+//        kafkaListenerContainerFactory.setConsumerFactory(consumerFactory);
+//        return kafkaListenerContainerFactory;
+//    }
 
     @Bean("kafkaListenerContainerFactory")
-    public ConcurrentKafkaListenerContainerFactory<String, Telegram> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, Telegram> concurrentKafkaListenerContainerFactory
+    public ConcurrentKafkaListenerContainerFactory<String, TransactionHistoryDto> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, TransactionHistoryDto> concurrentKafkaListenerContainerFactory
                 = new ConcurrentKafkaListenerContainerFactory<>();
         concurrentKafkaListenerContainerFactory.setConsumerFactory(consumerFactory());
         DeadLetterPublishingRecoverer deadLetterPublishingRecoverer =

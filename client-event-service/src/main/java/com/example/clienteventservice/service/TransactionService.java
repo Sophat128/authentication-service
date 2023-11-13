@@ -3,9 +3,10 @@ package com.example.clienteventservice.service;
 import com.example.clienteventservice.domain.event.TransactionHistorySaveEvent;
 import com.example.clienteventservice.domain.model.BankAccount;
 import com.example.clienteventservice.domain.model.TransactionHistory;
-import com.example.clienteventservice.domain.type.StatementType;
-import com.example.clienteventservice.domain.type.TransactionStatus;
-import com.example.clienteventservice.domain.type.TransactionType;
+import com.example.dto.TransactionHistoryDto;
+import com.example.type.StatementType;
+import com.example.type.TransactionStatus;
+import com.example.type.TransactionType;
 import com.example.clienteventservice.event.SBAEventListener;
 import com.example.clienteventservice.exception.InsufficientBalanceManagerException;
 import com.example.clienteventservice.repository.TransactionHistoryRepository;
@@ -16,6 +17,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -78,10 +82,11 @@ public class TransactionService {
                 fromBankAccount.getId());
 
         // create TransactionHistoryBuilder for fromBankAccount
-        TransactionHistory.TransactionHistoryBuilder fromTransactionHistoryBuilder = getTransactionHistoryBuilder(
+        TransactionHistory.TransactionHistoryBuilder fromTransactionHistoryBuilder = getTransactionHistoryTransfer(
                 TransactionType.TRANSFER,
                 StatementType.EXPENSE,
                 fromBankAccount,
+                toBankAccount.getAccountNumber(),
                 amount);
 
         // create TransactionHistoryBuilder for toBankAccount
@@ -158,7 +163,7 @@ public class TransactionService {
                 .afterBalance(updatedBankAccount.getCurrentBalance());
     }
 
-    private TransactionHistory.TransactionHistoryBuilder getTransactionHistoryBuilder(
+    public TransactionHistory.TransactionHistoryBuilder getTransactionHistoryBuilder(
             TransactionType transactionType,
             StatementType statementType,
             BankAccount bankAccount,
@@ -172,6 +177,25 @@ public class TransactionService {
                 .bankAccountNumber(bankAccount.getAccountNumber())
 //                .cardId(bankAccount.getCard().getId())
                 .beforeBalance(bankAccount.getCurrentBalance());
+    }
+
+
+    //use for transfer events to push to kafka topic
+    public TransactionHistory.TransactionHistoryBuilder getTransactionHistoryTransfer(
+            TransactionType transactionType,
+            StatementType statementType,
+            BankAccount senderBankAccountNumber,
+            String receivedBankAccountNumber,
+            BigDecimal amount) {
+
+        return TransactionHistory.builder()
+                .type(transactionType)
+                .statementType(statementType)
+                .bankAccountNumber(senderBankAccountNumber.getAccountNumber())
+                .receivedAccountNumber(receivedBankAccountNumber)
+                .amount(amount)
+                .customerId(senderBankAccountNumber.getCustomerId())
+                .beforeBalance(senderBankAccountNumber.getCurrentBalance());
     }
 
     private void setTransactionHistoryBuilderAsFail(

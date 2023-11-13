@@ -1,9 +1,7 @@
 package com.example.config;
 
-import com.nimbusds.oauth2.sdk.http.HTTPRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -22,7 +20,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authorize ->
                 authorize
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/v1/telegram/subscribe").permitAll()
+                        .requestMatchers("/api/v1/telegram/users/**").permitAll()
+                        .requestMatchers("/api/v1/telegram/bots/**").permitAll()
                         .anyRequest().authenticated()
 
         );

@@ -4,7 +4,6 @@ import com.example.clienteventservice.exception.AlreadyExistException;
 import com.example.clienteventservice.exception.BadRequestException;
 import com.example.clienteventservice.exception.ForbiddenException;
 import com.example.clienteventservice.exception.NotFoundException;
-import com.example.clienteventservice.domain.model.Subscription;
 import com.example.clienteventservice.repository.SubscriptionRepository;
 import com.example.dto.UserDtoClient;
 import com.example.clienteventservice.domain.model.User;
@@ -20,12 +19,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -34,9 +28,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.servlet.view.RedirectView;
 
-import javax.naming.AuthenticationException;
 import javax.ws.rs.core.Response;
-import java.math.BigDecimal;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -48,7 +40,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-//@AllArgsConstructor
 public class UserService {
 
 
@@ -82,19 +73,16 @@ public class UserService {
     private String telegramUrl;
 
 
-    private static final String NOTIFICATION_TOPIC = "notification";
     private final WebClient.Builder webClient;
     private final EmailService emailService;
     private final RestTemplate restTemplate;
-    private final KafkaTemplate<String, String> kafkaTemplate;
     private final Keycloak keycloak;;
     private final SubscriptionRepository subscriptionRepository;
 
-    public UserService(WebClient.Builder webClient, EmailService emailService, RestTemplate restTemplate, KafkaTemplate<String, String> kafkaTemplate, Keycloak keycloak, SubscriptionRepository subscriptionRepository) {
+    public UserService(WebClient.Builder webClient, EmailService emailService, RestTemplate restTemplate, Keycloak keycloak, SubscriptionRepository subscriptionRepository) {
         this.webClient = webClient;
         this.emailService = emailService;
         this.restTemplate = restTemplate;
-        this.kafkaTemplate = kafkaTemplate;
         this.keycloak = keycloak;
         this.subscriptionRepository = subscriptionRepository;
     }
@@ -480,76 +468,10 @@ public class UserService {
 //    }
 
 
-    public ApiResponse<?> sendMoney(String sendMoney, Principal principal) {
-
-        if (principal == null) {
-            // User is not authenticated; return an error response
-            return new ApiResponse<>(HttpStatus.FORBIDDEN, "Authentication required");
-        }
-
-        try {
-            // Validate the input amount (e.g., ensure it's a valid numeric value)
-            BigDecimal amount = new BigDecimal(sendMoney);
-
-            // Get the sender's user information (e.g., balance, user ID)
-            User sender = getUserByPrincipal(principal);
-
-            // Check if the sender has sufficient funds to complete the transaction
-//            BigDecimal senderBalance = sender.getBalance();
-
-            // Deduct the amount from the sender's balance
-//            sender.setBalance(senderBalance.subtract(amount));
 
 
-            String _sender = "user id: ";
-            String _userId = principal.getName();
-            String _action = " has send money.";
-
-            List<Subscription> subscriptions = subscriptionRepository.findAll();
-
-            for (Subscription subscription : subscriptions) {
-                String subscriptionUserId = subscription.getUserId();
-
-                if (subscriptionUserId.equals(_userId)) {
-                    // Send a notification to the Kafka topic
-                    String notificationMessage = _sender + subscriptionUserId + _action;
-                    sendNotificationToKafka(_userId, notificationMessage);
-                }
-            }
-
-            // Return a successful response with user data
-            return ApiResponse.builder()
-                    .message("send money successfully!")
-                    .payload(User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url))
-                    .status(200)
-                    .build();
-        } catch (AuthenticationException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private User getUserByPrincipal(Principal principal) throws AuthenticationException {
-        if (principal == null) {
-            throw new AuthenticationException("Principal is null");
-        }
-
-        String principalName = principal.getName();
-
-        UserDtoClient userDTOClient = User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url);
-
-        User user = new User();
-        user.setId(userDTOClient.getId());
-        user.setUsername(principalName);
-
-//        String balanceAsString = userDTOClient.getBalance();
-//        BigDecimal balance = new BigDecimal(balanceAsString);
-//        user.setBalance(balance); // Set the user's balance
-
-        return user;
-    }
-
-    private void sendNotificationToKafka(String userId, String message) {
-        kafkaTemplate.send(NOTIFICATION_TOPIC, userId, message);
-    }
+//    private void sendNotificationToKafka(String userId, String message) {
+//        kafkaTemplate.send(NOTIFICATION_TOPIC, userId, message);
+//    }
 
 }

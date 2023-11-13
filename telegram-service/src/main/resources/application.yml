@@ -1,6 +1,6 @@
-bot:
-  token: 6666866418:AAFe1UyRicd_jFhpadlh8Qp3bMCwxTx3Q4k
-  name: FintrackAPIBot
+#bot:
+#  token: 6666866418:AAF2c8nkzeEpBi94_exnUHhGZhj-cLRHWM8
+#  name: FintrackAPIBot
 
 spring:
   kafka:
@@ -20,8 +20,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8443/auth/realms/client_user
-          jwk-set-uri: http://localhost:8443/auth/realms/client_user/protocol/openid-connect/certs
+          issuer-uri: https://keycloak-fintrack.sythorng.site/auth/realms/USER_SERVICE
+          jwk-set-uri: https://keycloak-fintrack.sythorng.site/auth/realms/USER_SERVICE/protocol/openid-connect/certs
   jpa:
     hibernate:
       ddl-auto: update
@@ -31,19 +31,18 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 keycloak:
-  realm: client_user
-  resource: client-user-app
+  realm: USER_SERVICE
+  resource: client-app
   #  auth-server-url: https://demo.docengine.tech/auth/ #docker container
-  auth-server-url: http://localhost:8443/auth/ #docker container
+  auth-server-url: https://keycloak-fintrack.sythorng.site/auth/ #docker container
   credentials:
     username: 'admin'
     password: 'admin'
-    client-id: 'client-user-app' # admin account for creating users
-    secret: 'kdV1S5gjjriGOK1wUXGoooGRUHUdIFgf'
-    provider: secret
+    client-id: 'client-app' # admin account for creating users
+    secret: 'fdakufDNpefxzc7oaGHugg4UcL6jmSAy'
 
   grant-type: password
-  tokenUrl: http://localhost:8443/auth/realms/client_user/protocol/openid-connect/token
+  tokenUrl: https://keycloak-fintrack.sythorng.site/auth/realms/USER_SERVICE/protocol/openid-connect/token
 
 server:
   port: 8082

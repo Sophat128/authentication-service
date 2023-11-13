@@ -1,5 +1,6 @@
 package com.example.config;
 
+import com.example.dto.TransactionHistoryDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.TopicPartition;
@@ -14,6 +15,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.CommonErrorHandler;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.util.backoff.FixedBackOff;
 
 import java.util.HashMap;
@@ -34,18 +36,19 @@ public class KafkaConsumerConfig {
     @Value("${kafka.auto-offset}")
     private String autoOffset;
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate;
 
-    public KafkaConsumerConfig(KafkaTemplate<String, String> kafkaTemplate) {
+    public KafkaConsumerConfig(KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
     @Bean
-    public ConsumerFactory<String, String> consumerFactory() {
+    public ConsumerFactory<String, TransactionHistoryDto> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffset);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         return new DefaultKafkaConsumerFactory<>(props);
@@ -53,8 +56,8 @@ public class KafkaConsumerConfig {
 
 
     @Bean("kafkaListenerContainerFactory")
-    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, String> concurrentKafkaListenerContainerFactory
+    public ConcurrentKafkaListenerContainerFactory<String, TransactionHistoryDto> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, TransactionHistoryDto> concurrentKafkaListenerContainerFactory
                 = new ConcurrentKafkaListenerContainerFactory<>();
         concurrentKafkaListenerContainerFactory.setConsumerFactory(consumerFactory());
         DeadLetterPublishingRecoverer deadLetterPublishingRecoverer =
