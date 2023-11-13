@@ -45,20 +45,36 @@ public class EmailConsumer {
         props.put("subscriptionDate", new Date());
         Email email = Email.builder()
                 .withTo(recipients)
-                .withFrom(from.trim( ))
+                .withFrom(from.trim())
                 .withContent(content)
                 .withSubject(subject)
                 .withProps(props)
                 .build();
+
+        // Check if the attachmentFilePath is present and not empty in the JSON object
         if (object.getAsJsonObject().has("attachmentFilePath")) {
             String attachmentFilePath = object.getAsJsonObject().get("attachmentFilePath").getAsString();
-            File file = new File(attachmentFilePath);
-            System.out.println("File Exists: " + file.exists());
-            email.setAttachmentFilePath(attachmentFilePath);
+
+            // Check if attachmentFilePath is not empty
+            if (!attachmentFilePath.isEmpty()) {
+                try {
+                    File file = new File(attachmentFilePath);
+                    if (file.exists() && file.isFile()) {
+                        System.out.println("File Exists: " + file.exists());
+                        email.setAttachmentFilePath(attachmentFilePath);
+                    } else {
+                        System.out.println("Error: File does not exist or is not a regular file.");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Error checking file: " + e.getMessage());
+                }
+            }
         }
 
         System.out.println("Convert to Email: " + email);
         emailKbService.sendConfirmationEmail(email);
         LOGGER.log(Level.INFO, () -> " »» Mail sent successfully");
     }
+
+
 }
