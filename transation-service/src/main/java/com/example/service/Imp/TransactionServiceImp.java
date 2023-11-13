@@ -1,7 +1,5 @@
 package com.example.service.Imp;
 
-import com.example.entities.request.TransferRequest;
-import com.example.entities.response.TransferResponse;
 import com.example.service.TransactionService;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -16,16 +14,17 @@ public class TransactionServiceImp implements TransactionService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
-    public TransferResponse transfer(TransferRequest transferRequest) {
-
-        Message<TransferResponse> message = MessageBuilder
-                .withPayload(transferRequest.toEntity())
-                .setHeader(KafkaHeaders.TOPIC, "notification")
+    public String transfer(String amount,String email) {
+        Message<String> message = MessageBuilder
+                .withPayload(amount)
+//                .setHeader(KafkaHeaders.TOPIC, "notification")
+                .setHeader(KafkaHeaders.TOPIC,"send.email.kb")
                 .build();
         System.out.println("Message: " + message);
         kafkaTemplate.send(message);
 
-        return message.getPayload();
+
+        return amount;
     }
 
 }

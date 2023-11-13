@@ -56,9 +56,16 @@ public class UserController {
 
     @PutMapping
     @SecurityRequirement(name = "auth")
-    @Operation(summary = "update information user current user (token) ")
+    @Operation(summary = "update information user current user  ")
     public ResponseEntity<?> updateById(@RequestBody ProfileRequest userRequest, Principal principal,@AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok().body(userService.updateById(userRequest, principal,jwt));
+    }
+
+    @GetMapping("/after-login")
+    @SecurityRequirement(name = "auth")
+    @Operation(summary = "set Attributes when login git & google ")
+    public ResponseEntity<?> updateUserWhenLoginGit( Principal principal) {
+        return ResponseEntity.ok().body(userService.updateUserWhenLoginGit(principal));
     }
 
 

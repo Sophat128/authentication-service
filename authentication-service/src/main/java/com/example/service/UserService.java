@@ -157,11 +157,9 @@ public class UserService {
             );
         }
 
-        UserRepresentation userRepresentation = prepareUserRepresentation(userRequest, preparePasswordRepresentation(userRequest.getPassword()));
+        UserRepresentation userRepresentation = prepareUserRepresentation(userRequest);
         UsersResource userResource = keycloak.realm(realm).users();
-
         Response response = userResource.create(userRepresentation);
-
         if (response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
             throw new AlreadyExistException("email is already exist");
         }
@@ -183,10 +181,12 @@ public class UserService {
         return credentialRepresentation;
     }
 
-    public UserRepresentation prepareUserRepresentation(UserRequest userRequest, CredentialRepresentation credentialRepresentation) {
+    public UserRepresentation prepareUserRepresentation(UserRequest userRequest) {
+        // Create a new user
         UserRepresentation userRepresentation = new UserRepresentation();
         userRepresentation.setUsername(userRequest.getUsername());
         userRepresentation.setEmail(userRequest.getEmail());
+        userRepresentation.setEnabled(true);
 
         userRepresentation.singleAttribute("createdDate", String.valueOf(LocalDateTime.now()));
         userRepresentation.singleAttribute("lastModified", String.valueOf(LocalDateTime.now()));
@@ -194,8 +194,12 @@ public class UserService {
         userRepresentation.singleAttribute("profile", "DefaultProfile.jpeg");
         userRepresentation.singleAttribute("isVerify", "false");
 
-        userRepresentation.setCredentials(Collections.singletonList(credentialRepresentation));
-        userRepresentation.setEnabled(true);
+        // Set user password
+        CredentialRepresentation credential = new CredentialRepresentation();
+        credential.setType(CredentialRepresentation.PASSWORD);
+        credential.setValue(userRequest.getPassword());
+        userRepresentation.setCredentials(List.of(credential));
+
         return userRepresentation;
     }
 
@@ -243,6 +247,7 @@ public class UserService {
         userRepresentation.singleAttribute("createdDate", String.valueOf(createDate));
         userRepresentation.singleAttribute("lastModified", String.valueOf(LocalDateTime.now()));
         userRepresentation.singleAttribute("isVerify", "true");
+
         userRepresentation.setCredentials(Collections.singletonList(credentialRepresentation));
 
         userRepresentation.setEnabled(true);
@@ -381,13 +386,17 @@ public class UserService {
         if (principal == null) {
             throw new ForbiddenException("need token");
         }
+        try {
+            User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url);
+        } catch (Exception e) {
+            throw new ForbiddenException("user not found");
+        }
         return ApiResponse.builder()
                 .message("get user by id success")
                 .payload(User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url))
                 .status(200)
                 .build();
     }
-
 
     public ApiResponse<?> updateById(ProfileRequest userRequest, Principal principal, Jwt jwt) {
         if (principal == null) {
@@ -396,7 +405,7 @@ public class UserService {
         try {
             User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url);
         } catch (Exception e) {
-            throw new ForbiddenException("user need to login");
+            throw new ForbiddenException("user not found login");
         }
 
         UserRepresentation user = getUserRepresentationById(UUID.fromString(principal.getName()));
@@ -426,6 +435,33 @@ public class UserService {
         } catch (Exception e) {
             throw new BadRequestException("username already exist");
         }
+    }
+
+
+    public ApiResponse<?>  updateUserWhenLoginGit(Principal principal){
+        if (principal == null) {
+            throw new ForbiddenException("need token");
+        }
+        try {
+            User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url);
+        } catch (Exception e) {
+            throw new ForbiddenException("user not found");
+        }
+        UserRepresentation userRepresentation= getUserRepresentationById(UUID.fromString(principal.getName()));
+        if(userRepresentation.getAttributes()==null){
+            userRepresentation.singleAttribute("createdDate", String.valueOf(LocalDateTime.now()));
+            userRepresentation.singleAttribute("lastModified", String.valueOf(LocalDateTime.now()));
+            userRepresentation.singleAttribute("profile","DefaultProfile.jpeg");
+            userRepresentation.singleAttribute("isVerify", "true");
+            UsersResource userResource = keycloak.realm(realm).users();
+            userResource.get(userRepresentation.getId()).update(userRepresentation);
+            return ApiResponse.builder()
+                    .message("update user success")
+                    .payload(User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url))
+                    .status(200)
+                    .build();
+        }
+        return  null;
     }
 
 }

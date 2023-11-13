@@ -19,7 +19,7 @@ import java.util.List;
 
 @Service
 public class FileUploadService {
-    private final Path root = Paths.get("images/");
+    private final Path root = Paths.get("src/main/resources/images/");
 
     @Value("${image.url}")
     private String url;
