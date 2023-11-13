@@ -1,5 +1,6 @@
 package com.example.clienteventservice.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -29,7 +30,6 @@ public class BankAccount {
 
     private String accountNumber;
 
-
     @NonNull
     private BigDecimal currentBalance;
 
@@ -37,6 +37,7 @@ public class BankAccount {
 //    @JoinColumn(name = "customer_id")
 //    private Customer customer;
     private UUID customerId;
+
 
     @CreatedDate
     private Date createdAt;
@@ -48,6 +49,7 @@ public class BankAccount {
         this.accountNumber = accountNumber;
         this.currentBalance = currentBalance;
     }
+
 
 
     //    @OneToOne(optional = false, cascade = CascadeType.ALL, mappedBy = "bankAccount", fetch = FetchType.LAZY)

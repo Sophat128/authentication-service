@@ -1,7 +1,10 @@
 package com.example.clienteventservice.service;
 
-import com.example.clienteventservice.domain.dto.BankAccountDto;
 import com.example.clienteventservice.domain.model.BankAccount;
+import com.example.clienteventservice.domain.model.TransactionHistory;
+import com.example.dto.TransactionHistoryDto;
+import com.example.type.StatementType;
+import com.example.type.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +26,24 @@ public class WithdrawService {
 
     private TransactionService transactionService;
     private BankAccountService bankAccountService;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+
+    private final KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate;
 
     public void withdraw(String bankAccountNumber, BigDecimal amount) {
-        BankAccountDto bankAccountDto = new BankAccountDto(bankAccountNumber,amount);
         BankAccount bankAccount = bankAccountService.getBankAccount(bankAccountNumber);
         transactionService.executeWithdraw(bankAccount, amount);
-        Message<BankAccountDto> message = MessageBuilder
-                .withPayload(bankAccountDto)
+
+        TransactionHistory transactionHistory = transactionService
+                .getTransactionHistoryBuilder(
+                        TransactionType.WITHDRAW,
+                        StatementType.EXPENSE,
+                        bankAccount,
+                        amount
+                ).build();
+
+
+        Message<TransactionHistoryDto> message = MessageBuilder
+                .withPayload(transactionHistory.toDto())
                 .setHeader(KafkaHeaders.TOPIC, "notification")
                 .build();
         System.out.println("Message: " + message);

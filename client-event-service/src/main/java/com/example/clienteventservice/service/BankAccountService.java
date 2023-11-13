@@ -14,8 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * BankAccount management service
@@ -36,8 +39,16 @@ public class BankAccountService {
         BankAccount bankAccount = bankAccountDto.toEntity();
 
         Preconditions.checkNotNull(bankAccountDto, "bankAccount can not be null");
+        Preconditions.checkArgument(
+                bankAccountDto.getAccountNumber().matches("\\d{9}"),
+                "Bank AccountNumber must be 9 digits"
+        );
+
         Preconditions.checkNotNull(bankAccountDto.getBalance(), "currentBalance can not be null");
-        Preconditions.checkArgument(bankAccountDto.getBalance().compareTo(BigDecimal.ZERO) > -1, "CurrentBalance can not be negative");
+        Preconditions.checkArgument(
+                bankAccountDto.getBalance().compareTo(BigDecimal.ZERO) > -1 && bankAccountDto.getBalance().compareTo(new BigDecimal("5")) >= 0,
+                "CurrentBalance must be non-negative and at least $5"
+        );
 
 //        Customer customer = customerService.getCustomer(customerId);
         bankAccount.setCustomerId(customerId);
@@ -55,6 +66,44 @@ public class BankAccountService {
 
         return savedBankAccount;
     }
+
+
+//    private String formatAccountNumber(String accountNumber) {
+//        if (accountNumber == null) {
+//            return null;
+//        }
+//
+//        // Check if the accountNumber has 9 digits
+//        if (accountNumber.matches("\\d{9}")) {
+//            // Format with spaces for every three digits
+//            Pattern pattern = Pattern.compile("(\\d{3})(\\d{3})(\\d{3})");
+//            Matcher matcher = pattern.matcher(accountNumber);
+//
+//            if (matcher.matches()) {
+//                return matcher.group(1) + " " + matcher.group(2) + " " + matcher.group(3);
+//            }
+//        }
+//
+//        return accountNumber;
+//    }
+
+//    private static BigDecimal formatBalance(BigDecimal balance) {
+//        if (balance == null) {
+//            return null;
+//        }
+//
+//        DecimalFormat decimalFormat;
+//
+//        // Check if the balance is very large (1 billion dollars or more)
+//        if (balance.abs().compareTo(new BigDecimal("1000000000")) >= 0) {
+//            decimalFormat = new DecimalFormat("$#,##0");
+//        } else {
+//            decimalFormat = new DecimalFormat("$#,##0.00");
+//        }
+//
+//        String formattedString = decimalFormat.format(balance);
+//        return new BigDecimal(formattedString.replaceAll("[^\\d.]+", ""));
+//    }
 
     public BankAccount getBankAccount(String bankAccountNumber) {
         Preconditions.checkNotNull(bankAccountNumber, MESSAGE_FORMAT_NO_BANK_ACCOUNT, bankAccountNumber);

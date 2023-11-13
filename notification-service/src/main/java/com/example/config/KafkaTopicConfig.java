@@ -18,4 +18,9 @@ public class KafkaTopicConfig {
         return TopicBuilder.name("email").build();
     }
 
+    @Bean
+    public NewTopic topicWeb() {
+        return TopicBuilder.name("web").build();
+    }
+
 }

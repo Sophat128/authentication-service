@@ -15,10 +15,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         in = SecuritySchemeIn.HEADER,
         flows = @OAuthFlows(
                 clientCredentials = @OAuthFlow(
-                        tokenUrl = "http://localhost:8443/auth/realms/client_user/protocol/openid-connect/token"
+                        tokenUrl = "https://keycloak-fintrack.sythorng.site/auth/realms/USER_SERVICE/protocol/openid-connect/token"
                 ),
                 password = @OAuthFlow(
-                        tokenUrl = "http://localhost:8443/auth/realms/client_user/protocol/openid-connect/token"
+                        tokenUrl = "https://keycloak-fintrack.sythorng.site/auth/realms/USER_SERVICE/protocol/openid-connect/token"
                 )
         )
 )

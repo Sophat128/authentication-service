@@ -1,4 +1,4 @@
-package com.example.clienteventservice.domain.type;
+package com.example.type;
 
 public enum NotificationType {
     EMAIL,

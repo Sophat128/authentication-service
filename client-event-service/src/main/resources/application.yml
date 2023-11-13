@@ -29,9 +29,9 @@ spring:
           jwk-set-uri: https://keycloak-fintrack.sythorng.site/auth/realms/USER_SERVICE/protocol/openid-connect/certs
 
   datasource:
-    url: jdbc:postgresql://localhost:33007/mini_project_db
-    username: my_user
-    password: my_password
+    url: jdbc:postgresql://localhost:5432/demo_telegram_bot
+    username: postgres
+    password: krya
     driver-class-name: org.postgresql.Driver
 
   jpa:
