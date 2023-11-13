@@ -48,7 +48,7 @@ vapid:
 
 kafka:
 
-  group-id: hero-consumer
+  group-id: notification-consumer
   auto-offset: earliest
   topics:
     data: web-notification

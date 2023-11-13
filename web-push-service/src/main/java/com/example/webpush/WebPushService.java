@@ -3,6 +3,7 @@ package com.example.webpush;
 import com.example.model.entities.WebDataConfig;
 import com.example.model.request.PushNotificationRequest;
 import com.example.model.entities.UserSubscription;
+import com.example.model.respone.TransactionResponse;
 import com.example.repository.WebRepository;
 import com.example.service.WebService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,6 +29,7 @@ import java.security.Security;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -80,10 +82,8 @@ public class WebPushService {
     public void sendNotification(Subscription subscription, String messageJson) {
         try {
             System.out.println("user subscription: " + subscription.keys.auth);
-
             HttpResponse response = pushService.send(new Notification(subscription, messageJson));
             int statusCode = response.getStatusLine().getStatusCode();
-
             if (statusCode != 201) {
                 System.out.println("Server error, status code:" + statusCode);
                 InputStream content = response.getEntity().getContent();
@@ -121,7 +121,7 @@ public class WebPushService {
         System.out.println("Unsubscribed " + subscriptionPrefix + endpoint);
     }
 
-    public record Message(String title, String body) {
+    public record Message(String title, String body){
     }
 
     ObjectMapper mapper = new ObjectMapper();
@@ -150,6 +150,7 @@ public class WebPushService {
                 sendNotification(subscription, msg);
             });
         } catch (JsonProcessingException e) {
+            System.out.println("Error");
             throw new RuntimeException(e);
         }
     }

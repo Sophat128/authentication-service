@@ -29,6 +29,7 @@ public class NotificationConsumer {
     private static final String NOTIFICATION_TOPIC = "notification";
     private static final String TELEGRAM_TOPIC = "telegram";
     private static final String EMAIL_TOPIC = "email";
+    private static final String WEB_TOPIC = "web-notification";
 
 
     public NotificationConsumer(KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate, WebClientConfig webClientConfig) {
@@ -53,10 +54,12 @@ public class NotificationConsumer {
 
         Message<TransactionHistoryDto> message = MessageBuilder
                 .withPayload(notification.value())
-                .setHeader(KafkaHeaders.TOPIC, "web")
+                .setHeader(KafkaHeaders.TOPIC, WEB_TOPIC)
                 .build();
         System.out.println("Message: " + message);
         kafkaTemplate.send(message);
+
+
 
         String userId = String.valueOf(notification.value().getCustomerId());
 
@@ -72,7 +75,7 @@ public class NotificationConsumer {
         List<Map<String, Object>> payload = subscriptionDtos.getPayload();
         List<String> notificationTypes = payload.stream()
                 .map(subscription -> (String) subscription.get("notificationType"))
-                .collect(Collectors.toList());
+                .toList();
 
         System.out.println("Notification: " + notificationTypes);
 

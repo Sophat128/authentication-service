@@ -2,9 +2,9 @@ package com.example.clienteventservice.service;
 
 import com.example.clienteventservice.domain.model.BankAccount;
 import com.example.clienteventservice.domain.model.TransactionHistory;
+import com.example.clienteventservice.domain.type.TransactionType;
 import com.example.dto.TransactionHistoryDto;
 import com.example.type.StatementType;
-import com.example.type.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,13 +35,11 @@ public class WithdrawService {
 
         TransactionHistory transactionHistory = transactionService
                 .getTransactionHistoryBuilder(
-                        TransactionType.WITHDRAW,
+                     TransactionType.WITHDRAW,
                         StatementType.EXPENSE,
                         bankAccount,
                         amount
                 ).build();
-
-
         Message<TransactionHistoryDto> message = MessageBuilder
                 .withPayload(transactionHistory.toDto())
                 .setHeader(KafkaHeaders.TOPIC, "notification")

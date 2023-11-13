@@ -1,10 +1,9 @@
 package com.example.clienteventservice.service;
 
+import com.example.clienteventservice.domain.dto.TransactionHistoryDto;
 import com.example.clienteventservice.domain.model.BankAccount;
 import com.example.clienteventservice.domain.model.TransactionHistory;
-import com.example.clienteventservice.domain.response.DepositResponse;
-import com.example.clienteventservice.domain.response.TransactionResponse;
-import com.example.clienteventservice.domain.response.WithdrawResponse;
+import com.example.clienteventservice.domain.type.StatementType;
 import com.example.clienteventservice.domain.type.TransactionType;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -21,14 +20,23 @@ import java.util.List;
 public class DepositService {
     private final BankAccountService bankAccountService;
     private final TransactionService transactionService;
-    private final KafkaTemplate<Object, Object> kafkaTemplate;
 
-    public void deposit(String bankAccountNumber, BigDecimal amount) {
-        BankAccount toBankAccount = bankAccountService.getBankAccount(bankAccountNumber);
+    private final KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate;
+
+    public void deposit(String toBankAccountNumber, BigDecimal amount) {
+        BankAccount toBankAccount = bankAccountService.getBankAccount(toBankAccountNumber);
         transactionService.executeDeposit(toBankAccount, amount);
-        TransactionResponse depositResponse = new TransactionResponse(bankAccountNumber,amount, TransactionType.DEPOSIT.name());
-        Message<TransactionResponse> message = MessageBuilder
-                .withPayload(depositResponse)
+
+        TransactionHistory transactionHistory = transactionService
+                .getTransactionHistoryBuilder(
+                        TransactionType.DEPOSIT,
+                        StatementType.INCOME,
+                        toBankAccount,
+                        amount
+                ).build();
+
+        Message<TransactionHistoryDto> message = MessageBuilder
+                .withPayload(transactionHistory.toDto())
                 .setHeader(KafkaHeaders.TOPIC, "notification")
                 .build();
         System.out.println("Message: " + message);

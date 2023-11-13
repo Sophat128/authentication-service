@@ -12,9 +12,9 @@ spring:
 
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/demo_telegram_bot
-    username: postgres
-    password: krya
+    url: jdbc:postgresql://localhost:33007/mini_project_db
+    username: my_user
+    password: my_password
     driver-class-name: org.postgresql.Driver
   security:
     oauth2:

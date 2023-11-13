@@ -1,8 +1,8 @@
-package com.example.dto;
+package com.example.model.respone;
 
-import com.example.clienteventservice.domain.type.TransactionType;
-import com.example.type.StatementType;
-import com.example.type.TransactionStatus;
+import com.example.model.type.StatementType;
+import com.example.model.type.TransactionStatus;
+import com.example.model.type.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,11 +11,10 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
-public class TransactionHistoryDto {
-
+@AllArgsConstructor
+@NoArgsConstructor
+public class TransactionResponse {
     private Long id;
 
     private TransactionType type;

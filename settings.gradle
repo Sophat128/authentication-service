@@ -18,6 +18,8 @@ include 'scheduler-service'
 include 'smtp-service'
 include 'email-kb-service'
 include 'transation-service'
+include 'client-event-service'
+include 'gateway'
 
 
 
