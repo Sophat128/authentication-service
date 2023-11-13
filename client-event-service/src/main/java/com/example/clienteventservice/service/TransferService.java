@@ -2,8 +2,6 @@ package com.example.clienteventservice.service;
 
 import com.example.clienteventservice.domain.model.BankAccount;
 import com.example.clienteventservice.domain.response.TransactionResponse;
-import com.example.clienteventservice.domain.response.TransferResponse;
-import com.example.clienteventservice.domain.response.WithdrawResponse;
 import com.example.clienteventservice.domain.type.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
