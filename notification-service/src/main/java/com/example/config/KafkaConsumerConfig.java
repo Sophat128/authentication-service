@@ -15,6 +15,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.CommonErrorHandler;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.util.backoff.FixedBackOff;
 
@@ -36,10 +37,7 @@ public class KafkaConsumerConfig {
     @Value("${kafka.auto-offset}")
     private String autoOffset;
 
-    private final KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate;
-
     public KafkaConsumerConfig(KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
     }
 
     @Bean
@@ -51,23 +49,24 @@ public class KafkaConsumerConfig {
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffset);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
 
-    @Bean("kafkaListenerContainerFactory")
-    public ConcurrentKafkaListenerContainerFactory<String, TransactionHistoryDto> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, TransactionHistoryDto> concurrentKafkaListenerContainerFactory
-                = new ConcurrentKafkaListenerContainerFactory<>();
-        concurrentKafkaListenerContainerFactory.setConsumerFactory(consumerFactory());
-        DeadLetterPublishingRecoverer deadLetterPublishingRecoverer =
-                new DeadLetterPublishingRecoverer(kafkaTemplate, (record, ex) -> {
-                    log.info("Exception {} occurred sending the record to the error topic {}", ex.getMessage(), deadLetterTopic);
-                    return new TopicPartition(deadLetterTopic, -1);
-                });
-        CommonErrorHandler errorHandler = new DefaultErrorHandler(deadLetterPublishingRecoverer, new FixedBackOff(3000L, 3L));
-        concurrentKafkaListenerContainerFactory.setCommonErrorHandler(errorHandler);
-        return concurrentKafkaListenerContainerFactory;
-    }
+//    @Bean("kafkaListenerContainerFactory")
+//    public ConcurrentKafkaListenerContainerFactory<String, TransactionHistoryDto> kafkaListenerContainerFactory() {
+//        ConcurrentKafkaListenerContainerFactory<String, TransactionHistoryDto> concurrentKafkaListenerContainerFactory
+//                = new ConcurrentKafkaListenerContainerFactory<>();
+//        concurrentKafkaListenerContainerFactory.setConsumerFactory(consumerFactory());
+//        DeadLetterPublishingRecoverer deadLetterPublishingRecoverer =
+//                new DeadLetterPublishingRecoverer(kafkaTemplate, (record, ex) -> {
+//                    log.info("Exception {} occurred sending the record to the error topic {}", ex.getMessage(), deadLetterTopic);
+//                    return new TopicPartition(deadLetterTopic, -1);
+//                });
+//        CommonErrorHandler errorHandler = new DefaultErrorHandler(deadLetterPublishingRecoverer, new FixedBackOff(3000L, 3L));
+//        concurrentKafkaListenerContainerFactory.setCommonErrorHandler(errorHandler);
+//        return concurrentKafkaListenerContainerFactory;
+//    }
 
 }

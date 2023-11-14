@@ -7,7 +7,7 @@ spring:
   kafka:
     consumer:
       group-id: kafka-group
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: https://8.219.131.180:9092
 
 
 #    consumer:
@@ -26,9 +26,9 @@ spring:
 #      name: notification
 
   datasource:
-    url: jdbc:postgresql://localhost:33007/mini_project_db
-    username: my_user
-    password: my_password
+    url: jdbc:postgresql://34.142.208.161:2345/postgres
+    username: postgres
+    password: 1234
   jpa:
     hibernate:
       ddl-auto: update
