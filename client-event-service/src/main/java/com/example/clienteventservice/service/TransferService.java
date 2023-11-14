@@ -30,40 +30,72 @@ public class TransferService {
 
     private final KafkaTemplate<String, TransactionResponse> kafkaTemplate;
 
+    //    public void transfer(String fromBankAccountNumber, String toBankAccountNumber, BigDecimal amount) {
+//        BankAccount fromBankAccount = bankAccountService.getBankAccount(fromBankAccountNumber);
+//        BankAccount toBankAccount = bankAccountService.getBankAccount(toBankAccountNumber);
+//
+//        transactionService.executeTransfer(fromBankAccount, toBankAccount, amount);
+//        TransactionHistory senderResponse = transactionService
+//                .getTransactionHistoryBuilder(
+//                        TransactionType.TRANSFER,
+//                        StatementType.EXPENSE,
+//                        fromBankAccount,
+//                        amount
+//                ).build();
+//
+//        TransactionHistory receiverResponse = transactionService
+//                .getTransactionHistoryBuilder(
+//                        TransactionType.TRANSFER,
+//                        StatementType.INCOME,
+//                        toBankAccount,
+//                        amount
+//                ).build();
+//
+//        Message<TransactionHistoryDto> senderMessage = MessageBuilder
+//                .withPayload(senderResponse.toDto())
+//                .setHeader(KafkaHeaders.TOPIC, "notification")
+//                .build();
+//        System.out.println("Message from bank account: " + senderMessage);
+//        kafkaTemplate.send(senderMessage);
+//
+//        Message<TransactionHistoryDto> receiverMessage = MessageBuilder
+//                .withPayload(receiverResponse.toDto())
+//                .setHeader(KafkaHeaders.TOPIC, "notification")
+//                .build();
+//        System.out.println("Message from bank account: " + receiverMessage);
+//        kafkaTemplate.send(receiverMessage);
+//
+//    }
     public void transfer(String fromBankAccountNumber, String toBankAccountNumber, BigDecimal amount) {
         BankAccount fromBankAccount = bankAccountService.getBankAccount(fromBankAccountNumber);
         BankAccount toBankAccount = bankAccountService.getBankAccount(toBankAccountNumber);
 
         transactionService.executeTransfer(fromBankAccount, toBankAccount, amount);
-        TransactionHistory transactionHistory = transactionService
-                .getTransactionHistoryTransfer(
-                        TransactionType.TRANSFER,
-                        StatementType.EXPENSE,
-                        fromBankAccount,
-                        toBankAccountNumber,
-                        amount
-                ).build();
+
+        sendTransferNotification(TransactionType.SENDER, StatementType.EXPENSE, fromBankAccount, amount, toBankAccount);
+        sendTransferNotification(TransactionType.RECEIVER, StatementType.INCOME, toBankAccount, amount, fromBankAccount);
+    }
+
+    private void sendTransferNotification(TransactionType transactionType, StatementType statementType, BankAccount bankAccountUser1, BigDecimal amount, BankAccount bankAccountUser2) {
+        TransactionHistory transactionHistory = transactionService.getTransactionHistoryBuilder(
+                transactionType,
+                statementType,
+                bankAccountUser1,
+                amount
+        ).build();
+        if (transactionType.equals(TransactionType.SENDER)) {
+            transactionHistory.setReceivedAccountNumber(bankAccountUser2.getAccountNumber());
+        } else if (transactionType.equals(TransactionType.RECEIVER)) {
+            transactionHistory.setReceivedAccountNumber(bankAccountUser2.getAccountNumber());
+        }
 
         Message<TransactionHistoryDto> message = MessageBuilder
                 .withPayload(transactionHistory.toDto())
                 .setHeader(KafkaHeaders.TOPIC, "notification")
                 .build();
+
         System.out.println("Message from bank account: " + message);
         kafkaTemplate.send(message);
-
-//        sendTransactionNotification(fromBankAccountNumber, amount, TransactionType.SENDER);
-//        sendTransactionNotification(fromBankAccountNumber, amount, TransactionType.RECEIVER);
-    }
-
-    private void sendTransactionNotification(String accountNumber, BigDecimal amount, TransactionType transactionType) {
-        TransactionResponse response = new TransactionResponse(accountNumber, amount, transactionType.name());
-        Message<TransactionResponse> message = MessageBuilder
-                .withPayload(response)
-                .setHeader(KafkaHeaders.TOPIC, "notification")
-                .build();
-        kafkaTemplate.send(message);
-
-
     }
 
 

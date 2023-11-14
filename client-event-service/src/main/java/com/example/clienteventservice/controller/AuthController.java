@@ -2,6 +2,7 @@ package com.example.clienteventservice.controller;
 
 import com.example.clienteventservice.domain.request.LoginRequest;
 import com.example.clienteventservice.domain.request.UserRequest;
+import com.example.clienteventservice.exception.BadRequestException;
 import com.example.clienteventservice.service.UserService;
 import com.google.common.base.Preconditions;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +29,13 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(summary = "login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        try{
         return ResponseEntity.ok().body(userService.login(loginRequest));
+
+        }catch (BadRequestException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+
+        }
     }
 
     @GetMapping("/verify-email")

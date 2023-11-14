@@ -6,7 +6,6 @@ import com.example.clienteventservice.domain.model.TransactionHistory;
 import com.example.clienteventservice.domain.type.StatementType;
 import com.example.clienteventservice.domain.type.TransactionStatus;
 import com.example.clienteventservice.domain.type.TransactionType;
-import com.example.dto.TransactionHistoryDto;
 import com.example.clienteventservice.event.SBAEventListener;
 import com.example.clienteventservice.exception.InsufficientBalanceManagerException;
 import com.example.clienteventservice.repository.TransactionHistoryRepository;

@@ -40,7 +40,7 @@ public class BankAccountService {
 
         Preconditions.checkNotNull(bankAccountDto, "bankAccount can not be null");
         Preconditions.checkArgument(
-                bankAccountDto.getAccountNumber().matches("\\d{9}"),
+                bankAccountDto.getAccountNumber().matches("\\d{10}"),
                 "Bank AccountNumber must be 9 digits"
         );
 

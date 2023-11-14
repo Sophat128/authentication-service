@@ -1,17 +1,17 @@
 package com.example.clienteventservice.service;
 
+import com.example.clienteventservice.domain.dto.UserDtoClient;
+import com.example.clienteventservice.domain.response.ApiResponse;
+import com.example.clienteventservice.domain.response.LoginResponse;
 import com.example.clienteventservice.exception.AlreadyExistException;
 import com.example.clienteventservice.exception.BadRequestException;
 import com.example.clienteventservice.exception.ForbiddenException;
 import com.example.clienteventservice.exception.NotFoundException;
 import com.example.clienteventservice.repository.SubscriptionRepository;
-import com.example.dto.UserDtoClient;
 import com.example.clienteventservice.domain.model.User;
 import com.example.clienteventservice.domain.request.LoginRequest;
 import com.example.clienteventservice.domain.request.ProfileRequest;
 import com.example.clienteventservice.domain.request.UserRequest;
-import com.example.response.ApiResponse;
-import com.example.response.LoginResponse;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
@@ -106,7 +106,6 @@ public class UserService {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
             MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
             map.add("client_id", clientId);
             map.add("client_secret", secretKey);

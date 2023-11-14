@@ -18,9 +18,22 @@ public class ApiResponse<T> {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T payload;
     private Integer status;
-
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private LoginResponse loginResponse;
     public ApiResponse(String message, Integer status) {
         this.message = message;
+        this.status = status;
+    }
+
+    public ApiResponse(String message, T payload, Integer status) {
+        this.message = message;
+        this.payload = payload;
+        this.status = status;
+    }
+
+    public ApiResponse(String message, Integer status, LoginResponse loginResponse) {
+        this.message = message;
+        this.loginResponse = loginResponse;
         this.status = status;
     }
 }
