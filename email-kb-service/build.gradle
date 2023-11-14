@@ -26,6 +26,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation(project(":common"))
     implementation 'org.springframework:spring-test:6.0.12'
+    compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
+
 
 
 

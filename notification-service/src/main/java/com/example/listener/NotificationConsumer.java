@@ -29,7 +29,7 @@ public class NotificationConsumer {
 
     private static final String NOTIFICATION_TOPIC = "notification";
     private static final String TELEGRAM_TOPIC = "telegram";
-    private static final String EMAIL_TOPIC = "email";
+    private static final String EMAIL_TOPIC = "send.email.kb";
     private static final String WEB_TOPIC = "web-notification";
 
 
@@ -67,7 +67,12 @@ public class NotificationConsumer {
 
 
         String userId = String.valueOf(transactionHistoryDto.getCustomerId());
-
+        Message<TransactionHistoryDto> messages = MessageBuilder
+                .withPayload(transactionHistoryDto)
+                .setHeader(KafkaHeaders.TOPIC, EMAIL_TOPIC)
+                .build();
+        System.out.println("Message: " + messages);
+        kafkaTemplate.send(messages);
 
         String subscriptionUrl = "http://client-event-service/api/v1/clients/get-notification";
         WebClient web = webClientConfig.webClientBuilder().baseUrl(subscriptionUrl).build();

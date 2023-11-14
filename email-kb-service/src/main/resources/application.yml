@@ -5,7 +5,7 @@ spring:
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      bootstrap-servers: localhost:9092
+      bootstrap-servers: https://8.219.131.180:9092
     dead_letter_topic: notification-retry
   datasource:
     url: jdbc:postgresql://34.142.208.161:2345/postgres
