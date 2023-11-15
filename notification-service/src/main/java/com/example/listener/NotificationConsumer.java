@@ -3,6 +3,8 @@ package com.example.listener;
 import com.example.config.WebClientConfig;
 import com.example.dto.TransactionHistoryDto;
 import com.example.response.ApiResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.core.ParameterizedTypeReference;
@@ -16,7 +18,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -28,7 +29,7 @@ public class NotificationConsumer {
 
     private static final String NOTIFICATION_TOPIC = "notification-service";
     private static final String TELEGRAM_TOPIC = "telegram";
-    private static final String EMAIL_TOPIC = "email";
+    private static final String EMAIL_TOPIC = "send.email.kb";
     private static final String WEB_TOPIC = "web-notification";
 
 
@@ -36,17 +37,12 @@ public class NotificationConsumer {
         this.kafkaTemplate = kafkaTemplate;
         this.webClientConfig = webClientConfig;
     }
-    //    @RetryableTopic(
-//            attempts = "3",
-//            topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE,
-//            backoff = @Backoff(delay = 1000, maxDelay = 5_000, random = true),
-//            dltTopicSuffix = "-dead-letter"
-//    )
+
     @KafkaListener(
             topics = NOTIFICATION_TOPIC,
             groupId = "notification-consumer"
     )
-    void listener(ConsumerRecord<String, TransactionHistoryDto> notification) {
+    void listener(ConsumerRecord<String, TransactionHistoryDto> notification) throws JsonProcessingException {
         log.info("Started consuming message on topic: {}, offset {}, message {}", notification.topic(),
                 notification.offset(), notification.value());
 
@@ -60,6 +56,12 @@ public class NotificationConsumer {
 
 
         String userId = String.valueOf(notification.value().getCustomerId());
+        Message<TransactionHistoryDto> messages = MessageBuilder
+                .withPayload(notification.value())
+                .setHeader(KafkaHeaders.TOPIC, EMAIL_TOPIC)
+                .build();
+        System.out.println("Message: " + messages);
+        kafkaTemplate.send(messages);
 
         String subscriptionUrl = "http://client-event-service/api/v1/clients/get-notification";
         WebClient web = webClientConfig.webClientBuilder().baseUrl(subscriptionUrl).build();
@@ -70,6 +72,7 @@ public class NotificationConsumer {
                 .bodyToMono(new ParameterizedTypeReference<ApiResponse<List<Map<String, Object>>>>() {})
                 .block();
 
+        assert subscriptionDtos != null;
         List<Map<String, Object>> payload = subscriptionDtos.getPayload();
         List<String> notificationTypes = payload.stream()
                 .map(subscription -> (String) subscription.get("notificationType"))
@@ -78,15 +81,14 @@ public class NotificationConsumer {
         System.out.println("Notification: " + notificationTypes);
 
         for (String type : notificationTypes) {
-            String notificationType = type;
             System.out.println("Type: " + type);
-            log.info("Processing notificationType: {}", notificationType);
-            if (notificationType.equals("TELEGRAM")) {
+            log.info("Processing notificationType: {}", type);
+            if (type.equals("TELEGRAM")) {
                 kafkaTemplate.send(TELEGRAM_TOPIC, notification.key(), notification.value());
                 log.info("Sent message to TELEGRAM_TOPIC: {}", notification.value());
-            } else if (notificationType.equals("EMAIL")) {
-                kafkaTemplate.send(EMAIL_TOPIC, notification.key(), notification.value());
-                log.info("Sent message to EMAIL_TOPIC: {}", notification.value());
+//            } else if (type.equals("EMAIL")) {
+//                kafkaTemplate.send(EMAIL_TOPIC, notification.key(), notification.value());
+//                log.info("Sent message to EMAIL_TOPIC: {}", notification.value());
             } else {
                 log.info("this userId doesn't have subscribe telegram or email notification types!");
             }

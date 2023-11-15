@@ -14,7 +14,7 @@ public class EmailRequest {
     private String subject;
     private String content;
 
-    public Email toEntity(){
-        return new Email(to,from,subject,content, file);
-    }
+//    public Email toEntity(){
+//        return new Email(to,from,subject,content);
+//    }
 }

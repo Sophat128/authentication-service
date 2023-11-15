@@ -33,7 +33,6 @@ public class BankAccountService {
     private static final String MESSAGE_FORMAT_NO_BANK_ACCOUNT = "No bankAccount by bankAccountId: %s";
 
     private BankAccountRepository bankAccountRepository;
-    private CustomerService customerService;
 
     public BankAccount addBankAccount(UUID customerId, BankAccountDto bankAccountDto) {
         BankAccount bankAccount = bankAccountDto.toEntity();

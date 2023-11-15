@@ -41,6 +41,7 @@ public class EmailServiceImpl implements EmailKbService {
         this.webClient = webClient;
     }
 
+
     public UserDto getUserById(UUID userId) {
         return webClient.get()
                 .uri("/users/{userId}", userId)
@@ -79,6 +80,8 @@ public class EmailServiceImpl implements EmailKbService {
 
         mailSender.send(message);
     }
+
+
 
 
     @Override
