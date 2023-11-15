@@ -1,7 +1,7 @@
 package com.example.entities.request;
 
 import com.example.Notification;
-import com.example.entities.NotificationType;
+import com.example.type.NotificationType;
 import lombok.Data;
 
 import java.util.UUID;

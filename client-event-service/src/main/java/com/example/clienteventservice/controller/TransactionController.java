@@ -2,13 +2,11 @@ package com.example.clienteventservice.controller;
 
 import com.example.clienteventservice.domain.dto.AmountDto;
 import com.example.clienteventservice.domain.model.TransactionHistory;
-import com.example.clienteventservice.domain.type.TransactionType;
 import com.example.clienteventservice.service.DepositService;
 import com.example.clienteventservice.service.TransactionService;
 import com.example.clienteventservice.service.TransferService;
 import com.example.clienteventservice.service.WithdrawService;
 import com.example.clienteventservice.domain.response.ApiResponse;
-import com.example.response.LoginResponse;
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.*;
 import jakarta.validation.Valid;

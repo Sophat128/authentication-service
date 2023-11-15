@@ -1,5 +1,4 @@
-package com.example.clienteventservice.domain.type;
-
+package com.example.type;
 /**
  * Types of transaction in this implementation
  */

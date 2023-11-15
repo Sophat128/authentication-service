@@ -1,5 +1,6 @@
 package com.example;
 
+
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.OAuthFlow;
@@ -23,7 +24,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         )
 )
 public class TelegramApplication {
+
     public static void main(String[] args) {
         SpringApplication.run(TelegramApplication.class, args);
+
     }
+
+
 }

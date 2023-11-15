@@ -1,8 +1,8 @@
 package com.example.clienteventservice.service;
 
+import com.example.clienteventservice.exception.BankAccountManagerException;
 import com.example.clienteventservice.domain.model.BankAccount;
 import com.example.type.TransactionType;
-import com.example.clienteventservice.exception.BankAccountManagerException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

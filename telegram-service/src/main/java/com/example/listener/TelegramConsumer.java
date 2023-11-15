@@ -42,7 +42,7 @@ public class TelegramConsumer {
             UUID userId = telegram.value().getCustomerId();
 
 //            Check if the userId exists in your telegram_users table and get chatId
-            Long chatId = telegramUserRepository.getChatIdByUserId(String.valueOf(userId));
+            Long chatId = telegramUserRepository.getChatIdByUserId(userId);
             System.out.println("chatId: " + chatId);
 
             telegramBotUserService.sendTextMessage(chatId, telegram.value());

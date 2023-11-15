@@ -1,10 +1,8 @@
 package com.example.clienteventservice.service;
 
-import com.example.clienteventservice.domain.dto.CustomerDto;
-import com.example.clienteventservice.domain.model.Customer;
-import com.example.clienteventservice.event.SBAEventListener;
 import com.example.clienteventservice.exception.BankAccountManagerException;
 import com.example.clienteventservice.repository.CustomerRepository;
+import com.example.clienteventservice.domain.model.Customer;
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;

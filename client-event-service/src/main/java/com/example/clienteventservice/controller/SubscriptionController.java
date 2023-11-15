@@ -1,8 +1,8 @@
 package com.example.clienteventservice.controller;
 
 import com.example.clienteventservice.domain.model.Subscription;
+import com.example.clienteventservice.domain.response.ApiResponse;
 import com.example.clienteventservice.service.SubscriptionService;
-import com.example.response.ApiResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

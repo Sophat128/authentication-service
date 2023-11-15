@@ -1,15 +1,14 @@
 package com.example.clienteventservice.service;
 
-import com.example.clienteventservice.domain.event.TransactionHistorySaveEvent;
-import com.example.clienteventservice.domain.model.BankAccount;
-import com.example.clienteventservice.domain.model.TransactionHistory;
-import com.example.dto.TransactionHistoryDto;
-import com.example.type.StatementType;
-import com.example.type.TransactionStatus;
-import com.example.type.TransactionType;
 import com.example.clienteventservice.event.SBAEventListener;
 import com.example.clienteventservice.exception.InsufficientBalanceManagerException;
 import com.example.clienteventservice.repository.TransactionHistoryRepository;
+import com.example.clienteventservice.domain.event.TransactionHistorySaveEvent;
+import com.example.clienteventservice.domain.model.BankAccount;
+import com.example.clienteventservice.domain.model.TransactionHistory;
+import com.example.type.StatementType;
+import com.example.type.TransactionStatus;
+import com.example.type.TransactionType;
 import com.google.common.base.Preconditions;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +16,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

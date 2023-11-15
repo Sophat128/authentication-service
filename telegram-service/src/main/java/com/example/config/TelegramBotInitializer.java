@@ -21,8 +21,11 @@ public class TelegramBotInitializer {
     }
 
     @EventListener(ContextRefreshedEvent.class)
+
     public void init() {
+
         try {
+
             telegramBotUserService.clearWebhook();
 
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
@@ -32,5 +35,6 @@ public class TelegramBotInitializer {
             logger.error("Error registering Telegram bot", e);
         }
     }
+
 
 }

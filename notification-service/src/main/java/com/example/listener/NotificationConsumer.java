@@ -3,6 +3,8 @@ package com.example.listener;
 import com.example.config.WebClientConfig;
 import com.example.dto.TransactionHistoryDto;
 import com.example.response.ApiResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.core.ParameterizedTypeReference;
@@ -47,9 +49,17 @@ public class NotificationConsumer {
             topics = NOTIFICATION_TOPIC,
             groupId = "notification-consumer"
     )
-    void listener(ConsumerRecord<String, TransactionHistoryDto> notification) {
+    void listener(ConsumerRecord<String, TransactionHistoryDto> notification) throws JsonProcessingException {
         log.info("Started consuming message on topic: {}, offset {}, message {}", notification.topic(),
                 notification.offset(), notification.value());
+
+
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        String stringValue = String.valueOf(notification.value());
+//        TransactionHistoryDto transactionHistoryDto = objectMapper.readValue(stringValue, TransactionHistoryDto.class);
+//
+//        log.info("Started consuming message on topic: {}, offset {}, message {}", notification.topic(),
+//                notification.offset(), transactionHistoryDto);
 
         Message<TransactionHistoryDto> message = MessageBuilder
                 .withPayload(notification.value())
@@ -60,7 +70,7 @@ public class NotificationConsumer {
 
         String userId = String.valueOf(notification.value().getCustomerId());
 
-        String subscriptionUrl = "http://client-service/api/v1/clients/get-notification";
+        String subscriptionUrl = "http://client-event-service/api/v1/clients/get-notification";
         WebClient web = webClientConfig.webClientBuilder().baseUrl(subscriptionUrl).build();
 
         ApiResponse<List<Map<String, Object>>> subscriptionDtos = web.get()
