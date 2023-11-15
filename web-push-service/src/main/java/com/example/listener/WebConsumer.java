@@ -1,5 +1,6 @@
 package com.example.listener;
 
+import com.example.dto.TransactionHistoryDto;
 import com.example.model.request.PushNotificationRequest;
 import com.example.model.respone.BankAccountResponse;
 import com.example.model.respone.TransactionResponse;
@@ -40,25 +41,16 @@ public class WebConsumer {
 //        System.out.println("Receive Data after: " + commandsRecord.value());
 //
 //    }
-    public void sendConfirmationEmails(ConsumerRecord<Object, String> commandsRecord) throws MessagingException, IOException {
+    public void sendNotificationToWebPush(ConsumerRecord<String, TransactionHistoryDto> commandsRecord) throws MessagingException, IOException {
         LOGGER.log(Level.INFO, () -> String.format("sendConfirmationEmails() » Topic: %s", commandsRecord.topic()));
         System.out.println("Receive Data: " + commandsRecord.value());
 
-        // Create an ObjectMapper
-        ObjectMapper objectMapper = new ObjectMapper();
-        String data = commandsRecord.value();
-        String trimmedString = data.replaceAll("^\"|\"$", "");
-        String cleanedString = trimmedString.replaceAll("\\\\", "");
-        // Parse the JSON string into a JsonNode object
-        JsonNode root = objectMapper.readTree(cleanedString);
-        System.out.println("root " + root);
-        String accountNumber =  root.get("bankAccountNumber").asText();
-
         PushNotificationRequest pushNotificationRequest = new PushNotificationRequest("Transaction", commandsRecord.value());
+        System.out.println("pushNotificationRequest: " + pushNotificationRequest);
 
-        BankAccountResponse customerInfo = webService.getCustomerInfoByBankAccountNo(accountNumber);
+        BankAccountResponse customerInfo = webService.getCustomerInfoByBankAccountNo(commandsRecord.value().getBankAccountNumber());
         System.out.println("customerInfo: " + customerInfo);
-
+//
         webPushService.notifySpecificUser(pushNotificationRequest, customerInfo.getCustomerId());
     }
 }

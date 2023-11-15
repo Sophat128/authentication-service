@@ -1,5 +1,6 @@
 package com.example.webpush;
 
+import com.example.dto.TransactionHistoryDto;
 import com.example.model.entities.WebDataConfig;
 import com.example.model.request.PushNotificationRequest;
 import com.example.model.entities.UserSubscription;
@@ -121,7 +122,7 @@ public class WebPushService {
         System.out.println("Unsubscribed " + subscriptionPrefix + endpoint);
     }
 
-    public record Message(String title, String body){
+    public record Message(String title, TransactionHistoryDto body){
     }
 
     ObjectMapper mapper = new ObjectMapper();

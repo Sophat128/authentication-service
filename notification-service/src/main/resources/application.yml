@@ -13,16 +13,15 @@ spring:
       bootstrap-servers: localhost:9092
     dead_letter_topic: notification-retry
 
-
     topic:
       name: notification
 
     bootstrap-servers: localhost:9092
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/demo_telegram_bot
-    username: postgres
-    password: krya
+    url: jdbc:postgresql://localhost:33007/mini_project_db
+    username: my_user
+    password: my_password
   jpa:
     hibernate:
       ddl-auto: update

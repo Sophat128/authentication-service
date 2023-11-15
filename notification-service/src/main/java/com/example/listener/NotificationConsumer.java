@@ -26,7 +26,7 @@ public class NotificationConsumer {
     private final KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate;
     private final WebClientConfig webClientConfig;
 
-    private static final String NOTIFICATION_TOPIC = "notification";
+    private static final String NOTIFICATION_TOPIC = "notification-service";
     private static final String TELEGRAM_TOPIC = "telegram";
     private static final String EMAIL_TOPIC = "email";
     private static final String WEB_TOPIC = "web-notification";
@@ -36,14 +36,12 @@ public class NotificationConsumer {
         this.kafkaTemplate = kafkaTemplate;
         this.webClientConfig = webClientConfig;
     }
-
     //    @RetryableTopic(
 //            attempts = "3",
 //            topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE,
 //            backoff = @Backoff(delay = 1000, maxDelay = 5_000, random = true),
 //            dltTopicSuffix = "-dead-letter"
 //    )
-
     @KafkaListener(
             topics = NOTIFICATION_TOPIC,
             groupId = "notification-consumer"
@@ -63,7 +61,7 @@ public class NotificationConsumer {
 
         String userId = String.valueOf(notification.value().getCustomerId());
 
-        String subscriptionUrl = "http://client-service/api/v1/clients/get-notification";
+        String subscriptionUrl = "http://client-event-service/api/v1/clients/get-notification";
         WebClient web = webClientConfig.webClientBuilder().baseUrl(subscriptionUrl).build();
 
         ApiResponse<List<Map<String, Object>>> subscriptionDtos = web.get()

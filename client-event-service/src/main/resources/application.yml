@@ -11,7 +11,7 @@ spring:
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      bootstrap-servers: localhost:9092
+      bootstrap-servers: 8.219.131.180:9092
     dead_letter_topic: notification-retry
 
   mail:
