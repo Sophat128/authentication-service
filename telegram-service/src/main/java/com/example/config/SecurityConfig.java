@@ -22,7 +22,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authorize ->
                 authorize
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/v1/telegram/subscribe").permitAll()
+//                        .requestMatchers("/api/v1/telegram/subscribe").permitAll()
+                        .requestMatchers("/api/v1/telegram/**").permitAll()
                         .anyRequest().authenticated()
 
         );

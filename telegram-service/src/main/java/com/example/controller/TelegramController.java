@@ -12,8 +12,8 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("api/v1/telegram")
-@CrossOrigin
-@SecurityRequirement(name = "auth")
+//@CrossOrigin
+//@SecurityRequirement(name = "auth")
 public class TelegramController {
     private final TelegramBotService telegramBotService;
 
@@ -27,13 +27,18 @@ public class TelegramController {
 //    }
 
     @PostMapping("/send-message")
-    public ResponseEntity<?> sendMessage(@RequestParam String message, Principal principal){
-        return ResponseEntity.ok().body(telegramBotService.sendMessage(message,principal));
+    public ResponseEntity<?> sendMessage(@RequestParam String message, String token){
+        return ResponseEntity.ok().body(telegramBotService.sendMessage(message,token));
     }
 
     @GetMapping("/subscribe")
     public Boolean subscribe(@RequestParam String chat_id, @RequestParam String token){
         return telegramBotService.isSubscribe(chat_id,token);
+    }
+
+    @GetMapping("/get")
+    public Boolean get(){
+        return true;
     }
 
 }

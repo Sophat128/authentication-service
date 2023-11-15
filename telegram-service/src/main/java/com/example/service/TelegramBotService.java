@@ -136,11 +136,11 @@ public class TelegramBotService extends TelegramLongPollingBot {
         }
     }
 
-    public ApiResponse<?> sendMessage(String message, Principal principal) {
-        if (principal.getName() == null) {
-            throw new NotFoundException("use need to login");
-        }
-        Telegram telegram = telegramRepository.findByUserId(UUID.fromString(principal.getName()));
+    public ApiResponse<?> sendMessage(String message, String token) {
+//        if (principal.getName() == null) {
+//            throw new NotFoundException("use need to login");
+//        }
+        Telegram telegram = telegramRepository.findByUserId(UUID.fromString("ec79a214-f589-4349-8a59-b0a10c541555"));
         if (telegram != null) {
             String answer = EmojiParser.parseToUnicode(message);
             sendMessage(telegram.getChatId(), answer);
