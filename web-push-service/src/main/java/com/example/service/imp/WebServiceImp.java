@@ -23,13 +23,9 @@ public class WebServiceImp implements WebService {
     private final WebRepository webRepository;
     private final WebClient.Builder webClient;
 
-
     @Override
     public void addConfig(WebConfigRequest webConfigRequest) throws GeneralSecurityException {
         webConfigRepository.save(webConfigRequest.toEntity());
-//        webPushService.reinitializeConfig();
-
-
     }
 
     @Override
