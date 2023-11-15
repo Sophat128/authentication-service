@@ -20,9 +20,9 @@ spring:
     bootstrap-servers: 8.219.131.180:9092
 
   datasource:
-    url: jdbc:postgresql://34.142.208.161:2345/postgres
-    username: postgres
-    password: 1234
+    url: jdbc:postgresql://8.219.131.180:8765/fintrack
+    username: root
+    password: 123
   jpa:
     hibernate:
       ddl-auto: update

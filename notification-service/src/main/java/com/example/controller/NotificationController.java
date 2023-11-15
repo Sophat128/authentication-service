@@ -34,7 +34,6 @@ public class NotificationController {
     public ResponseEntity<?> sendMail(@RequestBody EmailRequest emailRequest) {
         service.publishToMail(emailRequest);
         return ResponseEntity.ok("Successful");
-
     }
 
     @GetMapping

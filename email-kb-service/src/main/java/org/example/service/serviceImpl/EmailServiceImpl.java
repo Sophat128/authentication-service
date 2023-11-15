@@ -82,6 +82,8 @@ public class EmailServiceImpl implements EmailKbService {
     }
 
 
+
+
     @Override
     public SmtpDto configEmail(SmtpRequest smtpRequest, Principal principal) {
         if(principal == null){

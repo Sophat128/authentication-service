@@ -43,7 +43,7 @@ public class NotificationServiceImpl implements NotificationService {
         Email email = emailRequest.toEntity();
         Message<Email> message = MessageBuilder
                 .withPayload(email) // Set the payload to the 'email' object
-                .setHeader(KafkaHeaders.TOPIC, "send.email.kb") // Set the Kafka topic header
+                .setHeader(KafkaHeaders.TOPIC, "send.email") // Set the Kafka topic header
                 .build();
 
         System.out.println("Message: " + message);
