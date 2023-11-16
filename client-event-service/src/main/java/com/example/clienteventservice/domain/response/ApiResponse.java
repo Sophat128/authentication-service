@@ -1,12 +1,15 @@
 package com.example.clienteventservice.domain.response;
 
 
+import com.example.clienteventservice.domain.model.TransactionHistory;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -35,5 +38,8 @@ public class ApiResponse<T> {
         this.message = message;
         this.loginResponse = loginResponse;
         this.status = status;
+    }
+
+    public ApiResponse(String getDataSuccessfully, List<TransactionHistory> transactionHistories, int value) {
     }
 }

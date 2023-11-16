@@ -46,6 +46,14 @@ public class NotificationConsumer {
         log.info("Started consuming message on topic: {}, offset {}, message {}", notification.topic(),
                 notification.offset(), notification.value());
 
+
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        String stringValue = String.valueOf(notification.value());
+//        TransactionHistoryDto transactionHistoryDto = objectMapper.readValue(stringValue, TransactionHistoryDto.class);
+//
+//        log.info("Started consuming message on topic: {}, offset {}, message {}", notification.topic(),
+//                notification.offset(), transactionHistoryDto);
+
         Message<TransactionHistoryDto> message = MessageBuilder
                 .withPayload(notification.value())
                 .setHeader(KafkaHeaders.TOPIC, WEB_TOPIC)

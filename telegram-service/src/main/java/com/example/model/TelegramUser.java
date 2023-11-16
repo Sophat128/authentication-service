@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 
 @Entity
 @Table(name = "telegram_users")
@@ -17,6 +19,9 @@ public class TelegramUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long chatId;
-    private String userId;
+    private UUID userId;
+    private Boolean isSubscribed;
 
+    public TelegramUser(Long chatId, UUID uuid, boolean b) {
+    }
 }

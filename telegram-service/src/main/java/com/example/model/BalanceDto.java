@@ -1,9 +1,12 @@
-package com.example.clienteventservice.domain.dto;
+package com.example.model;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 /**
  * This class is an integration class for rest services
@@ -14,13 +17,9 @@ import lombok.NoArgsConstructor;
 // Fixing the errors: no Creators, like default construct, exist
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerDto {
+public class BalanceDto {
 
-    private String firstName;
-    private String lastName;
-    private String username;
-    private String email;
-    private String phoneNumber;
-
+    private String bankAccountNumber;
+    private BigDecimal currentBalance;
 
 }

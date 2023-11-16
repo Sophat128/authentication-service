@@ -1,8 +1,8 @@
 package com.example.clienteventservice.service;
 
-import com.example.clienteventservice.domain.model.BankAccount;
 import com.example.clienteventservice.exception.InsufficientBalanceManagerException;
 import com.example.clienteventservice.util.ValidationUtil;
+import com.example.clienteventservice.domain.model.BankAccount;
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
