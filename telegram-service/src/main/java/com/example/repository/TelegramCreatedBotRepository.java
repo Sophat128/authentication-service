@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TelegramCreatedBotRepository extends JpaRepository<TelegramCreatedBot, Long> {
@@ -14,5 +15,7 @@ public interface TelegramCreatedBotRepository extends JpaRepository<TelegramCrea
 
     @Query("SELECT t.id FROM TelegramCreatedBot t ORDER BY t.id ASC")
     List<Long> getBotIdAtIndexZero();
+
+    Optional<TelegramCreatedBot> findByBotUsernameAndBotTokenAndBotLink(String botUsername, String botToken, String botLink);
 
 }

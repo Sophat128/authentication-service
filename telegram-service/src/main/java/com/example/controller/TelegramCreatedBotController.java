@@ -21,7 +21,7 @@ public class TelegramCreatedBotController {
     private final TelegramCreatedBotService telegramCreatedBotService;
 
     @GetMapping("/get-bots-from-database")
-    @Operation(summary = "we used only bot index = 0 in database to send notifications")
+    @Operation(summary = "we used only bot index 0 in database to send notifications")
     public ResponseEntity<?> getBots() {
         List<TelegramCreatedBot> telegramCreatedBot = telegramCreatedBotService.getBots();
         return ResponseEntity.ok().body(telegramCreatedBot);

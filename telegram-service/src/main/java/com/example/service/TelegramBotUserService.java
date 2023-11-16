@@ -25,7 +25,6 @@ import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScope
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,8 +50,8 @@ public class TelegramBotUserService extends TelegramLongPollingBot {
         botCommandList.add(new BotCommand("/balance", "Check your account balance"));
 
         this.execute(new SetMyCommands(botCommandList, new BotCommandScopeDefault(), null));
-    }
 
+    }
 
 
     @Override
@@ -68,38 +67,42 @@ public class TelegramBotUserService extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        String emojiThanks = EmojiParser.parseToUnicode(":pray:");
-        String emojiHeart = EmojiParser.parseToUnicode(":heart:");
+       try {
+           String emojiThanks = EmojiParser.parseToUnicode(":pray:");
+           String emojiHeart = EmojiParser.parseToUnicode(":heart:");
 
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            Long chatId = update.getMessage().getChatId();
-            String messageText = update.getMessage().getText().toLowerCase();
+           if (update.hasMessage() && update.getMessage().hasText()) {
+               Long chatId = update.getMessage().getChatId();
+               String messageText = update.getMessage().getText().toLowerCase();
 
-            if (messageText.equals("/start")) {
-                if (telegramUserRepository.findUserByChatId(chatId) == null) {
-                    handleStartCommand(chatId);
-                } else {
-                    prepareAndSendMessage(
-                            chatId,
-                            "This telegram account has bind with KB Prasac Bank's account already " + emojiHeart + "\n" +
-                                    "Thank you for using our KB Prasac Bank Services " + emojiThanks
-                    );
-                }
-            } else if (messageText.equals("/help")) {
-                handleHelpCommand(chatId);
-            } else if (messageText.equals("/balance")) {
-                if (telegramUserRepository.findUserByChatId(chatId) != null) {
-                    handleBalanceCommand(chatId);
-                } else {
-                    prepareAndSendMessage(
-                            chatId,
-                            "This telegram account not bind with KB Prasac Bank's account yet!"
-                    );
-                }
-            } else {
-                prepareAndSendMessage(chatId, "Sorry, command was not recognized!");
-            }
-        }
+               if (messageText.equals("/start")) {
+                   if (telegramUserRepository.findUserByChatId(chatId) == null) {
+                       handleStartCommand(chatId);
+                   } else {
+                       prepareAndSendMessage(
+                               chatId,
+                               "This telegram account has bind with KB Prasac Bank's account already " + emojiHeart + "\n" +
+                                       "Thank you for using our KB Prasac Bank Services " + emojiThanks
+                       );
+                   }
+               } else if (messageText.equals("/help")) {
+                   handleHelpCommand(chatId);
+               } else if (messageText.equals("/balance")) {
+                   if (telegramUserRepository.findUserByChatId(chatId) != null) {
+                       handleBalanceCommand(chatId);
+                   } else {
+                       prepareAndSendMessage(
+                               chatId,
+                               "This telegram account not bind with KB Prasac Bank's account yet!"
+                       );
+                   }
+               } else {
+                   prepareAndSendMessage(chatId, "Sorry, command was not recognized!");
+               }
+           }
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
     }
 
     public void clearWebhook() {
@@ -210,8 +213,6 @@ public class TelegramBotUserService extends TelegramLongPollingBot {
 
         TelegramUser telegramUser = telegramUserRepository.findUserByChatId(chatId);
         UUID userId = telegramUser.getUserId();
-
-        System.out.println("userId" + userId);
 
         String getBankInfoByUserIdUrl = "http://client-event-service/api/v1/bank/bankInfo";
         WebClient getBankInfoByUserId = webClientConfig.webClientBuilder().baseUrl(getBankInfoByUserIdUrl).build();
