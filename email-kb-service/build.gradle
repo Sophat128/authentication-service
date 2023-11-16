@@ -27,6 +27,8 @@ dependencies {
     implementation(project(":common"))
     implementation 'org.springframework:spring-test:6.0.12'
     compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
 
 
 

@@ -21,12 +21,17 @@ public class TelegramUserConfig {
         String botLink = "https://t.me/FintrackAPIBot";
 
         if (!existsByBotUsernameAndBotTokenAndBotLink(botUsername, botToken, botLink)) {
+            try {
             TelegramCreatedBot telegramCreatedBot = new TelegramCreatedBot();
             telegramCreatedBot.setBotUsername(botUsername);
             telegramCreatedBot.setBotToken(botToken);
             telegramCreatedBot.setBotLink(botLink);
             telegramCreatedBotRepository.save(telegramCreatedBot);
             System.out.println("First running");
+
+            }catch (Exception e){
+                System.out.println("Error: " + e.getMessage());
+            }
         } else {
             System.out.println("Bot configuration already exists. Skipping...");
         }

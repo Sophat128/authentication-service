@@ -32,7 +32,8 @@ public class TelegramBotInitializer {
             try {
                 telegramBotsApi.registerBot(telegramBotUserService);
             } catch (TelegramApiException e) {
-                e.printStackTrace();
+                throw new RuntimeException("Error: " + e.getMessage());
+//                e.printStackTrace();
             }
             logger.info("Telegram bot registered successfully.");
         } catch (TelegramApiRequestException e) {

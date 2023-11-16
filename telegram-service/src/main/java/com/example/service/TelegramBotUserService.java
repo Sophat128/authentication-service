@@ -39,7 +39,7 @@ public class TelegramBotUserService extends TelegramLongPollingBot {
     private final WebClientConfig webClientConfig;
     private final TelegramUserRepository telegramUserRepository;
 
-    public TelegramBotUserService(TelegramUserConfig telegramUserConfig, WebClientConfig webClientConfig, TelegramUserRepository telegramUserRepository) throws TelegramApiException {
+    public TelegramBotUserService(TelegramUserConfig telegramUserConfig, WebClientConfig webClientConfig, TelegramUserRepository telegramUserRepository) {
         this.telegramUserConfig = telegramUserConfig;
         this.webClientConfig = webClientConfig;
         this.telegramUserRepository = telegramUserRepository;
@@ -49,7 +49,12 @@ public class TelegramBotUserService extends TelegramLongPollingBot {
         botCommandList.add(new BotCommand("/help", "Get information and assistance"));
         botCommandList.add(new BotCommand("/balance", "Check your account balance"));
 
-        this.execute(new SetMyCommands(botCommandList, new BotCommandScopeDefault(), null));
+        try {
+            this.execute(new SetMyCommands(botCommandList, new BotCommandScopeDefault(), null));
+        } catch (TelegramApiException e) {
+            System.out.println("Error: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -61,7 +66,12 @@ public class TelegramBotUserService extends TelegramLongPollingBot {
 
     @Override
     public String getBotToken() {
+        try {
         return telegramUserConfig.botToken();
+
+        }catch (Exception e){
+            throw new RuntimeException("Error message: " + e.getMessage());
+        }
     }
 
 
