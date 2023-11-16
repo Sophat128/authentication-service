@@ -1,7 +1,7 @@
 package com.example.service.impl;
 
-import com.example.Email;
-import com.example.Notification;
+import com.example.entities.Email;
+import com.example.entities.Notification;
 import com.example.entities.request.EmailRequest;
 import com.example.entities.request.NotificationRequest;
 import com.example.exception.BadRequestException;

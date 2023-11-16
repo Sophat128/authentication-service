@@ -1,10 +1,10 @@
 package com.example.clienteventservice.controller;
 
 import com.example.clienteventservice.config.WebClientConfig;
-import com.example.dto.TelegramCreatedBotDto;
+import com.example.clienteventservice.domain.dto.TelegramCreatedBotDto;
 import com.example.clienteventservice.domain.request.ProfileRequest;
+import com.example.clienteventservice.domain.type.NotificationType;
 import com.example.clienteventservice.service.UserService;
-import com.example.type.NotificationType;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.v3.oas.annotations.Operation;

@@ -1,6 +1,6 @@
 package com.example.clienteventservice.domain.request;
 
-import com.example.type.NotificationType;
+import com.example.clienteventservice.domain.type.NotificationType;
 import lombok.Data;
 
 

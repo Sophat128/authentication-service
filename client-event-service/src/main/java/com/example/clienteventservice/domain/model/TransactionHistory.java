@@ -1,8 +1,8 @@
 package com.example.clienteventservice.domain.model;
-import com.example.dto.TransactionHistoryDto;
-import com.example.type.StatementType;
-import com.example.type.TransactionStatus;
-import com.example.type.TransactionType;
+import com.example.clienteventservice.domain.dto.TransactionHistoryDto;
+import com.example.clienteventservice.domain.type.StatementType;
+import com.example.clienteventservice.domain.type.TransactionStatus;
+import com.example.clienteventservice.domain.type.TransactionType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

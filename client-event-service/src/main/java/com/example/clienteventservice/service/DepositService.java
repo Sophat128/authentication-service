@@ -1,10 +1,10 @@
 package com.example.clienteventservice.service;
 
+import com.example.clienteventservice.domain.dto.TransactionHistoryDto;
 import com.example.clienteventservice.domain.model.BankAccount;
 import com.example.clienteventservice.domain.model.TransactionHistory;
-import com.example.dto.TransactionHistoryDto;
-import com.example.type.StatementType;
-import com.example.type.TransactionType;
+import com.example.clienteventservice.domain.type.StatementType;
+import com.example.clienteventservice.domain.type.TransactionType;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;

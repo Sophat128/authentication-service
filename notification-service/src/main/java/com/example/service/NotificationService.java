@@ -1,6 +1,6 @@
 package com.example.service;
 
-import com.example.Notification;
+import com.example.entities.Notification;
 import com.example.entities.request.EmailRequest;
 import com.example.entities.request.NotificationRequest;
 import org.springframework.web.multipart.MultipartFile;

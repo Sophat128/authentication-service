@@ -1,7 +1,7 @@
 package com.example.entities.request;
 
-import com.example.Email;
 
+import com.example.entities.Email;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
