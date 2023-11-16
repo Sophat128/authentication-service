@@ -91,11 +91,11 @@ public class EmailServiceImpl implements EmailKbService {
         }
         UUID userId = UUID.fromString(principal.getName());
         if (smtpRequest.getUsername().isBlank() || smtpRequest.getUsername().isEmpty()) {
-            throw new BadRequestException("Field username can't be blank");
+            throw new BadRequestException("Field Email can't be blank");
         }
 
         if (!smtpRequest.getUsername().matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,6}")) {
-            throw new BadRequestException("Username should be like this -> something@something.com");
+            throw new BadRequestException("Email should be like this -> something@something.com");
         }
 
         if (smtpRequest.getPassword().isBlank() || smtpRequest.getPassword().isEmpty()) {
@@ -120,11 +120,11 @@ public class EmailServiceImpl implements EmailKbService {
         Smtp smtp = emailKbServiceRepository.findIdandUserId(id,userId);
         if (smtp != null){
             if (smtpRequest.getUsername().isBlank() || smtpRequest.getUsername().isEmpty()) {
-                throw new BadRequestException("Field username can't be blank");
+                throw new BadRequestException("Field Email can't be blank");
             }
 
             if (!smtpRequest.getUsername().matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,6}")) {
-                throw new BadRequestException("Username should be like this -> something@something.com");
+                throw new BadRequestException("Email should be like this -> something@something.com");
             }
 
             if (smtpRequest.getPassword().isBlank() || smtpRequest.getPassword().isEmpty()) {

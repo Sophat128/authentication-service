@@ -130,6 +130,7 @@ public class EmailConsumer {
         System.out.println("Receiving message: " + object);
         var subject = object.getAsJsonObject().get("subject").getAsString();
         String from = object.getAsJsonObject().get("from").getAsString();
+        from = from.replaceAll("\\s", "");
         String content = object.getAsJsonObject().get("content").getAsString();
         JsonArray toList = object.getAsJsonObject().getAsJsonArray("to");
         List<String> recipients = new ArrayList<>();

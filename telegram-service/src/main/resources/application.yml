@@ -1,8 +1,15 @@
-#bot:
-#  token: 6666866418:AAF2c8nkzeEpBi94_exnUHhGZhj-cLRHWM8
-#  name: FintrackAPIBot
+server.port: 8082
+bot:
+  token: 6866869281:AAHkeris_QJgrkfmR7HV67hw168sLPYhzYw
+  name: fintrack_notification_bot
+
+fontEnd:
+  Url: http://localhost:4200
 
 spring:
+  application:
+    name: telegram-service
+
   kafka:
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -12,16 +19,16 @@ spring:
 
 
   datasource:
-    url: jdbc:postgresql://localhost:33007/mini_project_db
-    username: my_user
-    password: my_password
+    url: jdbc:postgresql://34.142.208.161:2345/fintrack_db
+    username: postgres
+    password: 1234
     driver-class-name: org.postgresql.Driver
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://keycloak-fintrack.sythorng.site/auth/realms/USER_SERVICE
-          jwk-set-uri: https://keycloak-fintrack.sythorng.site/auth/realms/USER_SERVICE/protocol/openid-connect/certs
+          issuer-uri: https://keycloak-fintrack.sythorng.site/auth/realms/Fintrack
+          jwk-set-uri: https://keycloak-fintrack.sythorng.site/auth/realms/Fintrack/protocol/openid-connect/certs
   jpa:
     hibernate:
       ddl-auto: update
@@ -38,14 +45,9 @@ keycloak:
   credentials:
     username: 'admin'
     password: 'admin'
-    client-id: 'client-app' # admin account for creating users
-    secret: 'fdakufDNpefxzc7oaGHugg4UcL6jmSAy'
+    client-id: 'fintrack-app' # admin account for creating users
+    secret: 'MYhYGrLOk1UNwK9eTaULwIye39hVujPi'
+    provider: secret
 
   grant-type: password
-  tokenUrl: https://keycloak-fintrack.sythorng.site/auth/realms/USER_SERVICE/protocol/openid-connect/token
-
-server:
-  port: 8082
-
-kafka:
-  group-id: notification-consumer
+  tokenUrl: https://keycloak-fintrack.sythorng.site/auth/realms/Fintrack/protocol/openid-connect/token
