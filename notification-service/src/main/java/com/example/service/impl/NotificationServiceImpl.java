@@ -4,6 +4,7 @@ import com.example.Email;
 import com.example.Notification;
 import com.example.entities.request.EmailRequest;
 import com.example.entities.request.NotificationRequest;
+import com.example.exception.BadRequestException;
 import com.example.service.NotificationService;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -40,15 +41,17 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void publishToMail(EmailRequest emailRequest) {
-        Email email = emailRequest.toEntity();
-        Message<Email> message = MessageBuilder
-                .withPayload(email) // Set the payload to the 'email' object
-                .setHeader(KafkaHeaders.TOPIC, "send.email") // Set the Kafka topic header
-                .build();
-
-        System.out.println("Message: " + message);
-        kafkaTemplate.send(message);
-
+        if (emailRequest.getTo()==null||emailRequest.getTo().isEmpty()){
+          throw new BadRequestException("Email is empty") ;
+        }else{
+            Email email = emailRequest.toEntity();
+            Message<Email> message = MessageBuilder
+                    .withPayload(email)
+                    .setHeader(KafkaHeaders.TOPIC, "send.email")
+                    .build();
+            System.out.println("Message: " + message);
+            kafkaTemplate.send(message);
+        }
     }
 
     @Override
