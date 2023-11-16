@@ -5,6 +5,7 @@ import com.example.entities.request.NotificationRequest;
 import com.example.service.NotificationService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +22,6 @@ import java.util.UUID;
 //@SecurityRequirement(name = "app")
 public class NotificationController {
     private final NotificationService service;
-
-
     @PostMapping("/notify")
     public ResponseEntity<?> getNews(@RequestBody NotificationRequest notificationRequest) {
         service.publishToMessageBroker(notificationRequest);
@@ -31,9 +30,9 @@ public class NotificationController {
 
     }
     @PostMapping(value = "/send_mail")
-    public ResponseEntity<?> sendMail(@RequestBody EmailRequest emailRequest) {
-        service.publishToMail(emailRequest);
-        return ResponseEntity.ok("Successful");
+    public ResponseEntity<?> sendMail(@Valid @RequestBody EmailRequest emailRequest) {
+            service.publishToMail(emailRequest);
+            return ResponseEntity.ok("Send Email Successful");
     }
 
     @GetMapping

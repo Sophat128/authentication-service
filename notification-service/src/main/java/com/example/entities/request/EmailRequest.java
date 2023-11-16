@@ -1,17 +1,19 @@
 package com.example.entities.request;
 
 import com.example.Email;
+
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmailRequest {
-    private List<String> to;
+
+    private List< @jakarta.validation.constraints.Email(message = "Invalid email address") String> to;
     private String from;
     private String subject;
     private String content;

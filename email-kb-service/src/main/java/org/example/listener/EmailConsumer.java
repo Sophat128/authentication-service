@@ -75,7 +75,7 @@ public class EmailConsumer {
             content = String.format("Dear %s,\n\n" +
                     "You have received a " + object.get("type").asText().toLowerCase() + " of $%.2f to your account (%s).\n\n" +
                     "Thank you for choosing our services.\n\n" +
-                    "Sincerely,\nYour Bank", userDtoClient.getUsername(), object.get("amount").asDouble(), object.get("bankAccountNumber").asText());
+                    "Sincerely,\n KB Prasac Bank", userDtoClient.getUsername(), object.get("amount").asDouble(), object.get("bankAccountNumber").asText());
         }
 
         // Add other recipients if available
@@ -130,6 +130,7 @@ public class EmailConsumer {
         System.out.println("Receiving message: " + object);
         var subject = object.getAsJsonObject().get("subject").getAsString();
         String from = object.getAsJsonObject().get("from").getAsString();
+        from = from.replaceAll("\\s", "");
         String content = object.getAsJsonObject().get("content").getAsString();
         JsonArray toList = object.getAsJsonObject().getAsJsonArray("to");
         List<String> recipients = new ArrayList<>();
