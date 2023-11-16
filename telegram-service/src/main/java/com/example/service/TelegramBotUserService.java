@@ -130,7 +130,18 @@ public class TelegramBotUserService extends TelegramLongPollingBot {
                             "Congratulations you have bind your account with KB Prasac Bank's account successfully " + emojiCongratulation + "\n" +
                             "Thank you for using our KB Prasac Bank Services " + emojiThanks
                     );
-                return telegramUserRepository.save(new TelegramUser(chatId, UUID.fromString(userId), true)).getIsSubscribed();
+                Boolean saveInDatabase = telegramUserRepository.save(new TelegramUser(chatId, UUID.fromString(userId), true)).getIsSubscribed();
+
+                String saveTelegramNotificationByUserIdUrl = "http://client-event-service/api/v1/clients/save-telegram-notification-by-userId";
+                WebClient saveTelegramNotificationByUserId = webClientConfig.webClientBuilder().baseUrl(saveTelegramNotificationByUserIdUrl).build();
+
+                saveTelegramNotificationByUserId.post()
+                        .uri("/{userId}", userId)
+                        .retrieve()
+                        .bodyToMono(BalanceDto.class)
+                        .block();
+
+                return saveInDatabase;
             }
             throw new NotFoundException("user id is not found");
         } catch (Exception e) {

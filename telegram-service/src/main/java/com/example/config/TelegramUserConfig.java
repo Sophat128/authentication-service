@@ -17,7 +17,7 @@ public class TelegramUserConfig {
     @PostConstruct
     public void addConfig() {
         String botUsername = "FintrackAPIBot";
-        String botToken = "6666866418:AAGq-QFHKnhu55REjQv3xv6tfnNDca7xVxA";
+        String botToken = "6666866418:AAEG2U_O6xBUyqr5UkF3iAdEfx5QuV_HGuI";
         String botLink = "https://t.me/FintrackAPIBot";
 
         if (!existsByBotUsernameAndBotTokenAndBotLink(botUsername, botToken, botLink)) {
