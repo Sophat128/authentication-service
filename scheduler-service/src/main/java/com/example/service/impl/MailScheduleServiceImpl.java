@@ -46,7 +46,10 @@ public class MailScheduleServiceImpl implements MailScheduleService {
 
     @Override
     public ApiResponse<?> getAllSchedulesByUserId(String userId, Integer pageNo, Integer pageSize) {
-        return new ApiResponse<>("get all get all schedule by user id ", mailScheduleDao.getAllScheduleByUserId(userId, pageNo, pageSize), HttpStatus.OK.value(), true);
+        return new ApiResponse<>(
+                "get all get all schedule by user id ",
+                mailScheduleDao.getAllScheduleByUserId(userId, pageNo, pageSize).stream().map(ScheduleMapper::toDto).toList(),
+                HttpStatus.OK.value(), true);
     }
 
     @Override
@@ -55,14 +58,13 @@ public class MailScheduleServiceImpl implements MailScheduleService {
         if (mailSchedules.isEmpty()) {
             throw new NotFoundException("don't have schedule");
         }
-        return new ApiResponse<>("get all get all schedule", mailSchedules, HttpStatus.OK.value(), true);
+        return new ApiResponse<>("get all get all schedule", mailSchedules.stream().map(ScheduleMapper::toDto).toList(), HttpStatus.OK.value(), true);
     }
 
     @Override
     public ApiResponse<?> updateScheduleById(Long scheduleId, Request request) {
         checkIfScheduleExists(scheduleId);
-        mailScheduleDao.validateLocalDateTimeWithZoneId(request.getScheduledTime(),request.getZoneId());
-//        deleteScheduleById(scheduleId);
+        mailScheduleDao.validateLocalDateTimeWithZoneId(request.getScheduledTime(), request.getZoneId());
 
         mailScheduleDao.deleteMailSchedule(scheduleId);
         mailScheduleDao.deleteJobAndTrigger(scheduleId);
@@ -120,7 +122,7 @@ public class MailScheduleServiceImpl implements MailScheduleService {
         }
     }
 
-    public  void validateLocalDateTimeWithZoneId(LocalDateTime localDateTime, String zoneId) {
+    public void validateLocalDateTimeWithZoneId(LocalDateTime localDateTime, String zoneId) {
         ZonedDateTime inputZonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.of(zoneId));
         ZonedDateTime currentZonedDateTime = ZonedDateTime.now(ZoneId.of(zoneId));
 

@@ -39,8 +39,10 @@ public class MailScheduleJob extends QuartzJobBean {
 //        String toMail = jobDataMap.getString(TO_MAIL);
         String scheduleId = String.valueOf(jobDataMap.getLong(SCHEDULE_ID));
 
-        telegramService.sendMessage(message,"");
+//        telegramService.sendMessage(message,"");
         mailService.sendMail(from, "sun.sythorng@gmail.com", subject, message);
+
+        System.out.println("schedule job start working..!");
         mailScheduleDao.deleteMailSchedule(Long.valueOf(scheduleId));
     }
 }

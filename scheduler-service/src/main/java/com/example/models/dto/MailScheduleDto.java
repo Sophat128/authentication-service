@@ -16,8 +16,6 @@ public class MailScheduleDto {
 
     private String message;
 
-    private String toEmail;
-
     private LocalDateTime scheduledTime;
 
     private ZoneId zoneId;
