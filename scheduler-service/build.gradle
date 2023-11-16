@@ -67,6 +67,16 @@ dependencies {
     implementation(project(":common"))
 
 
+    implementation 'org.keycloak:keycloak-admin-client:21.0.1'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    //security
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    //resource serve
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+    implementation 'org.springframework.kafka:spring-kafka'
+
+
 
 }
 
