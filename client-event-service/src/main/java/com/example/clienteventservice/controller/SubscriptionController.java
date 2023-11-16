@@ -3,11 +3,15 @@ package com.example.clienteventservice.controller;
 import com.example.clienteventservice.domain.model.Subscription;
 import com.example.clienteventservice.domain.response.ApiResponse;
 import com.example.clienteventservice.service.SubscriptionService;
+import com.example.dto.SubscriptionDto;
+import com.example.type.NotificationType;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @CrossOrigin
@@ -27,4 +31,17 @@ public class SubscriptionController {
                 .build();
         return ResponseEntity.ok().body(response);
     }
+
+    @PostMapping("/save-telegram-notification-by-userId/{userId}")
+    public ResponseEntity<?> saveTelegramNotificationByUserId(@PathVariable UUID userId) {
+        String telegramType = String.valueOf(NotificationType.TELEGRAM);
+        Subscription subscription = subscriptionService.saveTelegramNotificationByUserId(userId, telegramType);
+        ApiResponse<Subscription> response = ApiResponse.<Subscription>builder()
+                .message("save success")
+                .status(HttpStatus.OK.value())
+                .payload(subscription)
+                .build();
+        return ResponseEntity.ok().body(response);
+    }
+
 }

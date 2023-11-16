@@ -22,7 +22,7 @@ spring:
   datasource:
     url: jdbc:postgresql://8.219.131.180:8765/fintrack
     username: root
-    password: 123
+    password: P@SSWORD666
   jpa:
     hibernate:
       ddl-auto: update
