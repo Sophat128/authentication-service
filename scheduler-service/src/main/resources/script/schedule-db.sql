@@ -6,8 +6,6 @@ create table qrtz_calendars
     primary key (sched_name, calendar_name)
 );
 
-alter table qrtz_calendars
-    owner to postgres;
 
 create table qrtz_fired_triggers
 (
@@ -28,8 +26,7 @@ create table qrtz_fired_triggers
     primary key (sched_name, entry_id)
 );
 
-alter table qrtz_fired_triggers
-    owner to postgres;
+
 
 create index idx_qrtz_ft_j_g
     on qrtz_fired_triggers (sched_name, job_name, job_group);
@@ -61,8 +58,7 @@ create table qrtz_job_details
     primary key (sched_name, job_name, job_group)
 );
 
-alter table qrtz_job_details
-    owner to postgres;
+
 
 create index idx_qrtz_j_grp
     on qrtz_job_details (sched_name, job_group);
@@ -74,8 +70,7 @@ create table qrtz_locks
     primary key (sched_name, lock_name)
 );
 
-alter table qrtz_locks
-    owner to postgres;
+
 
 create table qrtz_paused_trigger_grps
 (
@@ -84,8 +79,7 @@ create table qrtz_paused_trigger_grps
     primary key (sched_name, trigger_group)
 );
 
-alter table qrtz_paused_trigger_grps
-    owner to postgres;
+
 
 create table qrtz_scheduler_state
 (
@@ -96,8 +90,7 @@ create table qrtz_scheduler_state
     primary key (sched_name, instance_name)
 );
 
-alter table qrtz_scheduler_state
-    owner to postgres;
+
 
 create table qrtz_triggers
 (
@@ -122,8 +115,7 @@ create table qrtz_triggers
         foreign key (sched_name, job_name, job_group) references qrtz_job_details
 );
 
-alter table qrtz_triggers
-    owner to postgres;
+
 
 create table qrtz_blob_triggers
 (
@@ -136,8 +128,7 @@ create table qrtz_blob_triggers
         foreign key (sched_name, trigger_name, trigger_group) references qrtz_triggers
 );
 
-alter table qrtz_blob_triggers
-    owner to postgres;
+
 
 create table qrtz_cron_triggers
 (
@@ -151,8 +142,7 @@ create table qrtz_cron_triggers
         foreign key (sched_name, trigger_name, trigger_group) references qrtz_triggers
 );
 
-alter table qrtz_cron_triggers
-    owner to postgres;
+
 
 create table qrtz_simple_triggers
 (
@@ -167,8 +157,7 @@ create table qrtz_simple_triggers
         foreign key (sched_name, trigger_name, trigger_group) references qrtz_triggers
 );
 
-alter table qrtz_simple_triggers
-    owner to postgres;
+
 
 create index fki_qrtz_simple_triggers_qrtz_triggers
     on qrtz_simple_triggers (trigger_name, trigger_group);
@@ -194,8 +183,7 @@ create table qrtz_simprop_triggers
         foreign key (sched_name, trigger_name, trigger_group) references qrtz_triggers
 );
 
-alter table qrtz_simprop_triggers
-    owner to postgres;
+
 
 create index fki_qrtz_simple_triggers_job_details_name_group
     on qrtz_triggers (job_name, job_group);
