@@ -1,23 +1,22 @@
 package com.example.clienteventservice.controller;
 
 import com.example.clienteventservice.config.WebClientConfig;
-import com.example.clienteventservice.domain.response.ApiResponse;
+//import com.example.clienteventservice.domain.response.ApiResponse;
 import com.example.dto.TelegramCreatedBotDto;
-import com.example.clienteventservice.domain.request.ProfileRequest;
 import com.example.clienteventservice.service.UserService;
 import com.example.dto.UserDtoClient;
+import com.example.response.ApiResponse;
 import com.example.type.NotificationType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.ws.rs.client.Client;
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +35,7 @@ public class CustomerController {
     @GetMapping("username")
     @Operation(summary = "get user by username")
     public ResponseEntity<?> getByUsername(@RequestParam String username) {
-        ApiResponse<UserDtoClient> response = userService.getByUserName(username);
+      ApiResponse<UserDtoClient> response = userService.getByUserName(username);
 
         if (response.getStatus() == HttpStatus.OK.value()) {
             return ResponseEntity.ok().body(response);

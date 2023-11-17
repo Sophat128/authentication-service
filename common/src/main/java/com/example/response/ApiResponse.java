@@ -24,6 +24,8 @@ public class ApiResponse<T> {
 
     private Integer status;
 
-    public ApiResponse(HttpStatus httpStatus, String moneyTransferSuccessful) {
+    public ApiResponse(String message, Integer status) {
+        this.message = message;
+        this.status = status;
     }
 }

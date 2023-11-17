@@ -148,7 +148,7 @@ public class MailScheduleServiceImpl implements MailScheduleService {
 
         validateLocalDateTimeWithZoneId(request.getScheduledTime(), request.getZoneId());
         String scheduleId = mailScheduleDao.createScheduleForAll(request, zonedDateTime);
-        return new ApiResponse<>("create schedule success", ScheduleMapper.toDto(getScheduleById(Long.valueOf(scheduleId))), HttpStatus.OK.value(), true);
+        return new ApiResponse<>("create schedule success", ScheduleMapper.messageDto(getScheduleById(Long.valueOf(scheduleId))), HttpStatus.OK.value(), true);
 
     }
 

@@ -57,6 +57,7 @@ public class WebConsumer {
         System.out.println("Converted data field: " + scheduleDto.getMessage());
         if(scheduleDto.getUserId() == null){
             System.out.println("Send to all user");
+            webPushService.notifyAll(scheduleDto);
         }
 
         webPushService.notifySpecificUserWithSchedule(scheduleDto);

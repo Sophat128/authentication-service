@@ -2,7 +2,7 @@ package com.example.clienteventservice.service;
 
 import com.example.clienteventservice.domain.model.BankAccount;
 import com.example.clienteventservice.domain.model.TransactionHistory;
-import com.example.clienteventservice.domain.response.ApiResponse;
+import com.example.response.ApiResponse;
 import com.example.dto.TransactionHistoryDto;
 import com.example.type.StatementType;
 import com.example.type.TransactionType;

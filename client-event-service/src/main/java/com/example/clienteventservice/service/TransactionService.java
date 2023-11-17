@@ -1,6 +1,6 @@
 package com.example.clienteventservice.service;
 
-import com.example.clienteventservice.domain.response.ApiResponse;
+import com.example.response.ApiResponse;
 import com.example.clienteventservice.event.SBAEventListener;
 import com.example.clienteventservice.exception.InsufficientBalanceManagerException;
 import com.example.clienteventservice.repository.TransactionHistoryRepository;

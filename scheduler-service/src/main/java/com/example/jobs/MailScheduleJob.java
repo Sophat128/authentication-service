@@ -4,6 +4,8 @@ import com.example.config.WebClientConfig;
 import com.example.dao.MailScheduleDao;
 import com.example.dto.ScheduleDto;
 import com.example.dto.TransactionHistoryDto;
+import com.example.models.dto.MessageDto;
+import com.example.models.request.MessageRequest;
 import com.example.response.ApiResponse;
 import com.example.service.MailService;
 import com.example.service.impl.TelegramServiceImpl;
@@ -42,7 +44,7 @@ public class MailScheduleJob extends QuartzJobBean {
     @Value("${spring.mail.username}")
     private String from;
 
-    private final MailScheduleDao  mailScheduleDao;
+    private final MailScheduleDao mailScheduleDao;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
 
@@ -66,11 +68,20 @@ public class MailScheduleJob extends QuartzJobBean {
 //        String toMail = jobDataMap.getString(TO_MAIL);
         String scheduleId = String.valueOf(jobDataMap.getLong(SCHEDULE_ID));
 
-        ScheduleDto schedule=new ScheduleDto(userId,message);
+        ScheduleDto schedule = new ScheduleDto(userId, message);
+//        MessageDto messageDto = new MessageDto(message);
 
 //        telegramService.sendMessage(message,"");
-        mailService.sendMail(from, "sun.sythorng@gmail.com", userId, message);
+//        mailService.sendMail(from, "sun.sythorng@gmail.com", userId, message);
 
+//        if (userId == null) {
+//            Message<String> webResponse = MessageBuilder
+//                    .withPayload(messageDto.toString())
+//                    .setHeader(KafkaHeaders.TOPIC, NOTIFICATION_TOPIC)
+//                    .build();
+//            System.out.println("Message: " + message);
+//            kafkaTemplate.send(webResponse);
+//        }
 
         Message<String> webResponse = MessageBuilder
                 .withPayload(schedule.toString())
@@ -80,48 +91,48 @@ public class MailScheduleJob extends QuartzJobBean {
         kafkaTemplate.send(webResponse);
 
 
-        Message<ScheduleDto> emailResponse = MessageBuilder
-                .withPayload(schedule)
-                .setHeader(KafkaHeaders.TOPIC, EMAIL_TOPIC)
-                .build();
-        System.out.println("Message: " + emailResponse);
-        kafkaTemplate.send(emailResponse);
-
-        String subscriptionUrl = "http://client-event-service/api/v1/clients/get-notification";
-        WebClient web = webClientConfig.webClientBuilder().baseUrl(subscriptionUrl).build();
-
-        ApiResponse<List<Map<String, Object>>> subscriptionDtos = web.get()
-                .uri("/{userId}", userId)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<ApiResponse<List<Map<String, Object>>>>() {})
-                .block();
-
-        assert subscriptionDtos != null;
-        List<Map<String, Object>> payload = subscriptionDtos.getPayload();
-        List<String> notificationTypes = payload.stream()
-                .map(subscription -> (String) subscription.get("notificationType"))
-                .toList();
-
-        System.out.println("Notification: " + notificationTypes);
-
-        for (String type : notificationTypes) {
-            System.out.println("Type: " + type);
-            log.info("Processing notificationType: {}", type);
-            if (type.equals("TELEGRAM")) {
-                Message<ScheduleDto> telegramResponse = MessageBuilder
-                        .withPayload(schedule)
-                        .setHeader(KafkaHeaders.TOPIC, TELEGRAM_TOPIC)
-                        .build();
-                System.out.println("Message: " + telegramResponse);
-                kafkaTemplate.send(emailResponse);
-                log.info("Sent message to TELEGRAM_TOPIC: {}", telegramResponse);
-//            } else if (type.equals("EMAIL")) {
-//                kafkaTemplate.send(EMAIL_TOPIC, notification.key(), notification.value());
-//                log.info("Sent message to EMAIL_TOPIC: {}", notification.value());
-            } else {
-                log.info("this userId doesn't have subscribe telegram or email notification types!");
-            }
-        }
+//        Message<ScheduleDto> emailResponse = MessageBuilder
+//                .withPayload(schedule)
+//                .setHeader(KafkaHeaders.TOPIC, EMAIL_TOPIC)
+//                .build();
+//        System.out.println("Message: " + emailResponse);
+//        kafkaTemplate.send(emailResponse);
+//
+//        String subscriptionUrl = "http://client-event-service/api/v1/clients/get-notification";
+//        WebClient web = webClientConfig.webClientBuilder().baseUrl(subscriptionUrl).build();
+//
+//        ApiResponse<List<Map<String, Object>>> subscriptionDtos = web.get()
+//                .uri("/{userId}", userId)
+//                .retrieve()
+//                .bodyToMono(new ParameterizedTypeReference<ApiResponse<List<Map<String, Object>>>>() {})
+//                .block();
+//
+//        assert subscriptionDtos != null;
+//        List<Map<String, Object>> payload = subscriptionDtos.getPayload();
+//        List<String> notificationTypes = payload.stream()
+//                .map(subscription -> (String) subscription.get("notificationType"))
+//                .toList();
+//
+//        System.out.println("Notification: " + notificationTypes);
+//
+//        for (String type : notificationTypes) {
+//            System.out.println("Type: " + type);
+//            log.info("Processing notificationType: {}", type);
+//            if (type.equals("TELEGRAM")) {
+//                Message<ScheduleDto> telegramResponse = MessageBuilder
+//                        .withPayload(schedule)
+//                        .setHeader(KafkaHeaders.TOPIC, TELEGRAM_TOPIC)
+//                        .build();
+//                System.out.println("Message: " + telegramResponse);
+//                kafkaTemplate.send(emailResponse);
+//                log.info("Sent message to TELEGRAM_TOPIC: {}", telegramResponse);
+////            } else if (type.equals("EMAIL")) {
+////                kafkaTemplate.send(EMAIL_TOPIC, notification.key(), notification.value());
+////                log.info("Sent message to EMAIL_TOPIC: {}", notification.value());
+//            } else {
+//                log.info("this userId doesn't have subscribe telegram or email notification types!");
+//            }
+//        }
 
         System.out.println("schedule job start working..!");
         mailScheduleDao.deleteMailSchedule(Long.valueOf(scheduleId));

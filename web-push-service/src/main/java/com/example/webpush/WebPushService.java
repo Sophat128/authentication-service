@@ -115,7 +115,7 @@ public class WebPushService {
 
     ObjectMapper mapper = new ObjectMapper();
 
-    public void notifyAll(MessageRequest message) {
+    public void notifyAll(ScheduleDto message) {
         try {
             String msg = mapper.writeValueAsString(message);
 

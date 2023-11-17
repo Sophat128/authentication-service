@@ -1,6 +1,6 @@
 package com.example.clienteventservice.service;
 
-import com.example.clienteventservice.domain.response.ApiResponse;
+//import com.example.clienteventservice.domain.response.ApiResponse;
 import com.example.clienteventservice.event.SBAEventListener;
 import com.example.clienteventservice.exception.BankAccountManagerException;
 import com.example.clienteventservice.exception.NotFoundException;
@@ -8,6 +8,7 @@ import com.example.clienteventservice.repository.BankAccountRepository;
 import com.example.clienteventservice.domain.dto.BankAccountDto;
 import com.example.clienteventservice.domain.model.BankAccount;
 import com.example.dto.UserDtoClient;
+import com.example.response.ApiResponse;
 import com.google.common.base.Preconditions;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

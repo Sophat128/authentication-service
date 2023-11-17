@@ -4,7 +4,7 @@ import com.example.clienteventservice.domain.dto.BalanceDto;
 import com.example.clienteventservice.domain.dto.BankAccountDto;
 import com.example.clienteventservice.domain.model.BankAccount;
 import com.example.clienteventservice.service.BankAccountService;
-import com.example.clienteventservice.domain.response.ApiResponse;
+import com.example.response.ApiResponse;
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
