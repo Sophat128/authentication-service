@@ -1,4 +1,6 @@
 package org.example.listener;
+
+import com.example.dto.ScheduleDto;
 import com.example.dto.UserDtoClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,15 +27,17 @@ import java.util.*;
 public class EmailConsumer {
     private static final Logger LOGGER = LogManager.getLogger(EmailConsumer.class);
     private final EmailKbService emailKbService;
-    private final WebClient webClient;
+    private final WebClient.Builder webClient;
+    private static final String EMAIL_TOPIC_SCHEDULE = "send.email.kb.schedule";
 
-    public EmailConsumer(EmailKbService emailKbService, WebClient webClient) {
+
+    public EmailConsumer(EmailKbService emailKbService, WebClient.Builder webClient) {
         this.emailKbService = emailKbService;
         this.webClient = webClient;
     }
 
     public UserDtoClient getCustomerId(UUID customerId) {
-        return webClient.get()
+        return webClient.build().get()
                 .uri("http://localhost:8088/api/v1/customers/{customerId}", customerId)
                 .retrieve()
                 .bodyToMono(UserDtoClient.class)
@@ -56,19 +60,19 @@ public class EmailConsumer {
 
         List<String> recipients = Collections.singletonList(userDtoClient.getEmail());
 
-        String subject = object.get("type").asText()+"   Confirmation";
+        String subject = object.get("type").asText() + "   Confirmation";
         String from = "KB Prasac Bank";
         from = from.replaceAll("\\s", "");
         String content;
 
         if ("SENDER".equals(object.get("type").asText())) {
             content = String.format("Dear %s,\n\n" +
-                    "You have transfer  $%.2f to  account number "+ object.get("receivedAccountNumber").asText()+
+                    "You have transfer  $%.2f to  account number " + object.get("receivedAccountNumber").asText() +
                     " Thank you for using our services.\n\n" +
                     "Sincerely,\n KB Prasac Bank", userDtoClient.getUsername(), object.get("amount").asDouble(), object.get("bankAccountNumber").asText());
         } else if ("RECEIVER".equals(object.get("type").asText())) {
             content = String.format("Dear %s,\n\n" +
-                    "You have received  $%.2f from account number "+ object.get("receivedAccountNumber").asText()+
+                    "You have received  $%.2f from account number " + object.get("receivedAccountNumber").asText() +
                     " Thank you for using our services.\n\n" +
                     "Sincerely,\n KB Prasac Bank", userDtoClient.getUsername(), object.get("amount").asDouble(), object.get("bankAccountNumber").asText());
         } else {
@@ -174,5 +178,71 @@ public class EmailConsumer {
         LOGGER.log(Level.INFO, () -> " »» Mail sent successfully");
     }
 
+    @KafkaListener(
+            topics = EMAIL_TOPIC_SCHEDULE,
+            groupId = "notification-consumer"
+    )
+    public void sendConfirmationEmailSchedule(ConsumerRecord<String, String> commandsRecord) throws MessagingException, IOException {
+        LOGGER.log(Level.INFO, () -> String.format("sendConfirmationEmails() » Topic: %s", commandsRecord.value()));
+
+        ScheduleDto scheduleDto = parseScheduleDto(commandsRecord.value());
+
+        UUID customerId = UUID.fromString(scheduleDto.getUserId());
+        System.out.println("uuid: " + customerId);
+        System.out.println("String id: " + scheduleDto.getUserId());
+        UserDtoClient userDtoClient = getCustomerId(customerId);
+        System.out.println(userDtoClient.getEmail());
+
+        List<String> recipients = Collections.singletonList(userDtoClient.getEmail());
+
+        String subject = "KB Prasac Bank Information";
+        String from = "KB Prasac Bank";
+        from = from.replaceAll("\\s", "");
+        Map<String, Object> props = new HashMap<>();
+        props.put("name", userDtoClient.getUsername());
+        props.put("subscriptionDate", new Date());
+        String content = String.format("Dear %s,\n\n" +
+                scheduleDto.getMessage(), userDtoClient.getUsername());
+        System.out.println(recipients);
+        Email email = Email.builder()
+                .withTo(recipients)
+                .withFrom(from)
+                .withContent(content)
+                .withSubject(subject)
+                .withProps(props)
+                .build();
+        System.out.println("Convert to Email schedule: " + email);
+        emailKbService.sendConfirmationEmail(email);
+        LOGGER.log(Level.INFO, () -> " »» Mail sent successfully");
+    }
+
+    private ScheduleDto parseScheduleDto(String input) {
+        String userId = null;
+        String message = null;
+
+        String[] keyValuePairs = input.substring(input.indexOf("(") + 1, input.indexOf(")")).split(",\\s*");
+
+        for (String pair : keyValuePairs) {
+            String[] keyValue = pair.split("=");
+
+            if (keyValue.length == 2) {
+                String key = keyValue[0].trim();
+                String value = keyValue[1].trim();
+
+                if ("userId".equals(key)) {
+                    userId = value;
+                } else if ("message".equals(key)) {
+                    message = value;
+                }
+            }
+        }
+
+        if (userId != null && message != null) {
+            // Assuming userId is a valid UUID string
+            return new ScheduleDto(userId, message);
+        } else {
+            return null;
+        }
+    }
 
 }

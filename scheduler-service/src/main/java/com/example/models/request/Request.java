@@ -28,6 +28,12 @@ public class Request {
 
     private String zoneId;
 
+    public Request(String message, LocalDateTime scheduledTime, String zoneId) {
+        this.message = message;
+        this.scheduledTime = scheduledTime;
+        this.zoneId = zoneId;
+    }
+
     public MailSchedule toMailSchedule() {
         return new MailSchedule(null, String.valueOf(this.userId), this.message, this.scheduledTime.toString(), this.zoneId.toString());
     }
@@ -35,5 +41,6 @@ public class Request {
     public MailSchedule toMailSchedule(Long scheduleId) {
         return new MailSchedule(scheduleId, String.valueOf(this.userId), this.message, this.scheduledTime.toString(), this.zoneId.toString());
     }
+
 
 }

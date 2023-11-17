@@ -21,4 +21,14 @@ public class ScheduleMapper {
         response.setIsSended(mailSchedule.isSended());
         return response;
     }
+    public static MailScheduleDto messageDto(MailSchedule mailSchedule) {
+        MailScheduleDto response = new MailScheduleDto();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        response.setScheduleId(mailSchedule.getScheduleId());
+        response.setMessage(mailSchedule.getMessage());
+        response.setScheduledTime(LocalDateTime.parse(mailSchedule.getScheduleDateTime(), formatter));
+        response.setZoneId(ZoneId.of(mailSchedule.getScheduleZoneId()));
+        response.setIsSended(mailSchedule.isSended());
+        return response;
+    }
 }

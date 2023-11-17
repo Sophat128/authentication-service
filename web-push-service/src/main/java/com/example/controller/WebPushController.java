@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.model.entities.UserSubscription;
 import com.example.model.entities.WebDataConfig;
+import com.example.model.request.MessageRequest;
 import com.example.model.request.PushNotificationRequest;
 import com.example.model.request.WebConfigRequest;
 import com.example.model.respone.ApiResponse;
@@ -68,17 +69,17 @@ public class WebPushController {
         }
     }
 
-    @PostMapping("/send_notification")
-    public ResponseEntity<?> sendNotification(@RequestBody PushNotificationRequest pushNotificationRequest) {
-        try {
-            webPushService.notifyAll(pushNotificationRequest);
-            ApiResponse<?> data = new ApiResponse<>("Alert to all subscribers successfully", HttpStatus.OK.value());
-            return ResponseEntity.ok(data);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to alert to all subscribers " + e.getMessage());
-        }
-
-    }
+//    @PostMapping("/send_notification")
+//    public ResponseEntity<?> sendNotification(@RequestBody MessageRequest messageRequest) {
+//        try {
+//            webPushService.notifyAll(messageRequest);
+//            ApiResponse<?> data = new ApiResponse<>("Alert to all subscribers successfully", HttpStatus.OK.value());
+//            return ResponseEntity.ok(data);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to alert to all subscribers " + e.getMessage());
+//        }
+//
+//    }
 
     @PostMapping("/send_notification_user/{userId}")
     public ResponseEntity<?> sendNotificationToSpecificUser(@RequestBody PushNotificationRequest pushNotificationRequest, @PathVariable String userId) {

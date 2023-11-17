@@ -1,6 +1,5 @@
 package com.example.model.request;
 
-import com.example.dto.TransactionHistoryDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,8 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PushNotificationRequest {
-    private String title;
-    private TransactionHistoryDto body;
-
+public class MessageRequest {
+    private String message;
 }

@@ -5,13 +5,16 @@ spring:
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      bootstrap-servers: 47.236.10.166:30292
+      bootstrap-servers: localhost:9092
     dead_letter_topic: notification-retry
-
   datasource:
-    url: jdbc:postgresql://8.219.131.180:8765/fintrack
-    username: root
-    password: P@SSWORD666
+    url: jdbc:postgresql://localhost:33007/mini_project_db
+    username: my_user
+    password: my_password
+    #    url: jdbc:postgresql://8.219.131.180:8765/fintrack
+    #    username: root
+    #    password: P@SSWORD666
+#    soccerdatehrd@gmail.com
   jpa:
     hibernate:
       ddl-auto: update
@@ -19,6 +22,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
   #hibernate:
   #  jdbc:
   logging:
@@ -30,10 +34,6 @@ spring:
         jwt:
           issuer-uri: https://keycloak-fintrack.sythorng.site/auth/realms/Fintrack
           jwk-set-uri: https://keycloak-fintrack.sythorng.site/auth/realms/Fintrack/protocol/openid-connect/certs
-  management:
-    endpoint:
-      shutdown:
-        enabled: true
 kafka:
   #  username: todo-username
   #  password: todo-password
@@ -46,10 +46,10 @@ kafka:
   #  mechanism: PLAIN
   #  protocol: SASL_PLAINTEXT
   topics:
-    data: send.email.kb
+    data: kb-email-service
 Base:
-  url: http://localhost:8081/api/v1/
+  url: http://localhost:8088/api/v1/
+
 smtp:
   username: soccerdatehrd@gmail.com
   password: tmkylzbkhzsautkz
-

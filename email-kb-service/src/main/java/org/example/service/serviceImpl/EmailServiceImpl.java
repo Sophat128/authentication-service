@@ -59,13 +59,13 @@ public class EmailServiceImpl implements EmailKbService {
     }
 
 
-    public UserDto getUserById(UUID userId) {
-        return webClient.get()
-                .uri("/users/{userId}", userId)
-                .retrieve()
-                .bodyToMono(UserDto.class)
-                .block();
-    }
+//    public UserDto getUserById(UUID userId) {
+//        return webClient.get()
+//                .uri("/users/{userId}", userId)
+//                .retrieve()
+//                .bodyToMono(UserDto.class)
+//                .block();
+//    }
 
 
     @Override

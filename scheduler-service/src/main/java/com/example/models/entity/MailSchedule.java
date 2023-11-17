@@ -67,4 +67,10 @@ public class MailSchedule implements Serializable {
         this.scheduleDateTime = scheduleDateTime;
         this.scheduleZoneId = scheduleZoneId;
     }
+    public MailSchedule(Long scheduleId, String message, String scheduleDateTime, String scheduleZoneId) {
+        this.scheduleId = scheduleId;
+        this.message = message;
+        this.scheduleDateTime = scheduleDateTime;
+        this.scheduleZoneId = scheduleZoneId;
+    }
 }

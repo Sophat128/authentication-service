@@ -1,6 +1,7 @@
 package com.example.service;
 
 import com.example.models.entity.MailSchedule;
+import com.example.models.request.MessageRequest;
 import com.example.models.request.Request;
 import com.example.models.response.ApiResponse;
 
@@ -22,4 +23,5 @@ public interface MailScheduleService {
 
     void validateLocalDateTimeWithZoneId(LocalDateTime localDateTime, String zoneId);
 
+    Object createScheduleForAllUser(MessageRequest request);
 }

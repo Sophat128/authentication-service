@@ -1,20 +1,27 @@
 package com.example.clienteventservice.service;
 
+//import com.example.clienteventservice.domain.response.ApiResponse;
 import com.example.clienteventservice.event.SBAEventListener;
 import com.example.clienteventservice.exception.BankAccountManagerException;
+import com.example.clienteventservice.exception.NotFoundException;
 import com.example.clienteventservice.repository.BankAccountRepository;
 import com.example.clienteventservice.domain.dto.BankAccountDto;
 import com.example.clienteventservice.domain.model.BankAccount;
+import com.example.dto.UserDtoClient;
+import com.example.response.ApiResponse;
 import com.google.common.base.Preconditions;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -31,86 +38,119 @@ public class BankAccountService {
 
     private BankAccountRepository bankAccountRepository;
 
-    public BankAccount addBankAccount(UUID customerId, BankAccountDto bankAccountDto) {
-        BankAccount bankAccount = bankAccountDto.toEntity();
+    private final UserService userService;
 
-        Preconditions.checkNotNull(bankAccountDto, "bankAccount can not be null");
-        Preconditions.checkArgument(
-                bankAccountDto.getAccountNumber().matches("\\d{10}"),
-                "Bank AccountNumber must be 9 digits"
-        );
 
-        Preconditions.checkNotNull(bankAccountDto.getBalance(), "currentBalance can not be null");
-        Preconditions.checkArgument(
-                bankAccountDto.getBalance().compareTo(BigDecimal.ZERO) > -1 && bankAccountDto.getBalance().compareTo(new BigDecimal("5")) >= 0,
-                "CurrentBalance must be non-negative and at least $5"
-        );
+    public ApiResponse<BankAccount> addBankAccount(UUID customerId, BankAccountDto bankAccountDto) {
+        try {
+            Preconditions.checkNotNull(bankAccountDto, "bankAccount can not be null");
+            Preconditions.checkArgument(
+                    bankAccountDto.getAccountNumber().matches("\\d{10}"),
+                    "Bank AccountNumber must be 10 digits"
+            );
 
-//        Customer customer = customerService.getCustomer(customerId);
-        bankAccount.setCustomerId(customerId);
+            if (bankAccountRepository.existsByAccountNumber(bankAccountDto.getAccountNumber())) {
+                throw new IllegalArgumentException("Bank Account Number already exists");
+            }
 
-//        Card card = bankAccount.getCard();
-//        card.setHolderName(FormatterUtil.getCardHolderName(customer));
-//
-//        // a workaround
-//        bankAccount.setCard(null);
-        BankAccount savedBankAccount = bankAccountRepository.save(bankAccount);
-        LOG.info("A bank account saved for customer: {}", customerId);
+            Preconditions.checkNotNull(bankAccountDto.getBalance(), "currentBalance can not be null");
+            Preconditions.checkArgument(
+                    bankAccountDto.getBalance().compareTo(BigDecimal.ZERO) > -1 && bankAccountDto.getBalance().compareTo(new BigDecimal("5")) >= 0,
+                    "CurrentBalance must be non-negative and at least $5"
+            );
 
-//        card.setBankAccount(savedBankAccount);
-//        cardRepository.save(card);
+            if (bankAccountRepository.existsByCustomerId(customerId)) {
+                throw new IllegalArgumentException("Customer with ID already has a bank account");
+            }
 
-        return savedBankAccount;
+            ApiResponse<UserDtoClient> userDtoClient = userService.getById(customerId);
+
+            if (userDtoClient.getPayload() == null) {
+                throw new NotFoundException("User not found with ID: " + customerId);
+            }
+
+            System.out.println("userId in table: " + userDtoClient.getPayload().getId());
+
+            BankAccount bankAccount = bankAccountDto.toEntity();
+            bankAccount.setCustomerId(userDtoClient.getPayload().getId());
+
+            BankAccount savedBankAccount = bankAccountRepository.save(bankAccount);
+            LOG.info("A bank account saved for customer: {}", userDtoClient.getPayload().getId());
+
+            ApiResponse<BankAccount> response = ApiResponse.<BankAccount>builder()
+                    .message("Bank account created successfully")
+                    .status(HttpStatus.CREATED.value())
+                    .payload(savedBankAccount)
+                    .build();
+
+            return response;
+        } catch (NotFoundException | IllegalArgumentException e) {
+            return ApiResponse.<BankAccount>builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST.value())
+                    .build();
+        } catch (Exception e) {
+            return ApiResponse.<BankAccount>builder()
+                    .message("Internal Server Error")
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .build();
+        }
     }
 
 
-//    private String formatAccountNumber(String accountNumber) {
-//        if (accountNumber == null) {
-//            return null;
-//        }
-//
-//        // Check if the accountNumber has 9 digits
-//        if (accountNumber.matches("\\d{9}")) {
-//            // Format with spaces for every three digits
-//            Pattern pattern = Pattern.compile("(\\d{3})(\\d{3})(\\d{3})");
-//            Matcher matcher = pattern.matcher(accountNumber);
-//
-//            if (matcher.matches()) {
-//                return matcher.group(1) + " " + matcher.group(2) + " " + matcher.group(3);
-//            }
-//        }
-//
-//        return accountNumber;
-//    }
+    public ApiResponse<BankAccount> getBankAccount(String bankAccountNumber) {
+        try {
+            Preconditions.checkNotNull(bankAccountNumber, MESSAGE_FORMAT_NO_BANK_ACCOUNT, bankAccountNumber);
 
-//    private static BigDecimal formatBalance(BigDecimal balance) {
-//        if (balance == null) {
-//            return null;
-//        }
-//
-//        DecimalFormat decimalFormat;
-//
-//        // Check if the balance is very large (1 billion dollars or more)
-//        if (balance.abs().compareTo(new BigDecimal("1000000000")) >= 0) {
-//            decimalFormat = new DecimalFormat("$#,##0");
-//        } else {
-//            decimalFormat = new DecimalFormat("$#,##0.00");
-//        }
-//
-//        String formattedString = decimalFormat.format(balance);
-//        return new BigDecimal(formattedString.replaceAll("[^\\d.]+", ""));
-//    }
+            Optional<BankAccount> bankAccountOptional = bankAccountRepository.findByAccountNumber(bankAccountNumber);
 
-    public BankAccount getBankAccount(String bankAccountNumber) {
-        Preconditions.checkNotNull(bankAccountNumber, MESSAGE_FORMAT_NO_BANK_ACCOUNT, bankAccountNumber);
-
-        return bankAccountRepository.findByAccountNumber(bankAccountNumber)
-                .orElseThrow(() -> BankAccountManagerException.to(MESSAGE_FORMAT_NO_BANK_ACCOUNT, bankAccountNumber));
+            if (bankAccountOptional.isPresent()) {
+                BankAccount bankAccount = bankAccountOptional.get();
+                ApiResponse<BankAccount> response = ApiResponse.<BankAccount>builder()
+                        .message("Bank account retrieved successfully")
+                        .status(HttpStatus.OK.value())
+                        .payload(bankAccount)
+                        .build();
+                return response;
+            } else {
+                return ApiResponse.<BankAccount>builder()
+                        .message("Bank account not found")
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .build();
+            }
+        } catch (Exception e) {
+            return ApiResponse.<BankAccount>builder()
+                    .message("Internal Server Error")
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .build();
+        }
     }
 
 
-    public List<BankAccount> getBankAccountList() {
-        return bankAccountRepository.findAll();
+    public ApiResponse<List<BankAccount>> getBankAccountList() {
+        try {
+            List<BankAccount> bankAccounts = bankAccountRepository.findAll();
+
+            if (bankAccounts.isEmpty()) {
+                return ApiResponse.<List<BankAccount>>builder()
+                        .message("No bank accounts found")
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .build();
+            }
+
+            ApiResponse<List<BankAccount>> response = ApiResponse.<List<BankAccount>>builder()
+                    .message("Bank accounts retrieved successfully")
+                    .status(HttpStatus.OK.value())
+                    .payload(bankAccounts)
+                    .build();
+
+            return response;
+        } catch (Exception e) {
+            return ApiResponse.<List<BankAccount>>builder()
+                    .message("Internal Server Error")
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .build();
+        }
     }
 
     public BankAccount decreaseCurrentBalance(BankAccount bankAccount, BigDecimal amount) {
@@ -135,11 +175,31 @@ public class BankAccountService {
                 .orElseThrow(() -> BankAccountManagerException.to(MESSAGE_FORMAT_NO_BANK_ACCOUNT, bankAccount.getId()));
     }
 
-    public BankAccount getBankAccountByUserId(UUID userId) {
-        Preconditions.checkNotNull(userId, MESSAGE_FORMAT_NO_BANK_ACCOUNT, userId);
+    public ApiResponse<BankAccount> getBankAccountByUserId(UUID userId) {
+        try {
+            Preconditions.checkNotNull(userId, MESSAGE_FORMAT_NO_BANK_ACCOUNT, userId);
 
-        return bankAccountRepository.findByCustomerId(userId)
-                .orElseThrow(() -> BankAccountManagerException.to(MESSAGE_FORMAT_NO_BANK_ACCOUNT, userId));
+            Optional<BankAccount> bankAccountOptional = bankAccountRepository.findByCustomerId(userId);
+
+            if (bankAccountOptional.isPresent()) {
+                BankAccount bankAccount = bankAccountOptional.get();
+                return ApiResponse.<BankAccount>builder()
+                        .message("Bank account retrieved successfully")
+                        .status(HttpStatus.OK.value())
+                        .payload(bankAccount)
+                        .build();
+            } else {
+                return ApiResponse.<BankAccount>builder()
+                        .message("Bank account not found")
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .build();
+            }
+        } catch (Exception e) {
+            return ApiResponse.<BankAccount>builder()
+                    .message("Internal Server Error")
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .build();
+        }
     }
 
 
