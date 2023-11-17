@@ -22,11 +22,11 @@ public class EmailKBServiceController {
         this.emailKbService = emailKbService;
     }
 
-    @PostMapping("/")
-    public ResponseEntity<?> configEmail(@RequestBody SmtpRequest smtpRequest){
-        SmtpDto smtp = emailKbService.configEmail(smtpRequest);
-        return ResponseEntity.ok(smtp);
-    }
+//    @PostMapping("/")
+//    public ResponseEntity<?> configEmail(@RequestBody SmtpRequest smtpRequest){
+//        SmtpDto smtp = emailKbService.configEmail(smtpRequest);
+//        return ResponseEntity.ok(smtp);
+//    }
     @PutMapping("/")
     public ApiResponse updateConfigEmail(@RequestBody SmtpRequest smtpRequest){
         emailKbService.updateConfigEmail(smtpRequest);

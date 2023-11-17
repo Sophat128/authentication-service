@@ -49,3 +49,7 @@ kafka:
     data: send.email.kb
 Base:
   url: http://localhost:8081/api/v1/
+smtp:
+  username: soccerdatehrd@gmail.com
+  password: tmkylzbkhzsautkz
+

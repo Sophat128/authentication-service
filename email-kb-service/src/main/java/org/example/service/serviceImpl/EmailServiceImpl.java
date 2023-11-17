@@ -1,6 +1,7 @@
 package org.example.service.serviceImpl;
 
 import com.example.dto.UserDto;
+import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -13,6 +14,7 @@ import org.example.model.request.SmtpRequest;
 import org.example.repository.EmailKbServiceRepository;
 import org.example.service.EmailKbService;
 import org.example.service.MailSenderFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -37,6 +39,23 @@ public class EmailServiceImpl implements EmailKbService {
         this.mailSenderFactory = mailSenderFactory;
         this.emailKbServiceRepository = emailKbServiceRepository;
         this.webClient = webClient;
+    }
+
+    @Value("${smtp.username}")
+    private String smtpUsername;
+    @Value("${smtp.password}")
+    private String smtpPassword;
+
+    @PostConstruct
+    public void init(){
+        if(emailKbServiceRepository.findAll().isEmpty()){
+            Smtp smtp = new Smtp();
+            smtp.setUsername(smtpUsername);
+            smtp.setPassword(smtpPassword);
+            emailKbServiceRepository.save(smtp);
+        }else{
+            System.out.println("already add it ");
+        }
     }
 
 
@@ -81,30 +100,29 @@ public class EmailServiceImpl implements EmailKbService {
 
 
 
-
-    @Override
-    public SmtpDto configEmail(SmtpRequest smtpRequest) {
-
-        if (smtpRequest.getUsername().isBlank() || smtpRequest.getUsername().isEmpty()) {
-            throw new BadRequestException("Field username can't be blank");
-        }
-
-        if (!smtpRequest.getUsername().matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,6}")) {
-            throw new BadRequestException("Username should be like this -> something@something.com");
-        }
-
-        if (smtpRequest.getPassword().isBlank() || smtpRequest.getPassword().isEmpty()) {
-            throw new BadRequestException("Field password can't be blank");
-        }
-        Smtp smtp = new Smtp();
-        smtp.setUsername(smtpRequest.getUsername());
-        smtp.setPassword(smtpRequest.getPassword());
-        emailKbServiceRepository.save(smtp) ;
-        SmtpDto smtpDto = new SmtpDto();
-        smtpDto.setId(smtp.getId());
-        smtpDto.setUsername(smtp.getUsername());
-        return smtpDto;
-    }
+//    @Override
+//    public SmtpDto configEmail(SmtpRequest smtpRequest) {
+//
+//        if (smtpRequest.getUsername().isBlank() || smtpRequest.getUsername().isEmpty()) {
+//            throw new BadRequestException("Field username can't be blank");
+//        }
+//
+//        if (!smtpRequest.getUsername().matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,6}")) {
+//            throw new BadRequestException("Username should be like this -> something@something.com");
+//        }
+//
+//        if (smtpRequest.getPassword().isBlank() || smtpRequest.getPassword().isEmpty()) {
+//            throw new BadRequestException("Field password can't be blank");
+//        }
+//        Smtp smtp = new Smtp();
+//        smtp.setUsername(smtpRequest.getUsername());
+//        smtp.setPassword(smtpRequest.getPassword());
+//        emailKbServiceRepository.save(smtp) ;
+//        SmtpDto smtpDto = new SmtpDto();
+//        smtpDto.setId(smtp.getId());
+//        smtpDto.setUsername(smtp.getUsername());
+//        return smtpDto;
+//    }
 
     @Override
     public String updateConfigEmail(SmtpRequest smtpRequest) {
@@ -147,4 +165,6 @@ public class EmailServiceImpl implements EmailKbService {
 
         return smtpDtoList;
     }
+
+
 }

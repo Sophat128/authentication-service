@@ -13,9 +13,13 @@ public interface EmailKbService {
 
     void sendConfirmationEmail(Email email) throws MessagingException, IOException, jakarta.mail.MessagingException;
 
-    SmtpDto configEmail(SmtpRequest smtpRequest);
+//    SmtpDto configEmail(SmtpRequest smtpRequest);
 
     String updateConfigEmail(SmtpRequest smtpRequest);
 
     List<SmtpDto> getConfigEmail();
+
+
+
+
 }
