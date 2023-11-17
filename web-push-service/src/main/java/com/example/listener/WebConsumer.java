@@ -1,5 +1,6 @@
 package com.example.listener;
 
+import com.example.dto.ScheduleDto;
 import com.example.dto.TransactionHistoryDto;
 import com.example.model.request.PushNotificationRequest;
 import com.example.model.respone.BankAccountResponse;
@@ -21,6 +22,7 @@ public class WebConsumer {
     private static final Logger LOGGER = LogManager.getLogger(WebConsumer.class);
     private final WebPushService webPushService;
     private final WebService webService;
+    private String WEB_SCHEDULE = "web-notification-schedule";
 
     public WebConsumer(WebPushService webPushService, WebClient.Builder webClient, WebService webService) {
         this.webPushService = webPushService;
@@ -39,5 +41,14 @@ public class WebConsumer {
         System.out.println("customerInfo: " + customerInfo);
 //
         webPushService.notifySpecificUser(pushNotificationRequest, customerInfo.getCustomerId());
+    }
+
+    @KafkaListener(topics = "${kafka.topics.schedule}")
+
+    public void webPushSchedule(ConsumerRecord<String, ScheduleDto> commandsRecord) throws MessagingException, IOException {
+        LOGGER.log(Level.INFO, () -> String.format("sendConfirmationEmails() » Topic: %s", commandsRecord.topic()));
+        System.out.println("Receive Data: " + commandsRecord.value());
+        System.out.println("pushNotificationRequest: " + commandsRecord.value());
+        webPushService.notifySpecificUserWithSchedule(commandsRecord.value());
     }
 }

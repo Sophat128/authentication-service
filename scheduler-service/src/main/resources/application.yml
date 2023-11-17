@@ -1,0 +1,81 @@
+keycloak:
+    auth-server-url: https://keycloak-fintrack.sythorng.site/auth/
+    credentials:
+        client-id: fintrack-app
+        password: admin
+        provider: secret
+        secret: MYhYGrLOk1UNwK9eTaULwIye39hVujPi
+        username: admin
+    realm: Fintrack
+    resource: fintrack-app
+logging:
+    level:
+        org:
+            springframework:
+                web: DEBUG
+server:
+    port: 8086
+spring:
+    application:
+        name: scheduler-service
+
+    kafka:
+        producer:
+            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            bootstrap-servers: 47.236.10.166:30292
+        dead_letter_topic: notification-retry
+
+    autoconfigure:
+        exclude: org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration
+    datasource:
+        password: 123
+        url: jdbc:postgresql://8.219.131.180:4321/quart?useSSL=false
+        username: root
+    jpa:
+        hibernate:
+            ddl-auto: update
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+        show-sql: true
+    mail:
+        host: smtp.gmail.com
+        password: szngbwjeadnoegfs
+        port: 587
+        properties:
+            mail:
+                smtp:
+                    auth: true
+                    starttls:
+                        enable: true
+        username: fintrack.hrd@gmail.com
+    quartz:
+        job-store-type: jdbc
+        properties:
+            org:
+                quartz:
+                    dataSource:
+                        quartzDataSource:
+                            URL: jdbc:postgresql://8.219.131.180:4321/quart?useSSL=false
+                            driver: org.postgresql.Driver
+                            password: 123
+                            provider: hikaricp
+                            user: root
+                    jobStore:
+                        dataSource: quartzDataSource
+                        driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+                    threadPool:
+                        threadCount: 5
+    security:
+        oauth2:
+            resourceserver:
+                jwt:
+                    issuer-uri: https://keycloak-fintrack.sythorng.site/auth/realms/Fintrack
+                    jwk-set-uri: https://keycloak-fintrack.sythorng.site/auth/realms/Fintrack/protocol/openid-connect/certs
+springdoc:
+    swagger-ui:
+        oauth:
+            clientId: fintrack-app
+            clientSecret: MYhYGrLOk1UNwK9eTaULwIye39hVujPi
+            realm: Fintrack

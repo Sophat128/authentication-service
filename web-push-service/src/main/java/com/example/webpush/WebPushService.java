@@ -1,5 +1,6 @@
 package com.example.webpush;
 
+import com.example.dto.ScheduleDto;
 import com.example.dto.TransactionHistoryDto;
 import com.example.model.request.PushNotificationRequest;
 import com.example.model.entities.UserSubscription;
@@ -110,6 +111,7 @@ public class WebPushService {
     public record Message(String title, TransactionHistoryDto body) {
     }
 
+
     ObjectMapper mapper = new ObjectMapper();
 
     public void notifyAll(PushNotificationRequest pushNotificationRequest) {
@@ -130,6 +132,21 @@ public class WebPushService {
         try {
             String msg = mapper.writeValueAsString(new Message(pushNotificationRequest.getTitle(), pushNotificationRequest.getBody()));
             List<UserSubscription> userSubscriptions = webRepository.findByUserId(userId);
+            userSubscriptions.forEach(userSubscription -> {
+                Subscription subscription = new Subscription(userSubscription.getEndpoint(), new Subscription.Keys(userSubscription.getP256dh(), userSubscription.getAuth()));
+                System.out.println("Subscription: " + subscription.keys.auth);
+                sendNotification(subscription, msg);
+            });
+        } catch (JsonProcessingException e) {
+            System.out.println("Error");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void notifySpecificUserWithSchedule(ScheduleDto scheduleDto) {
+        try {
+            String msg = mapper.writeValueAsString(scheduleDto);
+            List<UserSubscription> userSubscriptions = webRepository.findByUserId(scheduleDto.getUserId());
             userSubscriptions.forEach(userSubscription -> {
                 Subscription subscription = new Subscription(userSubscription.getEndpoint(), new Subscription.Keys(userSubscription.getP256dh(), userSubscription.getAuth()));
                 System.out.println("Subscription: " + subscription.keys.auth);
