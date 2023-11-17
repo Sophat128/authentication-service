@@ -31,7 +31,7 @@ import static com.example.utils.Constants.MailScheduleJob.*;
 
 public class MailScheduleJob extends QuartzJobBean {
 
-    private static final String NOTIFICATION_TOPIC = "notification-service";
+    private static final String NOTIFICATION_TOPIC = "notification-service-schedule";
     private static final String TELEGRAM_TOPIC = "telegram-schedule";
     private static final String EMAIL_TOPIC = "email-schedule";
     private static final String WEB_TOPIC = "web-notification-schedule";
@@ -43,12 +43,12 @@ public class MailScheduleJob extends QuartzJobBean {
     private String from;
 
     private final MailScheduleDao  mailScheduleDao;
-    private final KafkaTemplate<String, ScheduleDto> kafkaTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
 
     private final TelegramServiceImpl telegramService;
 
-    public MailScheduleJob(WebClientConfig webClientConfig, MailService mailService, MailScheduleDao mailScheduleDao, KafkaTemplate<String, ScheduleDto> kafkaTemplate, TelegramServiceImpl telegramService) {
+    public MailScheduleJob(WebClientConfig webClientConfig, MailService mailService, MailScheduleDao mailScheduleDao, KafkaTemplate<String, String> kafkaTemplate, TelegramServiceImpl telegramService) {
 
         this.webClientConfig = webClientConfig;
         this.mailService = mailService;
@@ -72,12 +72,13 @@ public class MailScheduleJob extends QuartzJobBean {
         mailService.sendMail(from, "sun.sythorng@gmail.com", userId, message);
 
 
-        Message<ScheduleDto> webResponse = MessageBuilder
-                .withPayload(schedule)
-                .setHeader(KafkaHeaders.TOPIC, WEB_TOPIC)
+        Message<String> webResponse = MessageBuilder
+                .withPayload(schedule.toString())
+                .setHeader(KafkaHeaders.TOPIC, NOTIFICATION_TOPIC)
                 .build();
         System.out.println("Message: " + message);
         kafkaTemplate.send(webResponse);
+
 
         Message<ScheduleDto> emailResponse = MessageBuilder
                 .withPayload(schedule)

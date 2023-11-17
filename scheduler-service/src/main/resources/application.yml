@@ -23,7 +23,7 @@ spring:
         producer:
             value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
             key-serializer: org.apache.kafka.common.serialization.StringSerializer
-            bootstrap-servers: 47.236.10.166:30292
+            bootstrap-servers: localhost:9092
         dead_letter_topic: notification-retry
 
     autoconfigure:

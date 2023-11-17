@@ -4,18 +4,22 @@ import com.example.config.WebClientConfig;
 import com.example.dto.TransactionHistoryDto;
 import com.example.response.ApiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -25,16 +29,25 @@ import java.util.Map;
 public class NotificationConsumer {
 
     private final KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplateSchedule;
+
     private final WebClientConfig webClientConfig;
 
     private static final String NOTIFICATION_TOPIC = "notification-service";
+    private static final String NOTIFICATION_TOPIC_SCHEDULE = "notification-service-schedule";
+    private static final String WEB_TOPIC_SCHEDULE = "web-service-schedule";
+
+
     private static final String TELEGRAM_TOPIC = "telegram";
     private static final String EMAIL_TOPIC = "send.email.kb";
-    private static final String WEB_TOPIC = "web-notification";
+    private static final String WEB_TOPIC = "web-notification-service";
+    private static final Logger LOGGER = LogManager.getLogger(NotificationConsumer.class);
 
 
-    public NotificationConsumer(KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate, WebClientConfig webClientConfig) {
+
+    public NotificationConsumer(KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate, KafkaTemplate<String, String> kafkaTemplateSchedule, WebClientConfig webClientConfig) {
         this.kafkaTemplate = kafkaTemplate;
+        this.kafkaTemplateSchedule = kafkaTemplateSchedule;
         this.webClientConfig = webClientConfig;
     }
 
@@ -102,6 +115,25 @@ public class NotificationConsumer {
             }
         }
 
+    }
+
+    @KafkaListener(
+            topics = NOTIFICATION_TOPIC_SCHEDULE,
+            groupId = "notification-consumer"
+    )
+
+    public void webPushSchedule(ConsumerRecord<String, String> commandsRecord) throws MessagingException, IOException {
+
+        LOGGER.log(Level.INFO, () -> String.format("sendConfirmationEmails() » Topic: %s", commandsRecord.topic()));
+        System.out.println("Receive Data: " + commandsRecord.value());
+        System.out.println("pushNotificationRequest: " + commandsRecord.value());
+        Message<String> messages = MessageBuilder
+                .withPayload(commandsRecord.value())
+                .setHeader(KafkaHeaders.TOPIC, WEB_TOPIC_SCHEDULE)
+                .build();
+        System.out.println("Message: " + messages);
+        kafkaTemplateSchedule.send(messages);
+//        webPushService.notifySpecificUserWithSchedule(commandsRecord.value());
     }
 
 

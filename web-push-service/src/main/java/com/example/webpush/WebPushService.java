@@ -2,6 +2,7 @@ package com.example.webpush;
 
 import com.example.dto.ScheduleDto;
 import com.example.dto.TransactionHistoryDto;
+import com.example.model.request.MessageRequest;
 import com.example.model.request.PushNotificationRequest;
 import com.example.model.entities.UserSubscription;
 import com.example.model.request.WebConfigRequest;
@@ -114,9 +115,10 @@ public class WebPushService {
 
     ObjectMapper mapper = new ObjectMapper();
 
-    public void notifyAll(PushNotificationRequest pushNotificationRequest) {
+    public void notifyAll(MessageRequest message) {
         try {
-            String msg = mapper.writeValueAsString(new Message(pushNotificationRequest.getTitle(), pushNotificationRequest.getBody()));
+            String msg = mapper.writeValueAsString(message);
+
             System.out.println("Data: " + msg);
             getAllSubscriber().forEach(userSubscription -> {
                 Subscription subscription = new Subscription(userSubscription.getEndpoint(), new Subscription.Keys(userSubscription.getP256dh(), userSubscription.getAuth()));
@@ -144,6 +146,7 @@ public class WebPushService {
     }
 
     public void notifySpecificUserWithSchedule(ScheduleDto scheduleDto) {
+        System.out.println("Working now");
         try {
             String msg = mapper.writeValueAsString(scheduleDto);
             List<UserSubscription> userSubscriptions = webRepository.findByUserId(scheduleDto.getUserId());
@@ -153,7 +156,6 @@ public class WebPushService {
                 sendNotification(subscription, msg);
             });
         } catch (JsonProcessingException e) {
-            System.out.println("Error");
             throw new RuntimeException(e);
         }
     }

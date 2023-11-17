@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.model.entities.UserSubscription;
 import com.example.model.entities.WebDataConfig;
+import com.example.model.request.MessageRequest;
 import com.example.model.request.PushNotificationRequest;
 import com.example.model.request.WebConfigRequest;
 import com.example.model.respone.ApiResponse;
@@ -69,9 +70,9 @@ public class WebPushController {
     }
 
     @PostMapping("/send_notification")
-    public ResponseEntity<?> sendNotification(@RequestBody PushNotificationRequest pushNotificationRequest) {
+    public ResponseEntity<?> sendNotification(@RequestBody MessageRequest messageRequest) {
         try {
-            webPushService.notifyAll(pushNotificationRequest);
+            webPushService.notifyAll(messageRequest);
             ApiResponse<?> data = new ApiResponse<>("Alert to all subscribers successfully", HttpStatus.OK.value());
             return ResponseEntity.ok(data);
         } catch (Exception e) {

@@ -6,6 +6,7 @@ import com.example.model.request.PushNotificationRequest;
 import com.example.model.respone.BankAccountResponse;
 import com.example.service.WebService;
 import com.example.webpush.WebPushService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class WebConsumer {
@@ -45,10 +48,49 @@ public class WebConsumer {
 
     @KafkaListener(topics = "${kafka.topics.schedule}")
 
-    public void webPushSchedule(ConsumerRecord<String, ScheduleDto> commandsRecord) throws MessagingException, IOException {
+    public void webPushSchedule(ConsumerRecord<String, String> commandsRecord) throws MessagingException, IOException {
         LOGGER.log(Level.INFO, () -> String.format("sendConfirmationEmails() » Topic: %s", commandsRecord.topic()));
         System.out.println("Receive Data: " + commandsRecord.value());
         System.out.println("pushNotificationRequest: " + commandsRecord.value());
-        webPushService.notifySpecificUserWithSchedule(commandsRecord.value());
+        ScheduleDto scheduleDto = parseScheduleDto(commandsRecord.value());
+        System.out.println("Converted data: " + scheduleDto);
+        System.out.println("Converted data field: " + scheduleDto.getMessage());
+        if(scheduleDto.getUserId() == null){
+            System.out.println("Send to all user");
+        }
+
+        webPushService.notifySpecificUserWithSchedule(scheduleDto);
     }
+
+    private  ScheduleDto parseScheduleDto(String input) {
+        String userId = null;
+        String message = null;
+
+        String[] keyValuePairs = input.substring(input.indexOf("(") + 1, input.indexOf(")")).split(",\\s*");
+
+        for (String pair : keyValuePairs) {
+            String[] keyValue = pair.split("=");
+
+            if (keyValue.length == 2) {
+                String key = keyValue[0].trim();
+                String value = keyValue[1].trim();
+
+                if ("userId".equals(key)) {
+                    userId = value;
+                } else if ("message".equals(key)) {
+                    message = value;
+                }
+            }
+        }
+
+        if (userId != null && message != null) {
+            // Assuming userId is a valid UUID string
+            return new ScheduleDto(userId, message);
+        } else {
+            return null;
+        }
+    }
+
+
+
 }
