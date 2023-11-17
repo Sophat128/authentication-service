@@ -2,12 +2,14 @@ package com.example.clienteventservice.service;
 
 import com.example.clienteventservice.domain.model.BankAccount;
 import com.example.clienteventservice.domain.model.TransactionHistory;
+import com.example.clienteventservice.domain.response.ApiResponse;
 import com.example.dto.TransactionHistoryDto;
 import com.example.type.StatementType;
 import com.example.type.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
@@ -28,40 +30,64 @@ public class TransferService {
     private BankAccountService bankAccountService;
     private final KafkaTemplate<Object, Object> kafkaTemplate;
 
-    public void transfer(String fromBankAccountNumber, String toBankAccountNumber, BigDecimal amount) {
-        BankAccount fromBankAccount = bankAccountService.getBankAccount(fromBankAccountNumber);
-        BankAccount toBankAccount = bankAccountService.getBankAccount(toBankAccountNumber);
+    public ApiResponse<Void> transfer(String fromBankAccountNumber, String toBankAccountNumber, BigDecimal amount) {
+        try {
+            ApiResponse<BankAccount> fromBankAccount = bankAccountService.getBankAccount(fromBankAccountNumber);
+            ApiResponse<BankAccount> toBankAccount = bankAccountService.getBankAccount(toBankAccountNumber);
 
-        transactionService.executeTransfer(fromBankAccount, toBankAccount, amount);
+            if (fromBankAccount.getStatus() == HttpStatus.NOT_FOUND.value()) {
+                return ApiResponse.<Void>builder()
+                        .message("fromBankAccount not found")
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .build();
+            }
 
-        TransactionHistory senderResponse = transactionService
-                .getTransactionHistoryBuilder(
-                        TransactionType.SENDER,
-                        StatementType.EXPENSE,
-                        fromBankAccount,
-                        amount
-                ).build();
+            if (toBankAccount.getStatus() == HttpStatus.NOT_FOUND.value()) {
+                return ApiResponse.<Void>builder()
+                        .message("toBankAccount not found")
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .build();
+            }
 
-        TransactionHistory receiverResponse = transactionService
-                .getTransactionHistoryBuilder(
-                        TransactionType.RECEIVER,
-                        StatementType.INCOME,
-                        toBankAccount,
-                        amount
-                ).build();
+            transactionService.executeTransfer(fromBankAccount.getPayload(), toBankAccount.getPayload(), amount);
 
-        senderResponse.setReceivedAccountNumber(toBankAccountNumber);
-        receiverResponse.setReceivedAccountNumber(fromBankAccountNumber);
+            TransactionHistory senderResponse = transactionService
+                    .getTransactionHistoryBuilder(
+                            TransactionType.SENDER,
+                            StatementType.EXPENSE,
+                            fromBankAccount.getPayload(),
+                            amount
+                    ).build();
 
-        sendTransactionNotification(senderResponse);
-        sendTransactionNotification(receiverResponse);
+            TransactionHistory receiverResponse = transactionService
+                    .getTransactionHistoryBuilder(
+                            TransactionType.RECEIVER,
+                            StatementType.INCOME,
+                            toBankAccount.getPayload(),
+                            amount
+                    ).build();
 
-//        Message<TransactionHistoryDto> message = MessageBuilder
-//                .withPayload(transactionHistory.toDto())
-//                .setHeader(KafkaHeaders.TOPIC, "notification")
-//                .build();
-//        System.out.println("Message from bank account: " + message);
-//        kafkaTemplate.send(message);
+            senderResponse.setReceivedAccountNumber(toBankAccountNumber);
+            receiverResponse.setReceivedAccountNumber(fromBankAccountNumber);
+
+            sendTransactionNotification(senderResponse);
+            sendTransactionNotification(receiverResponse);
+
+            return ApiResponse.<Void>builder()
+                    .message("Transfer successful")
+                    .status(HttpStatus.OK.value())
+                    .build();
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.<Void>builder()
+                    .message("Invalid amount: " + e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST.value())
+                    .build();
+        } catch (Exception e) {
+            return ApiResponse.<Void>builder()
+                    .message("Internal Server Error")
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .build();
+        }
     }
 
     private void sendTransactionNotification(TransactionHistory history) {

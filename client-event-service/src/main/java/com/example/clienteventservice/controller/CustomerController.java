@@ -1,12 +1,12 @@
 package com.example.clienteventservice.controller;
 
 import com.example.clienteventservice.config.WebClientConfig;
+import com.example.clienteventservice.domain.response.ApiResponse;
 import com.example.dto.TelegramCreatedBotDto;
 import com.example.clienteventservice.domain.request.ProfileRequest;
 import com.example.clienteventservice.service.UserService;
+import com.example.dto.UserDtoClient;
 import com.example.type.NotificationType;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
@@ -19,6 +19,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -34,69 +35,76 @@ public class CustomerController {
 
     @GetMapping("username")
     @Operation(summary = "get user by username")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK."),
-            @ApiResponse(code = 400, message = "Bad Request."),
-            @ApiResponse(code = 500, message = "Internal Error.")
-    })
     public ResponseEntity<?> getByUsername(@RequestParam String username) {
-        return ResponseEntity.ok().body(userService.getByUserName(username));
+        ApiResponse<UserDtoClient> response = userService.getByUserName(username);
+
+        if (response.getStatus() == HttpStatus.OK.value()) {
+            return ResponseEntity.ok().body(response);
+        } else {
+            return ResponseEntity.status(response.getStatus()).body(response);
+        }
     }
 
     @GetMapping("email")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK."),
-            @ApiResponse(code = 400, message = "Bad Request."),
-            @ApiResponse(code = 500, message = "Internal Error.")
-    })
     @Operation(summary = "get user by email")
     public ResponseEntity<?> getByEmail(@RequestParam String email) {
-        return ResponseEntity.ok().body(userService.getByEmail(email));
-    }
+        ApiResponse<UserDtoClient> response = userService.getByEmail(email);
 
+        if (response.getStatus() == HttpStatus.OK.value()) {
+            return ResponseEntity.ok().body(response);
+        } else {
+            return ResponseEntity.status(response.getStatus()).body(response);
+        }
+    }
     @GetMapping
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK."),
-            @ApiResponse(code = 400, message = "Bad Request."),
-            @ApiResponse(code = 500, message = "Internal Error.")
-    })
-    public ResponseEntity<?> getAllUser() {
-        return ResponseEntity.ok().body(userService.getAllUsers());
+
+    public ResponseEntity<?> getAllUsers() {
+        ApiResponse<List<UserDtoClient>> response = userService.getAllUsers();
+
+        if (response.getStatus() == HttpStatus.OK.value()) {
+            return ResponseEntity.ok().body(response);
+        } else {
+            return ResponseEntity.status(response.getStatus()).body(response);
+        }
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "get user by id (UUID) ")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK."),
-            @ApiResponse(code = 400, message = "Bad Request."),
-            @ApiResponse(code = 500, message = "Internal Error.")
-    })
     public ResponseEntity<?> getById(@PathVariable UUID id) {
-        return ResponseEntity.ok().body(userService.getById(id));
+        ApiResponse<UserDtoClient> response = userService.getById(id);
+
+        if (response.getStatus() == HttpStatus.OK.value()) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(response.getStatus()).body(response);
+        }
     }
+
     @GetMapping("/current_user")
     @SecurityRequirement(name = "auth")
     @Operation(summary = "get user information ")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK."),
-            @ApiResponse(code = 400, message = "Bad Request."),
-            @ApiResponse(code = 500, message = "Internal Error.")
-    })
     public ResponseEntity<?> getUserInfo(Principal principal) {
-        return ResponseEntity.ok().body(userService.getInfo(principal));
+        ApiResponse<?> response = userService.getInfo(principal);
+
+        if (response.getStatus() == HttpStatus.OK.value()) {
+            return ResponseEntity.ok().body(response);
+        } else {
+            return ResponseEntity.status(response.getStatus()).body(response);
+        }
     }
 
-    @PutMapping
-    @SecurityRequirement(name = "auth")
-    @Operation(summary = "update information user current user (token) ")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK."),
-            @ApiResponse(code = 400, message = "Bad Request."),
-            @ApiResponse(code = 500, message = "Internal Error.")
-    })
-    public ResponseEntity<?> updateById(@RequestBody ProfileRequest userRequest, Principal principal, @AuthenticationPrincipal Jwt jwt) {
-        return ResponseEntity.ok().body(userService.updateById(userRequest, principal,jwt));
-    }
+//    @PutMapping
+//    @SecurityRequirement(name = "auth")
+//    @Operation(summary = "update information user current user (token) ")
+//    public ResponseEntity<?> updateById(@RequestBody ProfileRequest userRequest, Principal principal, @AuthenticationPrincipal Jwt jwt) {
+//        ApiResponse<?> response = userService.updateById(userRequest, principal, jwt);
+//
+//        if (response.getStatus() == HttpStatus.OK.value()) {
+//            return ResponseEntity.ok().body(response);
+//        } else {
+//            return ResponseEntity.status(response.getStatus()).body(response);
+//        }
+//    }
 
 
     @PostMapping("/notification-type")

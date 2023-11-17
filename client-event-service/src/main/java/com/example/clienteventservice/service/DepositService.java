@@ -2,10 +2,13 @@ package com.example.clienteventservice.service;
 
 import com.example.clienteventservice.domain.model.BankAccount;
 import com.example.clienteventservice.domain.model.TransactionHistory;
+import com.example.clienteventservice.domain.response.ApiResponse;
 import com.example.dto.TransactionHistoryDto;
 import com.example.type.StatementType;
 import com.example.type.TransactionType;
+import com.google.common.base.Preconditions;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
@@ -20,24 +23,49 @@ public class DepositService {
     private final TransactionService transactionService;
     private final KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate;
 
-    public void deposit(String bankAccountNumber, BigDecimal amount) {
-        BankAccount toBankAccount = bankAccountService.getBankAccount(bankAccountNumber);
-        transactionService.executeDeposit(toBankAccount, amount);
+    public ApiResponse<Void> deposit(String bankAccountNumber, BigDecimal amount) {
+        try {
+            ApiResponse<BankAccount> response = bankAccountService.getBankAccount(bankAccountNumber);
 
-        TransactionHistory transactionHistory = transactionService
-                .getTransactionHistoryBuilder(
-                        TransactionType.DEPOSIT,
-                        StatementType.INCOME,
-                        toBankAccount,
-                        amount
-                ).build();
+            if (response.getStatus() == HttpStatus.NOT_FOUND.value()) {
+                return ApiResponse.<Void>builder()
+                        .message("Bank account not found")
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .build();
+            }
 
-        Message<TransactionHistoryDto> message = MessageBuilder
-                .withPayload(transactionHistory.toDto())
-                .setHeader(KafkaHeaders.TOPIC, "notification")
-                .build();
-        System.out.println("Message: " + message);
-        kafkaTemplate.send(message);
+            BankAccount toBankAccount = response.getPayload();
+            transactionService.executeDeposit(toBankAccount, amount);
+
+            TransactionHistory transactionHistory = transactionService
+                    .getTransactionHistoryBuilder(
+                            TransactionType.DEPOSIT,
+                            StatementType.INCOME,
+                            toBankAccount,
+                            amount
+                    ).build();
+
+            Message<TransactionHistoryDto> message = MessageBuilder
+                    .withPayload(transactionHistory.toDto())
+                    .setHeader(KafkaHeaders.TOPIC, "notification")
+                    .build();
+            kafkaTemplate.send(message);
+
+            return ApiResponse.<Void>builder()
+                    .message("Deposit successful")
+                    .status(HttpStatus.OK.value())
+                    .build();
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.<Void>builder()
+                    .message("Invalid amount: " + e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST.value())
+                    .build();
+        } catch (Exception e) {
+            return ApiResponse.<Void>builder()
+                    .message("Internal Server Error")
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .build();
+        }
     }
 
 
