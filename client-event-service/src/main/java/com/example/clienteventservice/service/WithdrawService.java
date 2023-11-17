@@ -27,7 +27,7 @@ public class WithdrawService {
     private TransactionService transactionService;
     private BankAccountService bankAccountService;
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate;
 
     public void withdraw(String bankAccountNumber, BigDecimal amount) {
         BankAccount bankAccount = bankAccountService.getBankAccount(bankAccountNumber);
@@ -40,8 +40,8 @@ public class WithdrawService {
                         bankAccount,
                         amount
                 ).build();
-        Message<String> message = MessageBuilder
-                .withPayload(transactionHistory.toDto().toString())
+        Message<TransactionHistoryDto> message = MessageBuilder
+                .withPayload(transactionHistory.toDto())
                 .setHeader(KafkaHeaders.TOPIC, "notification-test")
                 .build();
         System.out.println("Message: " + message);

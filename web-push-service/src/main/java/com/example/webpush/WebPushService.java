@@ -1,6 +1,6 @@
 package com.example.webpush;
 
-import com.example.dto.TransactionHistoryDto;
+import com.example.model.dto.TransactionHistoryDto;
 import com.example.model.request.PushNotificationRequest;
 import com.example.model.entities.UserSubscription;
 import com.example.model.request.WebConfigRequest;
