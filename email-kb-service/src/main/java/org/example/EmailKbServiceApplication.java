@@ -24,6 +24,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
                 )
         ))
+
 public class EmailKbServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(EmailKbServiceApplication.class, args);

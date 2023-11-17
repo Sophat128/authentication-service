@@ -7,12 +7,15 @@ import org.example.model.request.SmtpRequest;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
 
 public interface EmailKbService {
 
     void sendConfirmationEmail(Email email) throws MessagingException, IOException, jakarta.mail.MessagingException;
 
-    SmtpDto configEmail(SmtpRequest smtpRequest, Principal principal);
+    SmtpDto configEmail(SmtpRequest smtpRequest);
 
-    String updateConfigEmail(Long id, SmtpRequest smtpRequest,Principal principal);
+    String updateConfigEmail(SmtpRequest smtpRequest);
+
+    List<SmtpDto> getConfigEmail();
 }

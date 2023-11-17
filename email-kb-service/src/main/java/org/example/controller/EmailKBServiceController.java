@@ -9,10 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/configEmail")
 @SecurityRequirement(name = "app")
+@CrossOrigin
 public class EmailKBServiceController {
     private final EmailKbService emailKbService;
 
@@ -21,16 +23,27 @@ public class EmailKBServiceController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> configEmail(@RequestBody SmtpRequest smtpRequest, Principal principal){
-        SmtpDto smtp = emailKbService.configEmail(smtpRequest,principal);
+    public ResponseEntity<?> configEmail(@RequestBody SmtpRequest smtpRequest){
+        SmtpDto smtp = emailKbService.configEmail(smtpRequest);
         return ResponseEntity.ok(smtp);
     }
-    @PutMapping("/{id}")
-    public ApiResponse updateConfigEmail(@PathVariable Long id , @RequestBody SmtpRequest smtpRequest,Principal principal){
-        emailKbService.updateConfigEmail(id,smtpRequest,principal);
+    @PutMapping("/")
+    public ApiResponse updateConfigEmail(@RequestBody SmtpRequest smtpRequest){
+        emailKbService.updateConfigEmail(smtpRequest);
         return ApiResponse.builder()
                 .message("successfully update configuration")
+                .status(201)
+                .build();
+    }
+
+    @GetMapping("/")
+    public ApiResponse getEmailConfig(){
+        List<SmtpDto> smtpDtos = emailKbService.getConfigEmail();
+        return ApiResponse.builder()
+                .message("get Email Successfully")
+                .payload(smtpDtos)
                 .status(200)
                 .build();
     }
+
 }
