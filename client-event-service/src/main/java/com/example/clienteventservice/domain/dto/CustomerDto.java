@@ -1,6 +1,5 @@
 package com.example.clienteventservice.domain.dto;
 
-import com.example.clienteventservice.domain.model.Customer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

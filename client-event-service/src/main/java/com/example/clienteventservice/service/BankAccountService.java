@@ -1,10 +1,10 @@
 package com.example.clienteventservice.service;
 
-import com.example.clienteventservice.domain.dto.BankAccountDto;
-import com.example.clienteventservice.domain.model.BankAccount;
 import com.example.clienteventservice.event.SBAEventListener;
 import com.example.clienteventservice.exception.BankAccountManagerException;
 import com.example.clienteventservice.repository.BankAccountRepository;
+import com.example.clienteventservice.domain.dto.BankAccountDto;
+import com.example.clienteventservice.domain.model.BankAccount;
 import com.google.common.base.Preconditions;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,11 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * BankAccount management service
@@ -33,7 +30,6 @@ public class BankAccountService {
     private static final String MESSAGE_FORMAT_NO_BANK_ACCOUNT = "No bankAccount by bankAccountId: %s";
 
     private BankAccountRepository bankAccountRepository;
-    private CustomerService customerService;
 
     public BankAccount addBankAccount(UUID customerId, BankAccountDto bankAccountDto) {
         BankAccount bankAccount = bankAccountDto.toEntity();

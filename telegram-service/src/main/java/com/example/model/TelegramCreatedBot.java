@@ -18,5 +18,6 @@ public class TelegramCreatedBot {
 
     private String botUsername;
     private String botToken;
+    private String botLink;
 
 }

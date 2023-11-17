@@ -19,16 +19,16 @@ import java.util.List;
 
 @Service
 public class FileUploadService {
-    private final Path root = Paths.get("src/main/resources/images/");
+    private final Path root = Paths.get("authentication-service/src/main/resources/images/");
 
     @Value("${image.url}")
     private String url;
 
     public Image uploadFile(MultipartFile file) throws IOException {
         String filename = System.currentTimeMillis() + "." + StringUtils.getFilenameExtension(file.getOriginalFilename());
-        if (!Files.exists(root)) {
-            Files.createDirectories(root);
-        }
+//        if (!Files.exists(root)) {
+//            Files.createDirectories(root);
+//        }
         Files.copy(file.getInputStream(), this.root.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
         return new Image(
                 filename,

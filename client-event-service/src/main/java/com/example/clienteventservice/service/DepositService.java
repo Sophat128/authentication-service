@@ -1,17 +1,16 @@
 package com.example.clienteventservice.service;
 
-import com.example.clienteventservice.domain.dto.TransactionHistoryDto;
 import com.example.clienteventservice.domain.model.BankAccount;
 import com.example.clienteventservice.domain.model.TransactionHistory;
-import com.example.clienteventservice.domain.type.StatementType;
-import com.example.clienteventservice.domain.type.TransactionType;
+import com.example.dto.TransactionHistoryDto;
+import com.example.type.StatementType;
+import com.example.type.TransactionType;
 import lombok.AllArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -37,7 +36,7 @@ public class DepositService {
 
         Message<TransactionHistoryDto> message = MessageBuilder
                 .withPayload(transactionHistory.toDto())
-                .setHeader(KafkaHeaders.TOPIC, "notification")
+                .setHeader(KafkaHeaders.TOPIC, "notification-service")
                 .build();
         System.out.println("Message: " + message);
         kafkaTemplate.send(message);

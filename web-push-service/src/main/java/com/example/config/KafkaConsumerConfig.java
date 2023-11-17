@@ -1,5 +1,6 @@
 package com.example.config;
 
+import com.example.dto.TransactionHistoryDto;
 import com.example.model.respone.TransactionResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -35,13 +36,13 @@ public class KafkaConsumerConfig {
     private String autoOffset;
 
 
-    private final KafkaTemplate<String, TransactionResponse> kafkaTemplate;
+    private final KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate;
 
-    public KafkaConsumerConfig(KafkaTemplate<String, TransactionResponse> kafkaTemplate) {
+    public KafkaConsumerConfig(KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
     @Bean
-    public ConsumerFactory<String, TransactionResponse> consumerFactory() {
+    public ConsumerFactory<String, TransactionHistoryDto> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -64,8 +65,8 @@ public class KafkaConsumerConfig {
 //    }
 
     @Bean("kafkaListenerContainerFactory")
-    public ConcurrentKafkaListenerContainerFactory<String, TransactionResponse> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, TransactionResponse> concurrentKafkaListenerContainerFactory
+    public ConcurrentKafkaListenerContainerFactory<String, TransactionHistoryDto> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, TransactionHistoryDto> concurrentKafkaListenerContainerFactory
                 = new ConcurrentKafkaListenerContainerFactory<>();
         concurrentKafkaListenerContainerFactory.setConsumerFactory(consumerFactory());
         DeadLetterPublishingRecoverer deadLetterPublishingRecoverer =

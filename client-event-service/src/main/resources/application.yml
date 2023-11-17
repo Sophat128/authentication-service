@@ -31,7 +31,7 @@ spring:
   datasource:
     url: jdbc:postgresql://8.219.131.180:8765/fintrack
     username: root
-    password: P@SSWORD666
+    password: 123
     driver-class-name: org.postgresql.Driver
 
   jpa:

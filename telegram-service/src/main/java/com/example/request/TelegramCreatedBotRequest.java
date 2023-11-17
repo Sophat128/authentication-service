@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class TelegramCreatedBotRequest {
     private String botUsername;
     private String botToken;
+    private String botLink;
 }

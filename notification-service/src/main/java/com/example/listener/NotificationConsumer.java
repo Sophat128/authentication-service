@@ -27,7 +27,7 @@ public class NotificationConsumer {
     private final KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate;
     private final WebClientConfig webClientConfig;
 
-    private static final String NOTIFICATION_TOPIC = "notification";
+    private static final String NOTIFICATION_TOPIC = "notification-service";
     private static final String TELEGRAM_TOPIC = "telegram";
     private static final String EMAIL_TOPIC = "send.email.kb";
     private static final String WEB_TOPIC = "web-notification";
@@ -38,13 +38,6 @@ public class NotificationConsumer {
         this.webClientConfig = webClientConfig;
     }
 
-    //    @RetryableTopic(
-//            attempts = "3",
-//            topicSuffixingStrategy = TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE,
-//            backoff = @Backoff(delay = 1000, maxDelay = 5_000, random = true),
-//            dltTopicSuffix = "-dead-letter"
-//    )
-
     @KafkaListener(
             topics = NOTIFICATION_TOPIC,
             groupId = "notification-consumer"
@@ -53,12 +46,16 @@ public class NotificationConsumer {
         log.info("Started consuming message on topic: {}, offset {}, message {}", notification.topic(),
                 notification.offset(), notification.value());
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String stringValue = String.valueOf(notification.value());
-        TransactionHistoryDto transactionHistoryDto = objectMapper.readValue(stringValue, TransactionHistoryDto.class);
+
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        String stringValue = String.valueOf(notification.value());
+//        TransactionHistoryDto transactionHistoryDto = objectMapper.readValue(stringValue, TransactionHistoryDto.class);
+//
+//        log.info("Started consuming message on topic: {}, offset {}, message {}", notification.topic(),
+//                notification.offset(), transactionHistoryDto);
 
         Message<TransactionHistoryDto> message = MessageBuilder
-                .withPayload(transactionHistoryDto)
+                .withPayload(notification.value())
                 .setHeader(KafkaHeaders.TOPIC, WEB_TOPIC)
                 .build();
         System.out.println("Message: " + message);
@@ -66,9 +63,9 @@ public class NotificationConsumer {
 
 
 
-        String userId = String.valueOf(transactionHistoryDto.getCustomerId());
+        String userId = String.valueOf(notification.value().getCustomerId());
         Message<TransactionHistoryDto> messages = MessageBuilder
-                .withPayload(transactionHistoryDto)
+                .withPayload(notification.value())
                 .setHeader(KafkaHeaders.TOPIC, EMAIL_TOPIC)
                 .build();
         System.out.println("Message: " + messages);

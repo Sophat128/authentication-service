@@ -1,9 +1,10 @@
 package com.example.webpush;
 
-import com.example.model.entities.WebDataConfig;
+import com.example.dto.TransactionHistoryDto;
 import com.example.model.request.PushNotificationRequest;
 import com.example.model.entities.UserSubscription;
-import com.example.model.respone.TransactionResponse;
+import com.example.model.request.WebConfigRequest;
+import com.example.repository.WebConfigRepository;
 import com.example.repository.WebRepository;
 import com.example.service.WebService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,58 +27,48 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.Security;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 @Service
 @Slf4j
 public class WebPushService {
 
-    //    @Value("${vapid.public.key}")
-//    private String publicKey;
-//    @Value("${vapid.private.key}")
-//    private String privateKey;
-//    @Value("${vapid.subject}")
-//    private String subject;
     private final WebService webService;
     private PushService pushService;
+
     private final Logger logger = LoggerFactory.getLogger(WebPushService.class);
 
-    private final Map<String, Subscription> endpointToSubscription = new HashMap<>();
     private final WebRepository webRepository;
+    private final WebConfigRepository webConfigRepository;
 
-    public WebPushService(WebService webService, WebRepository webRepository) {
+    @Value("${vapid.private.key}")
+    private String PRIVATE_KEY;
+    @Value("${vapid.public.key}")
+    private String PUBLIC_KEY;
+
+    public WebPushService(WebService webService, WebRepository webRepository, WebConfigRepository webConfigRepository) {
         this.webService = webService;
         this.webRepository = webRepository;
+        this.webConfigRepository = webConfigRepository;
     }
 
     @PostConstruct
     private void init() throws GeneralSecurityException {
-        WebDataConfig webDataConfig = new WebDataConfig();
-        String subject = "http://localhost:64114";
-        try {
-            webDataConfig = webService.getConfig();
-            Security.addProvider(new BouncyCastleProvider());
-            pushService = new PushService(webDataConfig.getPublicKey(), webDataConfig.getPrivateKey(), subject);
 
+        WebConfigRequest webDataConfig = new WebConfigRequest(PRIVATE_KEY, PUBLIC_KEY);
+        if (!(webConfigRepository.findAll().size() > 0)) {
+            webService.addConfig(webDataConfig);
+        }
+        try {
+            Security.addProvider(new BouncyCastleProvider());
+            pushService = new PushService(webDataConfig.getPublicKey(), webDataConfig.getPrivateKey());
         } catch (Exception e) {
             System.out.println(e.getMessage());
             logger.error("Error initializing PushService: " + e.getMessage(), e);
         }
 
     }
-
-//    public void reinitializeConfig() throws GeneralSecurityException {
-//        WebDataConfig webDataConfig = webService.getConfig();
-//        Security.addProvider(new BouncyCastleProvider());
-//        pushService = new PushService(webDataConfig.getPublicKey(), webDataConfig.getPrivateKey());
-//    }
-//    public String getPublicKey() {
-//        return publicKey;
-//    }
 
     public void sendNotification(Subscription subscription, String messageJson) {
         try {
@@ -100,19 +91,14 @@ public class WebPushService {
         return webRepository.findAll();
     }
 
-    public void clearAllSubscription() {
-        endpointToSubscription.clear();
-    }
 
     public void subscribe(Subscription subscription, String userId) {
         System.out.println("Subscribed to " + subscription.endpoint);
         System.out.println("auth to " + subscription.keys.auth);
         System.out.println("p256dh to " + subscription.keys.p256dh);
-//        The userId should be get from web application but I just give the default
         UserSubscription userSubscription = new UserSubscription(subscription.endpoint, subscription.keys.auth, subscription.keys.p256dh, userId);
         webRepository.save(userSubscription);
 
-        endpointToSubscription.put(subscription.endpoint, subscription);
     }
 
     public void unsubscribe(String endpoint) {
@@ -121,7 +107,7 @@ public class WebPushService {
         System.out.println("Unsubscribed " + subscriptionPrefix + endpoint);
     }
 
-    public record Message(String title, String body){
+    public record Message(String title, TransactionHistoryDto body) {
     }
 
     ObjectMapper mapper = new ObjectMapper();

@@ -1,12 +1,13 @@
 package com.example.clienteventservice.service.implementation;
 
-import com.example.clienteventservice.domain.model.Subscription;
 import com.example.clienteventservice.repository.SubscriptionRepository;
+import com.example.clienteventservice.domain.model.Subscription;
 import com.example.clienteventservice.service.SubscriptionService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -30,5 +31,14 @@ public class SubscriptionServiceImp implements SubscriptionService {
 //        }
 
         return subscriptions;
+    }
+
+
+    @Override
+    public Subscription saveTelegramNotificationByUserId(UUID userId, String notificationType) {
+        Subscription subscription = new Subscription();
+        subscription.setUserId(String.valueOf(userId));
+        subscription.setNotificationType(notificationType);
+        return subscriptionRepository.save(subscription);
     }
 }

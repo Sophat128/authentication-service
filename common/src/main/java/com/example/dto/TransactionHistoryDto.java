@@ -1,8 +1,8 @@
 package com.example.dto;
 
-import com.example.clienteventservice.domain.type.TransactionType;
 import com.example.type.StatementType;
 import com.example.type.TransactionStatus;
+import com.example.type.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -19,7 +19,6 @@ public class RetryMessageListener {
         log.info("Started consuming message on topic: {}, offset {}, message {}", consumerRecord.topic(),
                 consumerRecord.offset(), consumerRecord.value());
 
-
 //        if(consumerRecord.offset() % 2 != 0) throw new IllegalStateException("This is something odd.");
 
         try {

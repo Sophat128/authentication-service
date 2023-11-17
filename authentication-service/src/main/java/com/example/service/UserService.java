@@ -78,17 +78,6 @@ public class UserService {
         this.restTemplate = restTemplate;
     }
 
-
-    public ApiResponse<?> sendMessage(String message, Jwt jwt) {
-        return webClient.baseUrl(telegramUrl + "/send-message")
-                .defaultHeaders(httpHeaders -> httpHeaders.setBearerAuth(jwt.getTokenValue()))
-                .build()
-                .post()
-                .uri("?message=" + message)
-                .retrieve()
-                .bodyToMono(ApiResponse.class).block();
-    }
-
     public ApiResponse<LoginResponse> login(LoginRequest loginrequest) {
         UserRepresentation userRepresentation = getUserRepresentationByEmail(loginrequest.getEmail());
         if (!Boolean.parseBoolean(userRepresentation.getAttributes().get("isVerify").get(0))) {
@@ -426,7 +415,6 @@ public class UserService {
             UserRepresentation userRepresentation = prepareUserRepresentationForProfile(user, userRequest);
             UsersResource userResource = keycloak.realm(realm).users();
             userResource.get(user.getId()).update(userRepresentation);
-            sendMessage("you have been update your information already", jwt);
             return ApiResponse.builder()
                     .message("update user by id success")
                     .payload(User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url))

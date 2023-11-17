@@ -103,10 +103,10 @@ public class WebPushController {
         }
     }
 
-    @PutMapping("/updateConfig/{id}")
-    public ResponseEntity<?> updateConfig(@RequestBody WebConfigRequest webConfigRequest, @PathVariable UUID id) {
+    @PutMapping("/updateConfig")
+    public ResponseEntity<?> updateConfig(@RequestBody WebConfigRequest webConfigRequest) {
         try {
-            WebDataConfig webDataConfig = webService.updateConfig(id, webConfigRequest);
+            WebDataConfig webDataConfig = webService.updateConfig(webService.getConfig().getId(), webConfigRequest);
             ApiResponse<?> data = new ApiResponse<>("Update configuration successfully", HttpStatus.OK.value(), webDataConfig);
             return ResponseEntity.ok(data);
         } catch (Exception e) {

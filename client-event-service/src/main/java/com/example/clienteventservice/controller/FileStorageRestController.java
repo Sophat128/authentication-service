@@ -55,8 +55,6 @@ public class FileStorageRestController {
             throw new NotFoundException("file name :" + fileName + "is not found");
         }
     }
-
-
     @GetMapping("/download-image")
     @Operation(summary = "Download Image")
     public ResponseEntity<Resource> downloadImage(
