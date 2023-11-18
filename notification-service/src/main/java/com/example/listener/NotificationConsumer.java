@@ -1,6 +1,7 @@
 package com.example.listener;
 
 import com.example.config.WebClientConfig;
+import com.example.dto.ScheduleDto;
 import com.example.dto.TransactionHistoryDto;
 import com.example.response.ApiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -37,9 +38,11 @@ public class NotificationConsumer {
     private static final String NOTIFICATION_TOPIC_SCHEDULE = "notification-service-schedule";
     private static final String WEB_TOPIC_SCHEDULE = "web-service-schedule";
 
+    private static final String TELEGRAM_TOPIC_SCHEDULE = "telegram-schedule";
+    private static final String EMAIL_TOPIC_SCHEDULE = "send.email.kb.schedule";
 
     private static final String TELEGRAM_TOPIC = "telegram";
-    private static final String EMAIL_TOPIC = "send.email.kb";
+    private static final String EMAIL_TOPIC = "kb-email-service";
     private static final String WEB_TOPIC = "web-notification-service";
     private static final Logger LOGGER = LogManager.getLogger(NotificationConsumer.class);
 
@@ -134,6 +137,81 @@ public class NotificationConsumer {
         System.out.println("Message: " + messages);
         kafkaTemplateSchedule.send(messages);
 //        webPushService.notifySpecificUserWithSchedule(commandsRecord.value());
+        ScheduleDto scheduleDto = parseScheduleDto(commandsRecord.value());
+
+        Message<String> messagesEmail = MessageBuilder
+                .withPayload(commandsRecord.value())
+                .setHeader(KafkaHeaders.TOPIC, EMAIL_TOPIC_SCHEDULE)
+                .build();
+        System.out.println("Message: " + messagesEmail);
+        kafkaTemplateSchedule.send(messagesEmail);
+
+
+        if (!scheduleDto.getUserId().equals("null")){
+
+            String subscriptionUrl = "http://client-event-service/api/v1/clients/get-notification";
+            WebClient web = webClientConfig.webClientBuilder().baseUrl(subscriptionUrl).build();
+
+            ApiResponse<List<Map<String, Object>>> subscriptionDtos = web.get()
+                    .uri("/{userId}", scheduleDto.getUserId())
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<ApiResponse<List<Map<String, Object>>>>() {
+                    })
+                    .block();
+
+            assert subscriptionDtos != null;
+            List<Map<String, Object>> payload = subscriptionDtos.getPayload();
+            List<String> notificationTypes = payload.stream()
+                    .map(subscription -> (String) subscription.get("notificationType"))
+                    .toList();
+
+            System.out.println("Notification: " + notificationTypes);
+
+            for (String type : notificationTypes) {
+                System.out.println("Type: " + type);
+                log.info("Processing notificationType: {}", type);
+                if (type.equals("TELEGRAM")) {
+                    kafkaTemplateSchedule.send(TELEGRAM_TOPIC_SCHEDULE, commandsRecord.key(), commandsRecord.value());
+                    log.info("Sent message to TELEGRAM_TOPIC: {}", commandsRecord.value());
+//            } else if (type.equals("EMAIL")) {
+//                kafkaTemplate.send(EMAIL_TOPIC, notification.key(), notification.value());
+//                log.info("Sent message to EMAIL_TOPIC: {}", notification.value());
+                } else {
+                    log.info("this userId doesn't have subscribe telegram or email notification types!");
+                }
+            }
+        }
+
+
+    }
+
+    private ScheduleDto parseScheduleDto(String input) {
+        String userId = null;
+        String message = null;
+
+        String[] keyValuePairs = input.substring(input.indexOf("(") + 1, input.indexOf(")")).split(",\\s*");
+
+        for (String pair : keyValuePairs) {
+            String[] keyValue = pair.split("=");
+
+            if (keyValue.length == 2) {
+                String key = keyValue[0].trim();
+                String value = keyValue[1].trim();
+
+                if ("userId".equals(key)) {
+                    userId = value;
+                } else if ("message".equals(key)) {
+                    message = value;
+                }
+            }
+        }
+
+        if (userId != null && message != null) {
+            // Assuming userId is a valid UUID string
+            return new ScheduleDto(userId, message);
+        } else {
+            return null;
+        }
     }
 
 
