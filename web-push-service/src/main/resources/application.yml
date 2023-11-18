@@ -12,9 +12,12 @@ spring:
 
 
   datasource:
-    url: jdbc:postgresql://8.219.131.180:8765/fintrack
-    username: root
-    password: P@SSWORD666
+    url: jdbc:postgresql://localhost:33007/mini_project_db
+    username: my_user
+    password: my_password
+#    url: jdbc:postgresql://8.219.131.180:8765/fintrack
+#    username: root
+#    password: P@SSWORD666
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

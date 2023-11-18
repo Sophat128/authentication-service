@@ -47,7 +47,7 @@ public class DepositService {
 
             Message<TransactionHistoryDto> message = MessageBuilder
                     .withPayload(transactionHistory.toDto())
-                    .setHeader(KafkaHeaders.TOPIC, "notification")
+                    .setHeader(KafkaHeaders.TOPIC, "notification-service")
                     .build();
             kafkaTemplate.send(message);
 

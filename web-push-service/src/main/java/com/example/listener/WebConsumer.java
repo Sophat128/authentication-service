@@ -40,10 +40,10 @@ public class WebConsumer {
         PushNotificationRequest pushNotificationRequest = new PushNotificationRequest("Transaction", commandsRecord.value());
         System.out.println("pushNotificationRequest: " + pushNotificationRequest);
 
-        BankAccountResponse customerInfo = webService.getCustomerInfoByBankAccountNo(commandsRecord.value().getBankAccountNumber());
-        System.out.println("customerInfo: " + customerInfo);
+//        BankAccountResponse customerInfo = webService.getCustomerInfoByBankAccountNo(commandsRecord.value().getBankAccountNumber());
+//        System.out.println("customerInfo: " + customerInfo);
 //
-        webPushService.notifySpecificUser(pushNotificationRequest, customerInfo.getCustomerId());
+        webPushService.notifySpecificUser(pushNotificationRequest, commandsRecord.value().getCustomerId().toString());
     }
 
     @KafkaListener(topics = "${kafka.topics.schedule}")
@@ -53,9 +53,9 @@ public class WebConsumer {
         System.out.println("Receive Data: " + commandsRecord.value());
         System.out.println("pushNotificationRequest: " + commandsRecord.value());
         ScheduleDto scheduleDto = parseScheduleDto(commandsRecord.value());
-        System.out.println("Converted data: " + scheduleDto);
+        System.out.println("Converted data: " + scheduleDto.getUserId());
         System.out.println("Converted data field: " + scheduleDto.getMessage());
-        if(scheduleDto.getUserId() == null){
+        if(scheduleDto.getUserId().equals("null")){
             System.out.println("Send to all user");
             webPushService.notifyAll(scheduleDto);
         }

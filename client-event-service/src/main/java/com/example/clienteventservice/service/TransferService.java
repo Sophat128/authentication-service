@@ -93,7 +93,7 @@ public class TransferService {
     private void sendTransactionNotification(TransactionHistory history) {
         Message<TransactionHistoryDto> message = MessageBuilder
                 .withPayload(history.toDto())
-                .setHeader(KafkaHeaders.TOPIC, "notification")
+                .setHeader(KafkaHeaders.TOPIC, "notification-service")
                 .build();
         kafkaTemplate.send(message);
 
