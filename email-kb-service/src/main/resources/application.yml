@@ -48,4 +48,8 @@ kafka:
   topics:
     data: kb-email-service
 Base:
-  url: http://localhost:8081/api/v1/
+  url: http://localhost:8088/api/v1/
+
+smtp:
+  username: soccerdatehrd@gmail.com
+  password: tmkylzbkhzsautkz

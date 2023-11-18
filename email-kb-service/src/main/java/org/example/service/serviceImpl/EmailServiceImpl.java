@@ -1,11 +1,11 @@
 package org.example.service.serviceImpl;
 
 import com.example.dto.UserDto;
+import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import org.example.exception.BadRequestException;
-import org.example.exception.ForbiddenException;
 import org.example.exception.NotFoundException;
 import org.example.model.Email;
 import org.example.model.Smtp;
@@ -14,6 +14,7 @@ import org.example.model.request.SmtpRequest;
 import org.example.repository.EmailKbServiceRepository;
 import org.example.service.EmailKbService;
 import org.example.service.MailSenderFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -23,9 +24,8 @@ import org.thymeleaf.context.Context;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 
@@ -41,14 +41,31 @@ public class EmailServiceImpl implements EmailKbService {
         this.webClient = webClient;
     }
 
+    @Value("${smtp.username}")
+    private String smtpUsername;
+    @Value("${smtp.password}")
+    private String smtpPassword;
 
-    public UserDto getUserById(UUID userId) {
-        return webClient.get()
-                .uri("/users/{userId}", userId)
-                .retrieve()
-                .bodyToMono(UserDto.class)
-                .block();
+    @PostConstruct
+    public void init(){
+        if(emailKbServiceRepository.findAll().isEmpty()){
+            Smtp smtp = new Smtp();
+            smtp.setUsername(smtpUsername);
+            smtp.setPassword(smtpPassword);
+            emailKbServiceRepository.save(smtp);
+        }else{
+            System.out.println("already add it ");
+        }
     }
+
+
+//    public UserDto getUserById(UUID userId) {
+//        return webClient.get()
+//                .uri("/users/{userId}", userId)
+//                .retrieve()
+//                .bodyToMono(UserDto.class)
+//                .block();
+//    }
 
 
     @Override
@@ -83,59 +100,71 @@ public class EmailServiceImpl implements EmailKbService {
 
 
 
+//    @Override
+//    public SmtpDto configEmail(SmtpRequest smtpRequest) {
+//
+//        if (smtpRequest.getUsername().isBlank() || smtpRequest.getUsername().isEmpty()) {
+//            throw new BadRequestException("Field username can't be blank");
+//        }
+//
+//        if (!smtpRequest.getUsername().matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,6}")) {
+//            throw new BadRequestException("Username should be like this -> something@something.com");
+//        }
+//
+//        if (smtpRequest.getPassword().isBlank() || smtpRequest.getPassword().isEmpty()) {
+//            throw new BadRequestException("Field password can't be blank");
+//        }
+//        Smtp smtp = new Smtp();
+//        smtp.setUsername(smtpRequest.getUsername());
+//        smtp.setPassword(smtpRequest.getPassword());
+//        emailKbServiceRepository.save(smtp) ;
+//        SmtpDto smtpDto = new SmtpDto();
+//        smtpDto.setId(smtp.getId());
+//        smtpDto.setUsername(smtp.getUsername());
+//        return smtpDto;
+//    }
 
     @Override
-    public SmtpDto configEmail(SmtpRequest smtpRequest, Principal principal) {
-        if(principal == null){
-            throw new ForbiddenException("Need Token");
-        }
-        UUID userId = UUID.fromString(principal.getName());
-        if (smtpRequest.getUsername().isBlank() || smtpRequest.getUsername().isEmpty()) {
-            throw new BadRequestException("Field Email can't be blank");
-        }
-
-        if (!smtpRequest.getUsername().matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,6}")) {
-            throw new BadRequestException("Email should be like this -> something@something.com");
-        }
-
-        if (smtpRequest.getPassword().isBlank() || smtpRequest.getPassword().isEmpty()) {
-            throw new BadRequestException("Field password can't be blank");
-        }
-        Smtp smtp = new Smtp();
-        smtp.setUsername(smtpRequest.getUsername());
-        smtp.setPassword(smtpRequest.getPassword());
-        smtp.setUserId(userId);
-        emailKbServiceRepository.save(smtp) ;
-        SmtpDto smtpDto = new SmtpDto();
-        UserDto userById =getUserById(userId);
-        smtpDto.setId(smtp.getId());
-        smtpDto.setUsername(smtp.getUsername());
-        smtpDto.setUserDto(userById);
-        return smtpDto;
-    }
-
-    @Override
-    public String updateConfigEmail(Long id, SmtpRequest smtpRequest,Principal principal) {
-        UUID userId = UUID.fromString(principal.getName());
-        Smtp smtp = emailKbServiceRepository.findIdandUserId(id,userId);
-        if (smtp != null){
+    public String updateConfigEmail(SmtpRequest smtpRequest) {
+        List<Smtp> smtp = emailKbServiceRepository.findAll();
+        try {
+            Smtp smtpUpdate = smtp.get(0);
             if (smtpRequest.getUsername().isBlank() || smtpRequest.getUsername().isEmpty()) {
-                throw new BadRequestException("Field Email can't be blank");
+                throw new BadRequestException("Field username can't be blank");
             }
 
             if (!smtpRequest.getUsername().matches("[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\\.[A-Za-z]{2,6}")) {
-                throw new BadRequestException("Email should be like this -> something@something.com");
+                throw new BadRequestException("Username should be like this -> something@something.com");
             }
 
             if (smtpRequest.getPassword().isBlank() || smtpRequest.getPassword().isEmpty()) {
                 throw new BadRequestException("Field password can't be blank");
             }
-            smtp.setUsername(smtpRequest.getUsername());
-            smtp.setPassword(smtpRequest.getPassword());
-            emailKbServiceRepository.save(smtp);
+            smtpUpdate.setUsername(smtpRequest.getUsername());
+            smtpUpdate.setPassword(smtpRequest.getPassword());
+            emailKbServiceRepository.save(smtpUpdate);
             return "successfully update smtp";
-        }else{
-            throw new NotFoundException("Config Id is not found");
+        }catch (Exception e){
+            throw new NotFoundException("Config is not create yet");
         }
     }
+
+    @Override
+    public List<SmtpDto> getConfigEmail() {
+        List<Smtp> smtpList = emailKbServiceRepository.findAll();
+        List<SmtpDto> smtpDtoList = new ArrayList<>();
+
+        if (!smtpList.isEmpty()) {
+            Smtp smtp = smtpList.get(0);
+
+            SmtpDto smtpDto = new SmtpDto();
+            smtpDto.setId(smtp.getId());
+            smtpDto.setUsername(smtp.getUsername());
+            smtpDtoList.add(smtpDto);
+        }
+
+        return smtpDtoList;
+    }
+
+
 }

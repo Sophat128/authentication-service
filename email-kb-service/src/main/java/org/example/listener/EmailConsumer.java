@@ -27,17 +27,17 @@ import java.util.*;
 public class EmailConsumer {
     private static final Logger LOGGER = LogManager.getLogger(EmailConsumer.class);
     private final EmailKbService emailKbService;
-    private final WebClient webClient;
+    private final WebClient.Builder webClient;
     private static final String EMAIL_TOPIC_SCHEDULE = "send.email.kb.schedule";
 
 
-    public EmailConsumer(EmailKbService emailKbService, WebClient webClient) {
+    public EmailConsumer(EmailKbService emailKbService, WebClient.Builder webClient) {
         this.emailKbService = emailKbService;
         this.webClient = webClient;
     }
 
     public UserDtoClient getCustomerId(UUID customerId) {
-        return webClient.get()
+        return webClient.build().get()
                 .uri("http://localhost:8088/api/v1/customers/{customerId}", customerId)
                 .retrieve()
                 .bodyToMono(UserDtoClient.class)
@@ -188,6 +188,8 @@ public class EmailConsumer {
         ScheduleDto scheduleDto = parseScheduleDto(commandsRecord.value());
 
         UUID customerId = UUID.fromString(scheduleDto.getUserId());
+        System.out.println("uuid: " + customerId);
+        System.out.println("String id: " + scheduleDto.getUserId());
         UserDtoClient userDtoClient = getCustomerId(customerId);
         System.out.println(userDtoClient.getEmail());
 
