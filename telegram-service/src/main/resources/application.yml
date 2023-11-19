@@ -16,9 +16,12 @@ spring:
 
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/demo_telegram_bot
-    username: postgres
-    password: krya
+    url: jdbc:postgresql://8.219.131.180:8765/fintrack
+    username: root
+    password: P@SSWORD666
+#    url: jdbc:postgresql://localhost:5432/demo_telegram_bot
+#    username: postgres
+#    password: krya
     driver-class-name: org.postgresql.Driver
   security:
     oauth2:

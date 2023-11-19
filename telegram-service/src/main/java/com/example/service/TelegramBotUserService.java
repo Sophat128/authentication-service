@@ -5,6 +5,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.config.TelegramUserConfig;
 import com.example.config.WebClientConfig;
+import com.example.dto.ScheduleDto;
 import com.example.model.BalanceDto;
 import com.example.dto.TransactionHistoryDto;
 import com.example.dto.UserDtoClient;
@@ -326,6 +327,22 @@ public class TelegramBotUserService extends TelegramLongPollingBot {
         }
     }
 
+
+
+    public void sendTextMessageSchedule(Long chatId, ScheduleDto scheduleDto) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        TransactionHistoryDto transactionHistoryDto = new TransactionHistoryDto();
+        UUID customerId = UUID.fromString(scheduleDto.getUserId());
+        transactionHistoryDto.setCustomerId(customerId);
+        sendMessage.setText(scheduleDto.getMessage());
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
     private String getFirstName(TransactionHistoryDto transactionHistoryDto) {
         UUID userId = transactionHistoryDto.getCustomerId();
 
@@ -370,22 +387,17 @@ public class TelegramBotUserService extends TelegramLongPollingBot {
         String receiverAccountNumber = transactionHistoryDto.getReceivedAccountNumber();
         String senderAccountNumber = transactionHistoryDto.getBankAccountNumber();
 
-        switch (transactionHistoryDto.getType()) {
-            case WITHDRAW:
-                return buildWithdrawMessage(firstName, lastName, emojiHeart, emojiThanks, emojiCheckmark, emojiKey, emojiDollar, amount, fromAccountNumber);
-
-            case SENDER:
-                return buildSenderMessage(firstName, lastName, emojiHeart, emojiThanks, emojiCheckmark, emojiKey, emojiDollar, amount, senderAccountNumber, receiverAccountNumber);
-
-            case RECEIVER:
-                return buildReceiverMessage(firstName, lastName, emojiHeart, emojiThanks, emojiCheckmark, emojiKey, emojiDollar, amount, senderAccountNumber, receiverAccountNumber);
-
-            case DEPOSIT:
-                return buildDepositMessage(firstName, lastName, emojiHeart, emojiThanks, emojiCheckmark, emojiKey, emojiDollar, amount, fromAccountNumber);
-
-            default:
-                return "";
-        }
+        return switch (transactionHistoryDto.getType()) {
+            case WITHDRAW ->
+                    buildWithdrawMessage(firstName, lastName, emojiHeart, emojiThanks, emojiCheckmark, emojiKey, emojiDollar, amount, fromAccountNumber);
+            case SENDER ->
+                    buildSenderMessage(firstName, lastName, emojiHeart, emojiThanks, emojiCheckmark, emojiKey, emojiDollar, amount, senderAccountNumber, receiverAccountNumber);
+            case RECEIVER ->
+                    buildReceiverMessage(firstName, lastName, emojiHeart, emojiThanks, emojiCheckmark, emojiKey, emojiDollar, amount, senderAccountNumber, receiverAccountNumber);
+            case DEPOSIT ->
+                    buildDepositMessage(firstName, lastName, emojiHeart, emojiThanks, emojiCheckmark, emojiKey, emojiDollar, amount, fromAccountNumber);
+            default -> "";
+        };
     }
 
     private String buildWithdrawMessage(String firstName, String lastName, String emojiHeart, String emojiThanks, String emojiCheckmark, String emojiKey, String emojiDollar,

@@ -219,9 +219,6 @@ public class EmailConsumer {
 
         ScheduleDto scheduleDto = parseScheduleDto(commandsRecord.value());
 
-
-
-
         if (!scheduleDto.getUserId().equals("null")) {
             UUID customerId = UUID.fromString(scheduleDto.getUserId());
             System.out.println("uuid: " + customerId);
@@ -239,7 +236,6 @@ public class EmailConsumer {
             }
         }
     }
-
     private void sendEmailToCustomer(UserDtoClient userDtoClient, ScheduleDto scheduleDto) throws MessagingException, IOException {
         List<String> recipients = Collections.singletonList(userDtoClient.getEmail());
 
@@ -263,8 +259,6 @@ public class EmailConsumer {
         emailKbService.sendConfirmationEmail(email);
         LOGGER.log(Level.INFO, () -> " »» Mail sent successfully");
     }
-
-
     private ScheduleDto parseScheduleDto(String input) {
         String userId = null;
         String message = null;

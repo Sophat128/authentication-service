@@ -19,7 +19,6 @@ public class WebDataConfig {
     private UUID id;
     private String privateKey;
     private String publicKey;
-
     public WebDataConfig(String privateKey, String publicKey) {
         this.privateKey = privateKey;
         this.publicKey = publicKey;

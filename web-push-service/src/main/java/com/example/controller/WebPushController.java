@@ -32,16 +32,15 @@ public class WebPushController {
     private final WebPushService webPushService;
     private final WebService webService;
 
-    @GetMapping("/publicKey")
+    @GetMapping("/vapidKeys")
     public ResponseEntity<?> getPublicKey() {
         try {
-            ApiResponse<?> data = new ApiResponse<>("publicKey", HttpStatus.OK.value(), webService.getConfig().getPublicKey());
+            ApiResponse<?> data = new ApiResponse<>("publicKey", HttpStatus.OK.value(), webService.getConfig());
             return ResponseEntity.ok(data);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to get Public key " + e.getMessage());
         }
     }
-
 
 
     @PostMapping("/subscribe/{userId}")
@@ -51,6 +50,8 @@ public class WebPushController {
             ApiResponse<?> data = new ApiResponse<>("Subscribe successfully", HttpStatus.OK.value());
             return ResponseEntity.ok(data);
         } catch (Exception e) {
+            ApiResponse<?> data = new ApiResponse<>("Failed to subscribe", HttpStatus.MULTI_STATUS.value());
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to subscribe " + e.getMessage());
         }
     }
