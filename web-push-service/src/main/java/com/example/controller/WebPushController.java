@@ -10,14 +10,20 @@ import com.example.service.WebService;
 import com.example.webpush.WebPushService;
 import lombok.AllArgsConstructor;
 import nl.martijndwars.webpush.Subscription;
+import nl.martijndwars.webpush.Utils;
+import org.jose4j.lang.JoseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.service.annotation.PutExchange;
 
 import java.security.GeneralSecurityException;
-import java.util.List;
-import java.util.UUID;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.util.*;
 
 @RestController
 @AllArgsConstructor
@@ -35,6 +41,8 @@ public class WebPushController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to get Public key " + e.getMessage());
         }
     }
+
+
 
     @PostMapping("/subscribe/{userId}")
     public ResponseEntity<?> subscribe(@RequestBody Subscription subscription, @PathVariable String userId) {
@@ -90,7 +98,6 @@ public class WebPushController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to alert to a subscriber " + e.getMessage());
         }
-
     }
 
     @PostMapping("/addConfig")
