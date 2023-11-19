@@ -59,7 +59,6 @@ public class WebConsumer {
             System.out.println("Send to all user");
             webPushService.notifyAll(scheduleDto);
         }
-
         webPushService.notifySpecificUserWithSchedule(scheduleDto);
     }
 

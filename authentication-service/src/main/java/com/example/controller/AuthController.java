@@ -12,6 +12,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 @RestController
 @RequestMapping("api/v1/auth")
+@CrossOrigin
 public class AuthController {
     private final UserService userService;
 
