@@ -219,12 +219,28 @@ public class EmailConsumer {
 
         ScheduleDto scheduleDto = parseScheduleDto(commandsRecord.value());
 
-        UUID customerId = UUID.fromString(scheduleDto.getUserId());
-        System.out.println("uuid: " + customerId);
-        System.out.println("String id: " + scheduleDto.getUserId());
-        UserDtoClient userDtoClient = getCustomerId(customerId);
-        System.out.println(userDtoClient.getEmail());
 
+
+
+        if (!scheduleDto.getUserId().equals("null")) {
+            UUID customerId = UUID.fromString(scheduleDto.getUserId());
+            System.out.println("uuid: " + customerId);
+            System.out.println("String id: " + scheduleDto.getUserId());
+            UserDtoClient userDtoClient = getCustomerId(customerId);
+            System.out.println(userDtoClient.getEmail());
+
+            sendEmailToCustomer(userDtoClient, scheduleDto);
+
+        } else {
+            List<UserDtoClient> allCustomers = getAllCustomers();
+
+            for (UserDtoClient userDtoClient : allCustomers) {
+                sendEmailToCustomer(userDtoClient, scheduleDto);
+            }
+        }
+    }
+
+    private void sendEmailToCustomer(UserDtoClient userDtoClient, ScheduleDto scheduleDto) throws MessagingException, IOException {
         List<String> recipients = Collections.singletonList(userDtoClient.getEmail());
 
         String subject = "KB Prasac Bank Information";
@@ -247,6 +263,7 @@ public class EmailConsumer {
         emailKbService.sendConfirmationEmail(email);
         LOGGER.log(Level.INFO, () -> " »» Mail sent successfully");
     }
+
 
     private ScheduleDto parseScheduleDto(String input) {
         String userId = null;
