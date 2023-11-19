@@ -2,6 +2,7 @@ package org.example.listener;
 
 import com.example.dto.ScheduleDto;
 import com.example.dto.UserDtoClient;
+import com.example.response.ApiResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -15,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.model.Email;
 import org.example.service.EmailKbService;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -22,6 +24,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class EmailConsumer {
@@ -40,8 +43,24 @@ public class EmailConsumer {
         return webClient.build().get()
                 .uri("http://localhost:8088/api/v1/customers/{customerId}", customerId)
                 .retrieve()
-                .bodyToMono(UserDtoClient.class)
+                .bodyToMono(new ParameterizedTypeReference<ApiResponse<UserDtoClient>>() {})
+                .block()
+                .getPayload();
+    }
+
+    public List<UserDtoClient> getAllCustomers() {
+        ApiResponse<List<UserDtoClient>> response = webClient.build().get()
+                .uri("http://localhost:8088/api/v1/customers")
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<ApiResponse<List<UserDtoClient>>>() {})
                 .block();
+
+        if (response != null) {
+            return response.getPayload();
+        } else {
+            // Handle the case when the response is null or contains an error
+            return Collections.emptyList(); // Or throw an exception, log an error, etc.
+        }
     }
 
 
@@ -136,17 +155,30 @@ public class EmailConsumer {
         String from = object.getAsJsonObject().get("from").getAsString();
         from = from.replaceAll("\\s", "");
         String content = object.getAsJsonObject().get("content").getAsString();
-        JsonArray toList = object.getAsJsonObject().getAsJsonArray("to");
-        List<String> recipients = new ArrayList<>();
-        for (JsonElement element : toList) {
-            recipients.add(element.getAsString());
+//        JsonArray toList = object.getAsJsonObject().getAsJsonArray("to");
+        List<String> dynamicRecipients;
+
+        if (object.getAsJsonObject().has("to")) {
+            JsonArray toList = object.getAsJsonObject().getAsJsonArray("to");
+            dynamicRecipients = new ArrayList<>();
+            for (JsonElement element : toList) {
+                dynamicRecipients.add(element.getAsString());
+            }
+        } else {
+            List<UserDtoClient> allCustomers = getAllCustomers();
+            dynamicRecipients = allCustomers.stream()
+                    .map(UserDtoClient::getEmail)
+                    .collect(Collectors.toList());
         }
+
+        List<String> allRecipients = new ArrayList<>(dynamicRecipients);
+
 
         Map<String, Object> props = new HashMap<>();
         props.put("name", "Sophat");
         props.put("subscriptionDate", new Date());
         Email email = Email.builder()
-                .withTo(recipients)
+                .withTo(allRecipients)
                 .withFrom(from.trim())
                 .withContent(content)
                 .withSubject(subject)
