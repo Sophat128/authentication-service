@@ -1,7 +1,6 @@
 package org.example.model;
 
 
-import com.example.dto.UserDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

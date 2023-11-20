@@ -1,6 +1,5 @@
 package org.example.service.serviceImpl;
 
-import com.example.dto.UserDto;
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
