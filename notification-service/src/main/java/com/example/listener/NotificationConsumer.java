@@ -59,19 +59,33 @@ public class NotificationConsumer {
             topics = NOTIFICATION_TOPIC,
             groupId = "notification-consumer"
     )
-    void listener(ConsumerRecord<String, TransactionHistoryDto> notification) throws JsonProcessingException {
+    void listener(ConsumerRecord<String, String> notification) throws JsonProcessingException {
         log.info("Started consuming message on topic: {}, offset {}, message {}", notification.topic(),
                 notification.offset(), notification.value());
 
 
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        String stringValue = String.valueOf(notification.value());
-//        TransactionHistoryDto transactionHistoryDto = objectMapper.readValue(stringValue, TransactionHistoryDto.class);
-//
-//        log.info("Started consuming message on topic: {}, offset {}, message {}", notification.topic(),
-//                notification.offset(), transactionHistoryDto);
+        // Remove "TransactionHistory(" and ")" to get valid JSON
+        String jsonString = notification.value().replaceAll("TransactionHistoryDto\\(|\\)", "");
+        System.out.println("Converted: " + jsonString);
 
-        Message<TransactionHistoryDto> message = MessageBuilder
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        TransactionHistoryDto transactionHistoryDto = new TransactionHistoryDto();
+        try {
+            // Deserialize the JSON string into a TransactionHistory object
+            transactionHistoryDto = objectMapper.readValue(jsonString, TransactionHistoryDto.class);
+
+            // Now you can use the transactionHistory object
+            System.out.println(transactionHistoryDto);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        log.info("Started consuming message on topic: {}, offset {}, message {}", notification.topic(),
+                notification.offset(), transactionHistoryDto);
+
+        Message<String> message = MessageBuilder
                 .withPayload(notification.value())
                 .setHeader(KafkaHeaders.TOPIC, WEB_TOPIC)
                 .build();
@@ -80,9 +94,9 @@ public class NotificationConsumer {
 
 
 
-        String userId = String.valueOf(notification.value().getCustomerId());
+        String userId = String.valueOf(transactionHistoryDto.getCustomerId());
         Message<TransactionHistoryDto> messages = MessageBuilder
-                .withPayload(notification.value())
+                .withPayload(transactionHistoryDto)
                 .setHeader(KafkaHeaders.TOPIC, EMAIL_TOPIC)
                 .build();
         System.out.println("Message: " + messages);
@@ -109,7 +123,7 @@ public class NotificationConsumer {
             System.out.println("Type: " + type);
             log.info("Processing notificationType: {}", type);
             if (type.equals("TELEGRAM")) {
-                kafkaTemplate.send(TELEGRAM_TOPIC, notification.key(), notification.value());
+                kafkaTemplate.send(TELEGRAM_TOPIC, notification.key(), transactionHistoryDto);
                 log.info("Sent message to TELEGRAM_TOPIC: {}", notification.value());
 //            } else if (type.equals("EMAIL")) {
 //                kafkaTemplate.send(EMAIL_TOPIC, notification.key(), notification.value());

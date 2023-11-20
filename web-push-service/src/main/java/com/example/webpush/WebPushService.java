@@ -2,10 +2,12 @@ package com.example.webpush;
 
 import com.example.model.dto.ScheduleDto;
 import com.example.model.dto.TransactionHistoryDto;
+import com.example.model.entities.WebPushHistory;
 import com.example.model.request.PushNotificationRequest;
 import com.example.model.entities.UserSubscription;
 import com.example.model.request.WebConfigRequest;
 import com.example.repository.WebConfigRepository;
+import com.example.repository.WebPushHistoryRepository;
 import com.example.repository.WebRepository;
 import com.example.service.WebService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -42,16 +44,18 @@ public class WebPushService {
 
     private final WebRepository webRepository;
     private final WebConfigRepository webConfigRepository;
+    private final WebPushHistoryRepository webPushHistoryRepository;
 
     @Value("${vapid.private.key}")
     private String PRIVATE_KEY;
     @Value("${vapid.public.key}")
     private String PUBLIC_KEY;
 
-    public WebPushService(WebService webService, WebRepository webRepository, WebConfigRepository webConfigRepository) {
+    public WebPushService(WebService webService, WebRepository webRepository, WebConfigRepository webConfigRepository, WebPushHistoryRepository webPushHistoryRepository) {
         this.webService = webService;
         this.webRepository = webRepository;
         this.webConfigRepository = webConfigRepository;
+        this.webPushHistoryRepository = webPushHistoryRepository;
     }
 
     @PostConstruct
@@ -106,6 +110,11 @@ public class WebPushService {
         webRepository.deleteByEndpointContains(endpoint);
         String subscriptionPrefix = "https://fcm.googleapis.com/fcm/send/";
         System.out.println("Unsubscribed " + subscriptionPrefix + endpoint);
+    }
+
+    public void saveWebHistory(WebPushHistory webPushHistory) {
+        webPushHistory.setStatus("Delivered");
+        webPushHistoryRepository.save(webPushHistory);
     }
 
     public record Message(String title, TransactionHistoryDto body) {

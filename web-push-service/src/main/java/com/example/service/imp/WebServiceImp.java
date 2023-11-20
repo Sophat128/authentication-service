@@ -1,14 +1,13 @@
 package com.example.service.imp;
 
 import com.example.exception.NotFoundException;
-import com.example.model.entities.UserSubscription;
+import com.example.model.entities.BankAccount;
 import com.example.model.entities.WebDataConfig;
 import com.example.model.request.WebConfigRequest;
-import com.example.model.respone.BankAccountResponse;
+import com.example.model.respone.ApiResponse;
 import com.example.repository.WebConfigRepository;
 import com.example.repository.WebRepository;
 import com.example.service.WebService;
-import com.example.webpush.WebPushService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -51,11 +50,11 @@ public class WebServiceImp implements WebService {
 
     }
 
-    public BankAccountResponse getCustomerInfoByBankAccountNo(String accountNo){
+    public ApiResponse<BankAccount> getCustomerInfoByBankAccountNo(String accountNo){
         return webClient.baseUrl("http://client-event-service/api/v1/bank/customerInfo/" + accountNo)
                 .build()
                 .get()
-                .retrieve().bodyToMono(BankAccountResponse.class).block();
+                .retrieve().bodyToMono(ApiResponse.class).block();
     }
 
 
