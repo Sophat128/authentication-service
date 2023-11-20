@@ -26,7 +26,7 @@ public class TelegramBotInitializer {
     @PostConstruct
     public void init() {
         try {
-            telegramBotUserService.clearWebhook();
+//            telegramBotUserService.clearWebhook();
 
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
             try {

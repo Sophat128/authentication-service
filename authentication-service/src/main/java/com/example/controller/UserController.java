@@ -1,6 +1,6 @@
 package com.example.controller;
 
-import com.example.model.ProfileRequest;
+import com.example.model.request.ProfileRequest;
 import com.example.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -16,6 +16,7 @@ import java.util.UUID;
 @RestController
 @CrossOrigin
 @RequestMapping("api/v1/users")
+
 public class UserController {
 
     private final UserService userService;

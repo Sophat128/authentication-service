@@ -36,5 +36,7 @@ public class ValidationService {
     public void validAmount(BigDecimal amount) {
         Preconditions.checkNotNull(amount, "amount can not be null");
         Preconditions.checkArgument(!ValidationUtil.isNegative(amount), "amount can not be negative");
+        Preconditions.checkArgument(amount.compareTo(BigDecimal.ZERO) != 0, "amount can not be zero");
     }
+
 }

@@ -22,7 +22,7 @@ import java.util.Map;
 
 @Configuration
 @Slf4j
-public class KafkaConsumerConfig {
+public class  KafkaConsumerConfig {
     @Value("${spring.kafka.producer.bootstrap-servers}")
     private String bootstrapServers;
     @Value(value = "${spring.kafka.dead_letter_topic}")

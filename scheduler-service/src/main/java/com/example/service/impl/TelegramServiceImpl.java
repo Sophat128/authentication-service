@@ -1,7 +1,7 @@
 package com.example.service.impl;
 
 import com.example.exception.DownStreamServerException;
-import com.example.response.ApiResponse;
+import com.example.models.response.ApiResponse;
 import com.example.service.TelegramService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;

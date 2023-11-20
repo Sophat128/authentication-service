@@ -1,6 +1,7 @@
 package com.example.dao;
 
 import com.example.models.entity.MailSchedule;
+import com.example.models.request.MessageRequest;
 import com.example.models.request.Request;
 import org.quartz.JobDetail;
 import org.quartz.Trigger;
@@ -41,4 +42,5 @@ public interface MailScheduleDao {
 
     void validateLocalDateTimeWithZoneId(LocalDateTime localDateTime, String zoneId);
 
+    String createScheduleForAll(MessageRequest request, ZonedDateTime zonedDateTime);
 }

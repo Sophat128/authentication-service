@@ -1,6 +1,6 @@
 package com.example.service.implementation;
 
-import com.example.model.TelegramCreatedBot;
+import com.example.model.dto.TelegramCreatedBot;
 import com.example.repository.TelegramCreatedBotRepository;
 import com.example.request.TelegramCreatedBotRequest;
 import com.example.service.TelegramCreatedBotService;

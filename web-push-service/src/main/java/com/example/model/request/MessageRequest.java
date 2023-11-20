@@ -1,4 +1,4 @@
-package com.example.model;
+package com.example.model.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginRequest {
-	private String email;
-	private String password;
+public class MessageRequest {
+    private String message;
 }

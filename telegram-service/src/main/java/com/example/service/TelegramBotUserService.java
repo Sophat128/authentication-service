@@ -5,20 +5,24 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.config.TelegramUserConfig;
 import com.example.config.WebClientConfig;
-import com.example.model.BalanceDto;
-import com.example.dto.TransactionHistoryDto;
-import com.example.dto.UserDtoClient;
+import com.example.model.dto.BalanceDto;
 import com.example.exception.BadRequestException;
 import com.example.model.TelegramUser;
+import com.example.model.dto.ScheduleDto;
+import com.example.model.dto.TransactionHistoryDto;
+import com.example.model.dto.UserDtoClient;
+import com.example.model.response.ApiResponse;
 import com.example.repository.TelegramUserRepository;
 import com.vdurmont.emoji.EmojiParser;
 import javassist.NotFoundException;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updates.DeleteWebhook;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
@@ -81,6 +85,32 @@ public class TelegramBotUserService extends TelegramLongPollingBot {
            String emojiThanks = EmojiParser.parseToUnicode(":pray:");
            String emojiHeart = EmojiParser.parseToUnicode(":heart:");
 
+
+//           **************************************************************************
+           //codes in this block for popup url just a string when users click on button bind
+           if (update.hasCallbackQuery()) {
+               CallbackQuery callbackQuery = update.getCallbackQuery();
+               String callbackData = callbackQuery.getData();
+
+               // Check if the callback data starts with "bind_"
+               if (callbackData.startsWith("bind_")) {
+                   Long chatId = Long.valueOf(callbackData.substring("bind_".length()));
+                   String url = "http://localhost:4200/home/?chatId=" + chatId;
+
+                   SendMessage sendMessage = new SendMessage();
+                   sendMessage.setChatId(chatId);
+                   sendMessage.setText("Bind's link: " + url);
+
+                   try {
+                       execute(sendMessage);
+                   } catch (TelegramApiException e) {
+                       e.printStackTrace();
+                   }
+               }
+           }
+//           **************************************************************************
+
+
            if (update.hasMessage() && update.getMessage().hasText()) {
                Long chatId = update.getMessage().getChatId();
                String messageText = update.getMessage().getText().toLowerCase();
@@ -140,7 +170,18 @@ public class TelegramBotUserService extends TelegramLongPollingBot {
                             "Congratulations you have bind your account with KB Prasac Bank's account successfully " + emojiCongratulation + "\n" +
                             "Thank you for using our KB Prasac Bank Services " + emojiThanks
                     );
-                return telegramUserRepository.save(new TelegramUser(chatId, UUID.fromString(userId), true)).getIsSubscribed();
+                Boolean saveInDatabase = telegramUserRepository.save(new TelegramUser(chatId, UUID.fromString(userId), true)).getIsSubscribed();
+
+                String saveTelegramNotificationByUserIdUrl = "http://client-event-service/api/v1/clients/save-telegram-notification-by-userId";
+                WebClient saveTelegramNotificationByUserId = webClientConfig.webClientBuilder().baseUrl(saveTelegramNotificationByUserIdUrl).build();
+
+                saveTelegramNotificationByUserId.post()
+                        .uri("/{userId}", UUID.fromString(userId))
+                        .retrieve()
+                        .bodyToMono(BalanceDto.class)
+                        .block();
+
+                return saveInDatabase;
             }
             throw new NotFoundException("user id is not found");
         } catch (Exception e) {
@@ -153,9 +194,13 @@ public class TelegramBotUserService extends TelegramLongPollingBot {
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
         InlineKeyboardButton urlButton = new InlineKeyboardButton();
-        urlButton.setText("Bind account");
+        urlButton.setText("Go bind");
 
-        urlButton.setUrl("https://google.com/?chatId=" + chatId);
+//        can setUrl only https
+//        urlButton.setUrl("http://localhost:4200/home/?chatId=" + chatId);
+
+        //used for click bind button for popup angular url in localhost
+        urlButton.setCallbackData("bind_" + chatId);
 
         keyboard.add(Collections.singletonList(urlButton));
         markup.setKeyboard(keyboard);
@@ -227,16 +272,17 @@ public class TelegramBotUserService extends TelegramLongPollingBot {
         String getBankInfoByUserIdUrl = "http://client-event-service/api/v1/bank/bankInfo";
         WebClient getBankInfoByUserId = webClientConfig.webClientBuilder().baseUrl(getBankInfoByUserIdUrl).build();
 
-        BalanceDto balanceDto = getBankInfoByUserId.get()
+        ParameterizedTypeReference<ApiResponse<BalanceDto>> typeReference = new ParameterizedTypeReference<ApiResponse<BalanceDto>>() {};
+        ApiResponse<BalanceDto> balanceDto = getBankInfoByUserId.get()
                 .uri("/{userId}", userId)
                 .retrieve()
-                .bodyToMono(BalanceDto.class)
+                .bodyToMono(typeReference)
                 .block();
 
         System.out.println("object " + balanceDto);
 
-        String userAccountNumber = balanceDto.getBankAccountNumber();
-        BigDecimal userBalance = balanceDto.getCurrentBalance();
+        String userAccountNumber = balanceDto.getPayload().getBankAccountNumber();
+        BigDecimal userBalance = balanceDto.getPayload().getCurrentBalance();
 
         System.out.println("userBalance " + userBalance);
 
@@ -281,18 +327,42 @@ public class TelegramBotUserService extends TelegramLongPollingBot {
         }
     }
 
+
+
+    public void sendTextMessageSchedule(Long chatId, ScheduleDto scheduleDto) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        TransactionHistoryDto transactionHistoryDto = new TransactionHistoryDto();
+        UUID customerId = UUID.fromString(scheduleDto.getUserId());
+        transactionHistoryDto.setCustomerId(customerId);
+        sendMessage.setText(scheduleDto.getMessage());
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
     private String getFirstName(TransactionHistoryDto transactionHistoryDto) {
         UUID userId = transactionHistoryDto.getCustomerId();
+
+        System.out.println("userId: " + transactionHistoryDto.getCustomerId());
+
         String getCustomerByIdUrl = "http://client-event-service/api/v1/customers";
         WebClient getCustomerById = webClientConfig.webClientBuilder().baseUrl(getCustomerByIdUrl).build();
 
-        UserDtoClient userDtoClient = getCustomerById.get()
+        ParameterizedTypeReference<ApiResponse<UserDtoClient>> typeReference = new ParameterizedTypeReference<ApiResponse<UserDtoClient>>() {};
+        ApiResponse<UserDtoClient> userDtoClient = getCustomerById.get()
                 .uri("/{userId}", userId)
                 .retrieve()
-                .bodyToMono(UserDtoClient.class)
+                .bodyToMono(typeReference)
                 .block();
 
-        return userDtoClient != null ? userDtoClient.getFirstName() : "";
+        System.out.println("object: " + userDtoClient);
+
+        System.out.println("firstname: " + userDtoClient.getPayload().getFirstName());
+
+        return userDtoClient.getPayload().getFirstName();
     }
 
     private String getLastName(TransactionHistoryDto transactionHistoryDto) {
@@ -300,13 +370,14 @@ public class TelegramBotUserService extends TelegramLongPollingBot {
         String getCustomerByIdUrl = "http://client-event-service/api/v1/customers";
         WebClient getCustomerById = webClientConfig.webClientBuilder().baseUrl(getCustomerByIdUrl).build();
 
-        UserDtoClient userDtoClient = getCustomerById.get()
+        ParameterizedTypeReference<ApiResponse<UserDtoClient>> typeReference = new ParameterizedTypeReference<ApiResponse<UserDtoClient>>() {};
+        ApiResponse<UserDtoClient> userDtoClient = getCustomerById.get()
                 .uri("/{userId}", userId)
                 .retrieve()
-                .bodyToMono(UserDtoClient.class)
+                .bodyToMono(typeReference)
                 .block();
 
-        return userDtoClient != null ? userDtoClient.getLastName() : "";
+        return userDtoClient.getPayload().getLastName();
     }
 
     private String buildTransactionMessage(TransactionHistoryDto transactionHistoryDto, String firstName, String lastName,
@@ -316,22 +387,17 @@ public class TelegramBotUserService extends TelegramLongPollingBot {
         String receiverAccountNumber = transactionHistoryDto.getReceivedAccountNumber();
         String senderAccountNumber = transactionHistoryDto.getBankAccountNumber();
 
-        switch (transactionHistoryDto.getType()) {
-            case WITHDRAW:
-                return buildWithdrawMessage(firstName, lastName, emojiHeart, emojiThanks, emojiCheckmark, emojiKey, emojiDollar, amount, fromAccountNumber);
-
-            case SENDER:
-                return buildSenderMessage(firstName, lastName, emojiHeart, emojiThanks, emojiCheckmark, emojiKey, emojiDollar, amount, senderAccountNumber, receiverAccountNumber);
-
-            case RECEIVER:
-                return buildReceiverMessage(firstName, lastName, emojiHeart, emojiThanks, emojiCheckmark, emojiKey, emojiDollar, amount, senderAccountNumber, receiverAccountNumber);
-
-            case DEPOSIT:
-                return buildDepositMessage(firstName, lastName, emojiHeart, emojiThanks, emojiCheckmark, emojiKey, emojiDollar, amount, fromAccountNumber);
-
-            default:
-                return "";
-        }
+        return switch (transactionHistoryDto.getType()) {
+            case WITHDRAW ->
+                    buildWithdrawMessage(firstName, lastName, emojiHeart, emojiThanks, emojiCheckmark, emojiKey, emojiDollar, amount, fromAccountNumber);
+            case SENDER ->
+                    buildSenderMessage(firstName, lastName, emojiHeart, emojiThanks, emojiCheckmark, emojiKey, emojiDollar, amount, senderAccountNumber, receiverAccountNumber);
+            case RECEIVER ->
+                    buildReceiverMessage(firstName, lastName, emojiHeart, emojiThanks, emojiCheckmark, emojiKey, emojiDollar, amount, senderAccountNumber, receiverAccountNumber);
+            case DEPOSIT ->
+                    buildDepositMessage(firstName, lastName, emojiHeart, emojiThanks, emojiCheckmark, emojiKey, emojiDollar, amount, fromAccountNumber);
+            default -> "";
+        };
     }
 
     private String buildWithdrawMessage(String firstName, String lastName, String emojiHeart, String emojiThanks, String emojiCheckmark, String emojiKey, String emojiDollar,

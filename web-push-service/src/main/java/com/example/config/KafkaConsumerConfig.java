@@ -15,7 +15,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.CommonErrorHandler;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
-import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.util.backoff.FixedBackOff;
 
@@ -41,33 +40,17 @@ public class KafkaConsumerConfig {
     public KafkaConsumerConfig(KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
-//    @Bean
-//    public ConsumerFactory<String, String> consumerFactory() {
-//        Map<String, Object> props = new HashMap<>();
-//        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-//        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-//        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-//        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffset);
-//        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-//        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-//        return new DefaultKafkaConsumerFactory<>(props);
-//    }
-@Bean
-public ConsumerFactory<String, String> consumerFactory() {
-    Map<String, Object> props = new HashMap<>();
-    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class); // Use ErrorHandlingDeserializer for keys
-    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class); // Use ErrorHandlingDeserializer2 for values
-    props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
-    props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffset);
-    props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-
-    // Configure actual key and value deserializers
-    props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, StringDeserializer.class.getName());
-    props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class.getName());
-
-    return new DefaultKafkaConsumerFactory<>(props);
-}
+    @Bean
+    public ConsumerFactory<String, TransactionHistoryDto> consumerFactory() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffset);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        return new DefaultKafkaConsumerFactory<>(props);
+    }
 //    @Bean
 //    public ConsumerFactory<Object, TransactionResponse> consumerFactory() {
 //        Map<String, Object> props = new HashMap<>();
@@ -81,8 +64,8 @@ public ConsumerFactory<String, String> consumerFactory() {
 //    }
 
     @Bean("kafkaListenerContainerFactory")
-    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, String> concurrentKafkaListenerContainerFactory
+    public ConcurrentKafkaListenerContainerFactory<String, TransactionHistoryDto> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, TransactionHistoryDto> concurrentKafkaListenerContainerFactory
                 = new ConcurrentKafkaListenerContainerFactory<>();
         concurrentKafkaListenerContainerFactory.setConsumerFactory(consumerFactory());
         DeadLetterPublishingRecoverer deadLetterPublishingRecoverer =

@@ -1,6 +1,7 @@
 package com.example.controller;
 
-import com.example.model.TelegramCreatedBot;
+import com.example.model.dto.TelegramCreatedBot;
+import com.example.model.response.ApiResponse;
 import com.example.request.TelegramCreatedBotRequest;
 import com.example.service.TelegramCreatedBotService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/telegram/bots")
@@ -24,7 +24,12 @@ public class TelegramCreatedBotController {
     @Operation(summary = "we used only bot index 0 in database to send notifications")
     public ResponseEntity<?> getBots() {
         List<TelegramCreatedBot> telegramCreatedBot = telegramCreatedBotService.getBots();
-        return ResponseEntity.ok().body(telegramCreatedBot);
+        ApiResponse<List<TelegramCreatedBot>> response = ApiResponse.<List<TelegramCreatedBot>>builder()
+                .message("get bots successfully")
+                .status(HttpStatus.OK.value())
+                .payload(telegramCreatedBot)
+                .build();
+        return ResponseEntity.ok().body(response);
     }
 
 
@@ -34,13 +39,30 @@ public class TelegramCreatedBotController {
     public ResponseEntity<?> updateBot(@RequestBody TelegramCreatedBotRequest telegramCreatedBotRequest) {
         try {
             TelegramCreatedBot telegramCreatedBot = telegramCreatedBotService.updateBot(telegramCreatedBotRequest);
-            return ResponseEntity.ok().body("Bot updated successfully.");
+            ApiResponse<TelegramCreatedBot> response = ApiResponse.<TelegramCreatedBot>builder()
+                    .message("Bot updated successfully")
+                    .status(HttpStatus.OK.value())
+                    .payload(telegramCreatedBot)
+                    .build();
+            return ResponseEntity.ok().body(response);
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            ApiResponse<TelegramCreatedBot> errorResponse = ApiResponse.<TelegramCreatedBot>builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.NOT_FOUND.value())
+                    .build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            ApiResponse<TelegramCreatedBot> errorResponse = ApiResponse.<TelegramCreatedBot>builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST.value())
+                    .build();
+            return ResponseEntity.badRequest().body(errorResponse);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
+            ApiResponse<TelegramCreatedBot> errorResponse = ApiResponse.<TelegramCreatedBot>builder()
+                    .message("Internal Server Error")
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .build();
+            return ResponseEntity.internalServerError().body(errorResponse);
         }
     }
 

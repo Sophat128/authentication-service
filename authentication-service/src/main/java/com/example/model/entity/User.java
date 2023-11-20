@@ -1,10 +1,10 @@
 package com.example.model.entity;
 
+import com.example.model.dto.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.keycloak.representations.idm.UserRepresentation;
-import com.example.dto.UserDto;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -21,7 +21,7 @@ public class User {
     private LocalDateTime createdDate;
     private LocalDateTime lastModified;
 
-    public static UserDto toDto(UserRepresentation userRepresentation,String url) {
+    public static UserDto toDto(UserRepresentation userRepresentation, String url) {
         return new UserDto(
                 UUID.fromString(userRepresentation.getId()),
                 userRepresentation.getUsername(),

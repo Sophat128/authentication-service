@@ -3,6 +3,20 @@ server:
 baseUrl: http://localhost:${server.port}
 
 spring:
+
+  datasource:
+    url: jdbc:postgresql://8.219.131.180:8765/fintrack
+    username: root
+    password: P@SSWORD666
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
   mail:
     properties:
       mail:

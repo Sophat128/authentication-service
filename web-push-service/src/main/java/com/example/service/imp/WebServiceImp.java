@@ -45,7 +45,6 @@ public class WebServiceImp implements WebService {
     public WebDataConfig getConfig() {
         if (!webConfigRepository.findAll().isEmpty()) {
             return webConfigRepository.findAll().get(0);
-
         }else {
             throw new NotFoundException("There is no config for this!!");
         }

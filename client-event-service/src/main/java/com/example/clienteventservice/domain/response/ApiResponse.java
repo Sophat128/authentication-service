@@ -20,9 +20,10 @@ public class ApiResponse<T> {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T payload;
-    private Integer status;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private LoginResponse loginResponse;
+    private Integer status;
+
     public ApiResponse(String message, Integer status) {
         this.message = message;
         this.status = status;

@@ -3,11 +3,13 @@ package com.example.clienteventservice.service;
 import com.example.clienteventservice.domain.dto.TransactionHistoryDto;
 import com.example.clienteventservice.domain.model.BankAccount;
 import com.example.clienteventservice.domain.model.TransactionHistory;
+import com.example.clienteventservice.domain.response.ApiResponse;
 import com.example.clienteventservice.domain.type.StatementType;
 import com.example.clienteventservice.domain.type.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
@@ -29,24 +31,49 @@ public class WithdrawService {
 
     private final KafkaTemplate<String, TransactionHistoryDto> kafkaTemplate;
 
-    public void withdraw(String bankAccountNumber, BigDecimal amount) {
-        BankAccount bankAccount = bankAccountService.getBankAccount(bankAccountNumber);
-        transactionService.executeWithdraw(bankAccount, amount);
+    public ApiResponse<Void> withdraw(String bankAccountNumber, BigDecimal amount) {
+        try {
+            ApiResponse<BankAccount> bankAccountResponse = bankAccountService.getBankAccount(bankAccountNumber);
 
-        TransactionHistory transactionHistory = transactionService
-                .getTransactionHistoryBuilder(
-                     TransactionType.WITHDRAW,
-                        StatementType.EXPENSE,
-                        bankAccount,
-                        amount
-                ).build();
-        Message<TransactionHistoryDto> message = MessageBuilder
-                .withPayload(transactionHistory.toDto())
-                .setHeader(KafkaHeaders.TOPIC, "notification-test")
-                .build();
-        System.out.println("Message: " + message);
-        kafkaTemplate.send(message);
+            if (bankAccountResponse.getStatus() == HttpStatus.NOT_FOUND.value()) {
+                return ApiResponse.<Void>builder()
+                        .message("Bank account not found")
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .build();
+            }
 
+            BankAccount bankAccount = bankAccountResponse.getPayload();
+            transactionService.executeWithdraw(bankAccount, amount);
+
+            TransactionHistory transactionHistory = transactionService
+                    .getTransactionHistoryBuilder(
+                            TransactionType.WITHDRAW,
+                            StatementType.EXPENSE,
+                            bankAccount,
+                            amount
+                    ).build();
+
+            Message<TransactionHistoryDto> message = MessageBuilder
+                    .withPayload(transactionHistory.toDto())
+                    .setHeader(KafkaHeaders.TOPIC, "notification-service")
+                    .build();
+            kafkaTemplate.send(message);
+
+            return ApiResponse.<Void>builder()
+                    .message("Withdrawal successful")
+                    .status(HttpStatus.OK.value())
+                    .build();
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.<Void>builder()
+                    .message("Invalid amount: " + e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST.value())
+                    .build();
+        } catch (Exception e) {
+            return ApiResponse.<Void>builder()
+                    .message("Internal Server Error")
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .build();
+        }
     }
 
 }

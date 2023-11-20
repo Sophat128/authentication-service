@@ -6,7 +6,6 @@ import com.example.clienteventservice.service.DepositService;
 import com.example.clienteventservice.service.TransactionService;
 import com.example.clienteventservice.service.TransferService;
 import com.example.clienteventservice.service.WithdrawService;
-import com.example.clienteventservice.domain.response.ApiResponse;
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.*;
 import jakarta.validation.Valid;
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.clienteventservice.domain.response.ApiResponse;
 
 import java.util.List;
 
@@ -35,32 +35,35 @@ public class TransactionController {
 
     @ApiOperation(value = "Withdraw from an account")
     @PostMapping(value = "/withdraw/{bankAccountId}")
-    public ResponseEntity<?> withdraw(@ApiParam(value = "The ID of the bank account") @PathVariable(name = "bankAccountId") String bankAccountNumber,
-                                   @ApiParam(value = "The amount of the withdraw transaction") @RequestBody @Valid AmountDto amountDto) {
+    public ResponseEntity<?> withdraw(
+            @ApiParam(value = "The ID of the bank account") @PathVariable(name = "bankAccountId") String bankAccountNumber,
+            @ApiParam(value = "The amount of the withdraw transaction") @RequestBody @Valid AmountDto amountDto) {
         LOG.info("/{} called with amount: {}", bankAccountNumber, amountDto);
         Preconditions.checkNotNull(amountDto, "amountDto can not be null");
 
-        withdrawService.withdraw(bankAccountNumber, amountDto.getAmount());
+        ApiResponse<Void> withdrawResponse = withdrawService.withdraw(bankAccountNumber, amountDto.getAmount());
 
-        return ResponseEntity.ok(new ApiResponse<>("Withdraw successfully",  HttpStatus.OK.value()));
+        return ResponseEntity.status(withdrawResponse.getStatus())
+                .body(new ApiResponse<>("Withdraw " + withdrawResponse.getMessage(), withdrawResponse.getStatus()));
     }
 
     @ApiOperation(value = "Transfer money from an account to other account")
 
     @PostMapping(value = "/transfer/{fromBankAccountId}/{toBankAccountId}")
     @ResponseStatus(value = HttpStatus.OK)
-    public ResponseEntity<?> transfer(@ApiParam(value = "The ID of the from bank account") @PathVariable(name = "fromBankAccountId") String fromBankAccountNumber,
-                         @ApiParam(value = "The ID of the to bank account") @PathVariable(name = "toBankAccountId") String toBankAccountNumber,
-                         @ApiParam(value = "The amount of the withdraw transaction") @RequestBody @Valid AmountDto amountDto) {
+    public ResponseEntity<?> transfer(
+            @ApiParam(value = "The ID of the from bank account") @PathVariable(name = "fromBankAccountId") String fromBankAccountNumber,
+            @ApiParam(value = "The ID of the to bank account") @PathVariable(name = "toBankAccountId") String toBankAccountNumber,
+            @ApiParam(value = "The amount of the withdraw transaction") @RequestBody @Valid AmountDto amountDto) {
         LOG.info("/{}/{} called with amount: {}", fromBankAccountNumber, toBankAccountNumber, amountDto);
 
-        transferService.transfer(fromBankAccountNumber, toBankAccountNumber, amountDto.getAmount());
-        return ResponseEntity.ok(new ApiResponse<>("Transfer successfully", HttpStatus.OK.value()));
+        ApiResponse<Void> transferResponse = transferService.transfer(fromBankAccountNumber, toBankAccountNumber, amountDto.getAmount());
 
+        return ResponseEntity.status(transferResponse.getStatus())
+                .body(new ApiResponse<>("Transfer " + transferResponse.getMessage(), transferResponse.getStatus()));
     }
 
     @ApiOperation(value = "Deposit the money")
-
     @PostMapping(value = "/deposit/{accountNumber}")
     @ResponseStatus(value = HttpStatus.OK)
     public ResponseEntity<?> deposit(
@@ -68,20 +71,20 @@ public class TransactionController {
             @ApiParam(value = "The amount of the withdraw transaction") @RequestBody @Valid AmountDto amountDto) {
         LOG.info("/{} called with amount: {}", accountNumber, amountDto);
 
-        depositService.deposit(accountNumber, amountDto.getAmount());
-        return ResponseEntity.ok(new ApiResponse<>("Deposit successfully", HttpStatus.OK.value()));
+        ApiResponse<Void> depositResponse = depositService.deposit(accountNumber, amountDto.getAmount());
 
+        return ResponseEntity.status(depositResponse.getStatus())
+                .body(new ApiResponse<>("Deposit " + depositResponse.getMessage(), depositResponse.getStatus()));
     }
 
     @ApiOperation(value = "Get transaction history")
 
     @GetMapping(value = "/history/{bankAccountNumber}")
-    public ResponseEntity<?> getTransactionHistoryByAccountNumber(
-            @ApiParam(value = "The ID of the to bank account") @PathVariable(name = "bankAccountNumber") String bankAccountNumber) {
+    public ResponseEntity<ApiResponse<List<TransactionHistory>>> getTransactionHistoryByAccountNumber(
+            @ApiParam(value = "The bank account number") @PathVariable String bankAccountNumber) {
+        ApiResponse<List<TransactionHistory>> response = transactionService.getTransactionHistoryByAccountNumber(bankAccountNumber);
 
-       List<TransactionHistory> transactionHistories =  transactionService.getTransactionHistoryByAccountNumber(bankAccountNumber);
-        return ResponseEntity.ok(new ApiResponse<>("Get data successfully",transactionHistories, HttpStatus.OK.value()));
-
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
 

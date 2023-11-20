@@ -1,6 +1,6 @@
 package com.example.config;
 
-import com.example.model.TelegramCreatedBot;
+import com.example.model.dto.TelegramCreatedBot;
 import com.example.repository.TelegramCreatedBotRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
@@ -16,9 +16,9 @@ public class TelegramUserConfig {
 
     @PostConstruct
     public void addConfig() {
-        String botUsername = "FintrackAPIBot";
-        String botToken = "6666866418:AAGq-QFHKnhu55REjQv3xv6tfnNDca7xVxA";
-        String botLink = "https://t.me/FintrackAPIBot";
+        String botUsername = "fintrack_service_bot";
+        String botToken = "6887618611:AAEPYa0QOM_CA5j0BjaExgRC7qH6P7WP_Fo";
+        String botLink = "https://t.me/fintrack_service_bot";
 
         if (!existsByBotUsernameAndBotTokenAndBotLink(botUsername, botToken, botLink)) {
             try {

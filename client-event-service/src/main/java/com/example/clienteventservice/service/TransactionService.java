@@ -3,6 +3,7 @@ package com.example.clienteventservice.service;
 import com.example.clienteventservice.domain.event.TransactionHistorySaveEvent;
 import com.example.clienteventservice.domain.model.BankAccount;
 import com.example.clienteventservice.domain.model.TransactionHistory;
+import com.example.clienteventservice.domain.response.ApiResponse;
 import com.example.clienteventservice.domain.type.StatementType;
 import com.example.clienteventservice.domain.type.TransactionStatus;
 import com.example.clienteventservice.domain.type.TransactionType;
@@ -16,9 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -227,8 +226,28 @@ public class TransactionService {
         }
     }
 
-    public List<TransactionHistory> getTransactionHistoryByAccountNumber(String bankAccountNumber) {
+    public ApiResponse<List<TransactionHistory>> getTransactionHistoryByAccountNumber(String bankAccountNumber) {
+        try {
+            List<TransactionHistory> transactionHistoryList = transactionHistoryRepository.findByBankAccountNumberAndStatus(bankAccountNumber);
 
-        return transactionHistoryRepository.findByBankAccountNumberAndStatus(bankAccountNumber);
+            if (!transactionHistoryList.isEmpty()) {
+                return ApiResponse.<List<TransactionHistory>>builder()
+                        .message("Transaction history retrieved successfully")
+                        .status(HttpStatus.OK.value())
+                        .payload(transactionHistoryList)
+                        .build();
+            } else {
+                return ApiResponse.<List<TransactionHistory>>builder()
+                        .message("No transaction history found for the given bank account number")
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .build();
+            }
+        } catch (Exception e) {
+            return ApiResponse.<List<TransactionHistory>>builder()
+                    .message("Internal Server Error")
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .build();
+        }
     }
+
 }

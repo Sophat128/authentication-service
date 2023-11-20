@@ -1,10 +1,9 @@
 package com.example.service;
 
-import com.example.model.TelegramCreatedBot;
+import com.example.model.dto.TelegramCreatedBot;
 import com.example.request.TelegramCreatedBotRequest;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface TelegramCreatedBotService {
 

@@ -19,6 +19,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -34,10 +35,7 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -128,11 +126,32 @@ public class UserService {
     }
 
 
-    public List<UserDtoClient> getAllUsers() {
-        return keycloak.realm(realm).users().
-                list().stream()
-                .map(e -> User.toDto(e, url))
-                .toList();
+    public ApiResponse<List<UserDtoClient>> getAllUsers() {
+        try {
+            List<UserDtoClient> users = keycloak.realm(realm).users()
+                    .list().stream()
+                    .map(e -> User.toDto(e, url))
+                    .toList();
+
+            if (users.isEmpty()) {
+                return ApiResponse.<List<UserDtoClient>>builder()
+                        .message("No users found")
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .build();
+            }
+
+            return ApiResponse.<List<UserDtoClient>>builder()
+                    .message("Users retrieved successfully")
+                    .status(HttpStatus.OK.value())
+                    .payload(users)
+                    .build();
+
+        } catch (Exception e) {
+            return ApiResponse.<List<UserDtoClient>>builder()
+                    .message("Internal Server Error")
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .build();
+        }
     }
 
     public ApiResponse<?> create(UserRequest userRequest) {
@@ -169,7 +188,7 @@ public class UserService {
         emailService.sendSimpleMail(userRequest.getUsername(), userRequest.getEmail(), 1);
         return ApiResponse.<UserDtoClient>builder()
                 .message("register success..!")
-                .payload(getByEmail(userRequest.getEmail()))
+                .payload(getByEmail(userRequest.getEmail()).getPayload())
                 .status(200)
                 .build();
     }
@@ -272,9 +291,34 @@ public class UserService {
         return newUser;
     }
 
-    public UserDtoClient getByEmail(String email) {
-        return User.toDto(getUserRepresentationByEmail(email.trim()), url);
+    public ApiResponse<UserDtoClient> getByEmail(String email) {
+        try {
+            UserRepresentation userRepresentation = getUserRepresentationByEmail(email.trim());
+
+            if (userRepresentation == null) {
+                throw new NotFoundException("Email not found");
+            }
+
+            UserDtoClient userDto = User.toDto(userRepresentation, url);
+
+            return ApiResponse.<UserDtoClient>builder()
+                    .message("User retrieved successfully")
+                    .status(HttpStatus.OK.value())
+                    .payload(userDto)
+                    .build();
+        } catch (NotFoundException e) {
+            return ApiResponse.<UserDtoClient>builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.NOT_FOUND.value())
+                    .build();
+        } catch (Exception e) {
+            return ApiResponse.<UserDtoClient>builder()
+                    .message("Internal Server Error")
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .build();
+        }
     }
+
 
     public UserRepresentation getUserRepresentationByEmail(String email) {
         List<UserRepresentation> users = keycloak.realm(realm).users().searchByEmail(email, true);
@@ -302,12 +346,30 @@ public class UserService {
         }
     }
 
-    public UserDtoClient getByUserName(String username) {
-        List<UserRepresentation> user = keycloak.realm(realm).users().searchByUsername(username.trim(), true);
-        if (user.isEmpty()) {
-            throw new NotFoundException("username : " + username + " is not found..!!");
+    public ApiResponse<UserDtoClient> getByUserName(String username) {
+        try {
+            List<UserRepresentation> users = keycloak.realm(realm).users().searchByUsername(username.trim(), true);
+
+            if (users.isEmpty()) {
+                return ApiResponse.<UserDtoClient>builder()
+                        .message("Username not found")
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .build();
+            }
+
+            UserDtoClient userDto = User.toDto(users.get(0), url);
+
+            return ApiResponse.<UserDtoClient>builder()
+                    .message("User retrieved successfully")
+                    .status(HttpStatus.OK.value())
+                    .payload(userDto)
+                    .build();
+        } catch (Exception e) {
+            return ApiResponse.<UserDtoClient>builder()
+                    .message("Internal Server Error")
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .build();
         }
-        return User.toDto(user.get(0), url);
     }
 
     public ApiResponse<?> forgetPassword(String email, String newPassword) {
@@ -378,20 +440,66 @@ public class UserService {
             throw new NotFoundException("user id : " + id + " is not found");
         }
     }
-    public UserDtoClient getById(UUID id) {
-        return User.toDto(getUserRepresentationById(id), url);
+    public ApiResponse<UserDtoClient> getById(UUID id) {
+        try {
+            UserDtoClient userDto = User.toDto(getUserRepresentationById(id), url);
+
+            return ApiResponse.<UserDtoClient>builder()
+                    .message("User retrieved successfully")
+                    .status(HttpStatus.OK.value())
+                    .payload(userDto)
+                    .build();
+        } catch (NotFoundException e) {
+            return ApiResponse.<UserDtoClient>builder()
+                    .message("User not found")
+                    .status(HttpStatus.NOT_FOUND.value())
+                    .build();
+        } catch (Exception e) {
+            return ApiResponse.<UserDtoClient>builder()
+                    .message("Internal Server Error")
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .build();
+        }
     }
 
     public ApiResponse<?> getInfo(Principal principal) {
-        if (principal==null){
-            throw new ForbiddenException("need token");
+        try {
+            if (principal == null) {
+                throw new ForbiddenException("Token is required");
+            }
+
+            UUID userId = UUID.fromString(principal.getName());
+            UserRepresentation userRepresentation = getUserRepresentationById(userId);
+
+            if (userRepresentation == null) {
+                throw new NotFoundException("User not found");
+            }
+
+            UserDtoClient userDto = User.toDto(userRepresentation, url);
+
+            return ApiResponse.builder()
+                    .message("User information retrieved successfully")
+                    .payload(userDto)
+                    .status(HttpStatus.OK.value())
+                    .build();
+        } catch (ForbiddenException e) {
+            return ApiResponse.builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.FORBIDDEN.value())
+                    .build();
+        } catch (NotFoundException e) {
+            return ApiResponse.builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.NOT_FOUND.value())
+                    .build();
+        } catch (Exception e) {
+            return ApiResponse.builder()
+                    .message("Internal Server Error")
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .build();
         }
-        return ApiResponse.builder()
-                .message("get user by id success")
-                .payload(User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url))
-                .status(200)
-                .build();
     }
+
 
 
     public ApiResponse<?> updateById( ProfileRequest userRequest, Principal principal,Jwt jwt) {

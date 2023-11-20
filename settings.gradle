@@ -1,5 +1,5 @@
 rootProject.name = 'fintrack'
-include 'common'
+//include 'common'
 include 'authentication-service'
 include 'telegram-service'
 include 'notification-service'

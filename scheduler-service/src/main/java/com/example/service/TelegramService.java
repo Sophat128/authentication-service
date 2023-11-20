@@ -1,7 +1,7 @@
 package com.example.service;
 
 import com.example.exception.DownStreamServerException;
-import com.example.response.ApiResponse;
+import com.example.models.response.ApiResponse;
 import org.springframework.stereotype.Component;
 
 @Component

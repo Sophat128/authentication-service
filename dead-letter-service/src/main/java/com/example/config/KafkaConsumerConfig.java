@@ -1,6 +1,6 @@
 package com.example.config;
-import com.example.Notification;
 import com.example.constance.FailedMessage;
+import com.example.constance.Notification;
 import com.example.repository.FailedMessageRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

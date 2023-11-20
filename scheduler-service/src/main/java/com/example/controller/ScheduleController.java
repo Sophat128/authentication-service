@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.models.request.MessageRequest;
 import com.example.models.request.Request;
 import com.example.service.MailScheduleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,9 +22,15 @@ public class ScheduleController {
     private MailScheduleService mailScheduleService;
 
     @PostMapping("create")
-    @Operation(summary = "create schedule ( use 1 -> 23 h ) ")
+    @Operation(summary = "create schedule for specific user ( use 1 -> 23 h ) ")
     public ResponseEntity<?> createSchedule(@RequestBody Request request) {
         return ResponseEntity.ok().body(mailScheduleService.createSchedule(request));
+    }
+
+    @PostMapping("scheduleForAll")
+    @Operation(summary = "create schedule for all ( use 1 -> 23 h ) ")
+    public ResponseEntity<?> createScheduleForAllUser(@RequestBody MessageRequest request) {
+        return ResponseEntity.ok().body(mailScheduleService.createScheduleForAllUser(request));
     }
 
     @GetMapping("")

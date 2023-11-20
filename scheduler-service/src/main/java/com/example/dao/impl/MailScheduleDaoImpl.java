@@ -7,6 +7,7 @@ import com.example.exception.InternalServerException;
 import com.example.exception.NotFoundException;
 import com.example.jobs.MailScheduleJob;
 import com.example.models.entity.MailSchedule;
+import com.example.models.request.MessageRequest;
 import com.example.models.request.Request;
 
 import jakarta.transaction.Transactional;
@@ -120,6 +121,17 @@ public class MailScheduleDaoImpl implements MailScheduleDao {
                 throw new BadRequestException("Can not input in the current time.");
             }
         }
+    }
+
+    @Override
+    public String createScheduleForAll(MessageRequest request, ZonedDateTime zonedDateTime) {
+        Request data = new Request(request.getMessage(),request.getScheduledTime(),request.getZoneId());
+        String scheduleId = saveSchedule(data);
+        JobDetail jobDetail = getJobDetail(scheduleId, data);
+        Trigger simpleTrigger = getSimpleTrigger(jobDetail, zonedDateTime);
+        scheduleJob(jobDetail, simpleTrigger);
+        System.out.println("createSchedule for all user");
+        return scheduleId;
     }
 
     @Override

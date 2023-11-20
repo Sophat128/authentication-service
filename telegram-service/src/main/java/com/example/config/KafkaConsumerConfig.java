@@ -1,6 +1,6 @@
 package com.example.config;
 
-import com.example.dto.TransactionHistoryDto;
+import com.example.model.dto.TransactionHistoryDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.TopicPartition;

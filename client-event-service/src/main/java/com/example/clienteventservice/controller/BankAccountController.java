@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import com.example.clienteventservice.domain.response.ApiResponse;
 import java.util.stream.Collectors;
 
 /**
@@ -41,70 +42,88 @@ public class BankAccountController {
 
 
     @ApiOperation(value = "Create a new bank account with a credit card or debit card by given customerId")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 400, message = "Bad Request."),
-            @ApiResponse(code = 500, message = "Internal Error.")
-    })
     @PutMapping(value = "{customerId}")
-    @ResponseStatus(value = HttpStatus.OK)
-    public void saveAccount(@ApiParam(value = "The ID of the customer") @PathVariable(name = "customerId") UUID customerId,
-                            @ApiParam(value = "The number of the customer") @RequestBody BankAccountDto bankAccountDto) {
+    public ResponseEntity<?> saveAccount(
+            @ApiParam(value = "The ID of the customer") @PathVariable(name = "customerId") UUID customerId,
+            @ApiParam(value = "Bank account details") @RequestBody BankAccountDto bankAccountDto) {
         LOG.info("/{}/{} called with bankAccountDto: {}", SERVICE_PATH, customerId, bankAccountDto);
-        // we used checkArgument instead of checkNotNull because we want an IllegalArgumentException
-        Preconditions.checkArgument(bankAccountDto != null, "bankAccountDto can not be null");
-//        Preconditions.checkArgument(bankAccountDto.getCard() != null, "bankAccountDto.card can not be null");
 
-//        BankAccount bankAccount = conversionService.convert(bankAccountDto, BankAccount.class);
+        com.example.clienteventservice.domain.response.ApiResponse<BankAccount> response =
+                bankAccountService.addBankAccount(customerId, bankAccountDto);
 
-        bankAccountService.addBankAccount(customerId, bankAccountDto);
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
-    @ApiOperation(value = "Retrieves the current balances of all bank accounts", response = BalanceDto.class, responseContainer = "List")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK."),
-            @ApiResponse(code = 400, message = "Bad Request."),
-            @ApiResponse(code = 500, message = "Internal Error.")
-    })
-    @GetMapping(value = METHOD_GET_BALANCE_ALL)
-    public List<BalanceDto> getAllBalances() {
-        LOG.info("/{}{} called", SERVICE_PATH, METHOD_GET_BALANCE_ALL);
 
-        return bankAccountService.getBankAccountList().stream()
-                .map(bankAccount -> conversionService.convert(bankAccount, BalanceDto.class))
-                .collect(Collectors.toList());
+    @ApiOperation(value = "Retrieves the current balances of all bank accounts", response = BalanceDto.class, responseContainer = "List")
+    @GetMapping(value = METHOD_GET_BALANCE_ALL)
+    public ResponseEntity<?> getBankAccountList() {
+        ApiResponse<List<BankAccount>> response = bankAccountService.getBankAccountList();
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     @ApiOperation(value = "Retrieves the current balance of a bank account", response = BalanceDto.class, responseContainer = "List")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK."),
-            @ApiResponse(code = 400, message = "Bad Request."),
-            @ApiResponse(code = 500, message = "Internal Error.")
-    })
     @GetMapping(value = METHOD_GET_BALANCE_WITH_PARAM)
-    public BalanceDto getBalance(@ApiParam(value = "The ID of the bank account") @PathVariable(name = "bankAccountNumber") String bankAccountNumber) {
-        LOG.info("/{}{}/{} called", SERVICE_PATH, METHOD_GET_BALANCE, bankAccountNumber);
-        BankAccount bankAccount = bankAccountService.getBankAccount(bankAccountNumber);
-        return conversionService.convert(bankAccount, BalanceDto.class);
+    public ResponseEntity<?> getBalance(
+            @ApiParam(value = "The bank account number") @PathVariable String bankAccountNumber) {
+        ApiResponse<BankAccount> bankAccountResponse = bankAccountService.getBankAccount(bankAccountNumber);
+
+        if (bankAccountResponse.getStatus() == HttpStatus.OK.value()) {
+            BankAccount bankAccount = bankAccountResponse.getPayload();
+            BalanceDto balanceDto = conversionService.convert(bankAccount, BalanceDto.class);
+            return ResponseEntity.ok().body(ApiResponse.<BalanceDto>builder()
+                    .message("Balance retrieved successfully")
+                    .status(HttpStatus.OK.value())
+                    .payload(balanceDto)
+                    .build());
+        } else {
+            return ResponseEntity.status(bankAccountResponse.getStatus()).body(ApiResponse.<BalanceDto>builder()
+                    .message(bankAccountResponse.getMessage())
+                    .status(bankAccountResponse.getStatus())
+                    .build());
+        }
     }
 
     @ApiOperation(value = "Retrieves bank info with user id", response = BalanceDto.class, responseContainer = "List")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK."),
-            @ApiResponse(code = 400, message = "Bad Request."),
-            @ApiResponse(code = 500, message = "Internal Error.")
-    })
     @GetMapping("/bankInfo/{userId}")
-    public BalanceDto getAccountInfoByUserId(@ApiParam(value = "The ID of the bank account") @PathVariable(name = "userId") UUID userId) {
-        BankAccount bankAccount = bankAccountService.getBankAccountByUserId(userId);
-        return conversionService.convert(bankAccount, BalanceDto.class);
+    public ResponseEntity<?> getAccountInfoByUserId(
+            @ApiParam(value = "The user ID") @PathVariable UUID userId) {
+        ApiResponse<BankAccount> bankAccountResponse = bankAccountService.getBankAccountByUserId(userId);
+
+        if (bankAccountResponse.getStatus() == HttpStatus.OK.value()) {
+            BankAccount bankAccount = bankAccountResponse.getPayload();
+            BalanceDto balanceDto = conversionService.convert(bankAccount, BalanceDto.class);
+            return ResponseEntity.ok().body(ApiResponse.<BalanceDto>builder()
+                    .message("Account info retrieved successfully")
+                    .status(HttpStatus.OK.value())
+                    .payload(balanceDto)
+                    .build());
+        } else {
+            return ResponseEntity.status(bankAccountResponse.getStatus()).body(ApiResponse.<BalanceDto>builder()
+                    .message(bankAccountResponse.getMessage())
+                    .status(bankAccountResponse.getStatus())
+                    .build());
+        }
     }
 
     @ApiOperation(value = "Retrieves customer info with bank account number", response = BankAccount.class)
-
     @GetMapping("/customerInfo/{bankAccountNo}")
-    public ResponseEntity<?> getAccountInfoByUserId(@ApiParam(value = "The ID of the bank account") @PathVariable(name = "bankAccountNo") String bankAccountNo) {
-        BankAccount bankAccount = bankAccountService.getBankAccount(bankAccountNo);
-        return ResponseEntity.ok(bankAccount);
+    public ResponseEntity<?> getAccountInfoByUserId(
+            @ApiParam(value = "The bank account number") @PathVariable String bankAccountNo) {
+        ApiResponse<BankAccount> bankAccountResponse = bankAccountService.getBankAccount(bankAccountNo);
+
+        if (bankAccountResponse.getStatus() == HttpStatus.OK.value()) {
+            BankAccount bankAccount = bankAccountResponse.getPayload();
+            return ResponseEntity.ok(ApiResponse.<BankAccount>builder()
+                    .message("Account info retrieved successfully")
+                    .status(HttpStatus.OK.value())
+                    .payload(bankAccount)
+                    .build());
+        } else {
+            return ResponseEntity.status(bankAccountResponse.getStatus()).body(ApiResponse.<BankAccount>builder()
+                    .message(bankAccountResponse.getMessage())
+                    .status(bankAccountResponse.getStatus())
+                    .build());
+        }
     }
 
 

@@ -1,5 +1,7 @@
 plugins {
     id 'java'
+    id 'org.springframework.boot' version '3.1.4'
+    id 'io.spring.dependency-management' version '1.1.3'
 }
 
 group 'com.example'
@@ -8,6 +10,9 @@ version '0.0.1-SNAPSHOT'
 repositories {
     mavenCentral()
 }
+ext {
+        set('springCloudVersion', "2022.0.4")
+    }
 
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.9.1')
@@ -64,7 +69,7 @@ dependencies {
     implementation 'org.hibernate.validator:hibernate-validator:7.0.1.Final' // Use the latest version
 
 
-    implementation(project(":common"))
+//    implementation(project(":common"))
 
 
     implementation 'org.keycloak:keycloak-admin-client:21.0.1'
@@ -75,10 +80,18 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
     implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
 
 
 
 }
+
+dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
 
 test {
     useJUnitPlatform()

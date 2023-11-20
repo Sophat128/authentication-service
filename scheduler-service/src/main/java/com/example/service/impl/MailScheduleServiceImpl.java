@@ -5,6 +5,7 @@ import com.example.exception.BadRequestException;
 import com.example.exception.NotFoundException;
 import com.example.mapper.ScheduleMapper;
 import com.example.models.entity.MailSchedule;
+import com.example.models.request.MessageRequest;
 import com.example.models.request.Request;
 import com.example.models.response.ApiResponse;
 import com.example.service.MailScheduleService;
@@ -136,6 +137,19 @@ public class MailScheduleServiceImpl implements MailScheduleService {
                 throw new BadRequestException("Can not input in the current time.");
             }
         }
+    }
+
+    @Override
+    public Object createScheduleForAllUser(MessageRequest request) {
+        parseDateTime(String.valueOf(request.getScheduledTime()));
+        isNotNullOrEmpty(request.getMessage(), "message");
+        isValidZoneId(request.getZoneId());
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(request.getScheduledTime(), ZoneId.of(request.getZoneId()));
+
+        validateLocalDateTimeWithZoneId(request.getScheduledTime(), request.getZoneId());
+        String scheduleId = mailScheduleDao.createScheduleForAll(request, zonedDateTime);
+        return new ApiResponse<>("create schedule success", ScheduleMapper.messageDto(getScheduleById(Long.valueOf(scheduleId))), HttpStatus.OK.value(), true);
+
     }
 
     public static void isValidZoneId(String zoneIdString) {

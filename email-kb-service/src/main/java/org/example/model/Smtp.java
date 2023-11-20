@@ -25,11 +25,11 @@ public class Smtp {
     private String username;
     @Column(name = "password", length = 100, nullable = false)
     private String password;
-    @Column(name = "user_id",nullable = false)
-    private UUID userId;
+//    @Column(name = "user_id",nullable = false)
+//    private UUID userId;
 
-    public SmtpDto toDto(UserDto userDto){
-      return new SmtpDto(this.id,this.username,userDto);
+    public SmtpDto toDto(){
+      return new SmtpDto(this.id,this.username);
     }
 
 
